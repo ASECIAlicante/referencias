@@ -14223,133 +14223,130 @@
   var homeBtn = document.querySelector('.nav-btn-home');
 
   var APPLE_ON_THIS_DAY = {
-    '01-03': [{ y: 1977, t: 'Apple se constituye legalmente como Apple Computer Company' }],
-    '01-05': [{ y: 2000, t: 'se presenta iTools, el germen de los futuros .Mac, MobileMe e iCloud, y se nombra a Steve Jobs como CEO oficial' }],
-    '01-06': [{ y: 2004, t: 'se presenta el iPod mini' }],
-    '01-07': [
-      { y: 2002, t: 'se presenta el iMac G4, con su icónica pantalla giratoria sobre base semiesférica, y iPhoto' },
-      { y: 2003, t: 'se presenta el router AirPort Extreme' }
-    ],
-    '01-09': [
-      { y: 2001, t: 'se presentan iTunes 1.0 y el PowerBook G4 de titanio en el Macworld de San Francisco' },
-      { y: 2007, t: 'Steve Jobs presenta el primer iPhone en el Macworld de San Francisco y se cambia oficialmente el nombre a Apple Inc.' }
-    ],
-    '01-10': [{ y: 2006, t: 'se presentan los primeros Mac con procesador Intel, el iMac y el MacBook Pro' }],
-    '01-11': [{ y: 2005, t: 'se presentan el Mac mini y el iPod shuffle' }],
-    '01-15': [{ y: 2008, t: 'se presenta el primer MacBook Air, que Steve Jobs sacó de un sobre de papel sobre el escenario' }],
-    '01-18': [{ y: 2023, t: 'se presenta el HomePod de 2ª generación' }],
-    '01-19': [{ y: 1983, t: 'se anuncia el Apple Lisa, el primer ordenador personal con interfaz gráfica y ratón de Apple' }],
-    '01-20': [{ y: 2003, t: 'se presenta el PowerBook G4 de 17 pulgadas y iLife' }],
-    '01-24': [{ y: 1984, t: 'se presenta el primer Macintosh, dos días después del mítico anuncio "1984" emitido durante la Super Bowl' }],
-    '01-27': [{ y: 2010, t: 'Steve Jobs presenta el primer iPad' }],
-    '02-24': [{ y: 1955, t: 'nace Steve Jobs en San Francisco' }],
-    '03-04': [{ y: 2026, t: 'presentación oficial del MacBook Neo, el ordenador portátil ultraligero y accesible impulsado por el chip A18 Pro' }],
-    '03-06': [{ y: 2008, t: 'anuncio del iPhone SDK y las bases de la App Store' }],
-    '03-08': [{ y: 2022, t: 'se presentan el Mac Studio, el Studio Display, el chip M1 Ultra y el iPhone SE de 3ª generación en el evento "Peek Performance"' }],
-    '03-09': [{ y: 2015, t: 'se presenta el MacBook de 12 pulgadas y se detallan precio y fecha del Apple Watch en el evento "Spring Forward"' }],
-    '03-20': [{ y: 2019, t: 'se presenta la 2ª generación de AirPods' }],
-    '03-21': [{ y: 2016, t: 'se presenta el iPhone SE de 1ª generación en el evento "Let Us Loop You In"' }],
-    '03-24': [{ y: 2001, t: 'se lanza Mac OS X 10.0 "Cheetah", la primera versión pública del sistema' }],
-    '03-25': [{ y: 2019, t: 'se presentan Apple Card, Apple Arcade, Apple News+ y Apple TV+ en el evento "It\'s show time"' }],
-    '04-01': [{ y: 1976, t: 'Steve Jobs, Steve Wozniak y Ronald Wayne fundan Apple y presentan de forma informal el Apple I en el Homebrew Computer Club' }],
-    '04-15': [{ y: 2020, t: 'se presenta el iPhone SE de 2ª generación' }],
-    '04-16': [{ y: 1977, t: 'se presenta el Apple II en la West Coast Computer Faire de San Francisco' }],
-    '04-28': [{ y: 2003, t: 'abre sus puertas la iTunes Music Store' }],
-    '05-06': [{ y: 1998, t: 'se anuncia el iMac original (G3), con su icónico diseño translúcido' }],
-    '05-16': [{ y: 2006, t: 'se presenta el primer MacBook de policarbonato, que sustituye al iBook' }],
-    '05-19': [{ y: 2001, t: 'abren las dos primeras Apple Store, en Tysons Corner y Glendale' }],
-    '05-29': [{ y: 1992, t: 'John Sculley presenta el Newton MessagePad, el primer PDA de Apple, en el Consumer Electronics Show de Chicago' }],
-    '06-02': [{ y: 2014, t: 'Apple presenta el lenguaje de programación Swift en la WWDC' }],
-    '06-03': [{ y: 2019, t: 'se presenta iPadOS (separándolo de iOS), la 3ª generación del Mac Pro y el monitor Pro Display XDR en la WWDC' }],
-    '06-05': [
-      { y: 2017, t: 'se presentan el HomePod, el iMac Pro y los nuevos sistemas operativos en la WWDC' },
-      { y: 2023, t: 'Apple presenta el Mac Pro con Apple Silicon y el visor Vision Pro con visionOS en la WWDC' }
-    ],
-    '06-06': [
-      { y: 2005, t: 'se anuncia oficialmente la transición de procesadores PowerPC a Intel' },
-      { y: 2011, t: 'Apple anuncia iCloud en la WWDC' },
-      { y: 2022, t: 'se presenta el MacBook Air con chip M2 en la WWDC' }
-    ],
-    '06-07': [{ y: 2010, t: 'se presenta el iPhone 4, FaceTime y la pantalla Retina en la WWDC' }],
-    '06-08': [{ y: 2015, t: 'se presenta oficialmente el servicio de streaming Apple Music en la WWDC' }],
-    '06-09': [
-      { y: 2008, t: 'se presenta el iPhone 3G, MobileMe y la App Store pública en la WWDC' },
-      { y: 2025, t: 'revelación del nuevo lenguaje visual Liquid Glass y la unificación de versiones de software' }
-    ],
-    '06-10': [
-      { y: 2013, t: 'se presenta el nuevo Mac Pro de diseño cilíndrico en la WWDC' },
-      { y: 2024, t: 'se presenta Apple Intelligence, la plataforma de inteligencia artificial generativa, en la WWDC' }
-    ],
-    '06-11': [{ y: 2012, t: 'se presentan los MacBook Pro con pantalla Retina en la WWDC' }],
-    '06-22': [{ y: 2020, t: 'anuncio histórico en la WWDC del cambio hacia los chips propios Apple Silicon' }],
-    '06-30': [{ y: 2015, t: 'se lanza Apple Music en todo el mundo' }],
-    '07-10': [{ y: 2008, t: 'se lanza oficialmente la App Store con 500 aplicaciones disponibles' }],
-    '07-19': [{ y: 2000, t: 'se presenta el Power Mac G4 Cube' }],
-    '07-21': [{ y: 1999, t: 'se presentan el iBook y la tecnología AirPort, con Steve Jobs atravesando un aro con el portátil' }],
-    '08-02': [{ y: 2018, t: 'Apple se convierte en la primera empresa cotizada en superar el billón de dólares de valor en bolsa' }],
-    '08-06': [{ y: 1997, t: 'Steve Jobs anuncia la inversión de 150 millones de dólares de Microsoft en el Macworld de Boston' }],
-    '08-07': [{ y: 2006, t: 'se presenta el primer Mac Pro con procesador Intel' }],
-    '08-24': [{ y: 2011, t: 'Steve Jobs renuncia como CEO de Apple y Tim Cook toma el relevo' }],
-    '09-01': [{ y: 2010, t: 'se presenta la 2ª generación de Apple TV en el evento "Back to the Rock"' }],
-    '09-05': [{ y: 2007, t: 'se presentan el iPod touch y el renovado iPod classic' }],
-    '09-07': [
-      { y: 2005, t: 'se presenta el primer iPod nano' },
-      { y: 2016, t: 'se presenta el iPhone 7 (eliminando el conector jack) y la primera generación de AirPods' },
-      { y: 2022, t: 'se presentan la familia iPhone 14, la vuelta del modelo Plus, los AirPods Pro de 2ª generación y el Apple Watch Ultra en el evento "Far Out"' }
-    ],
-    '09-09': [
-      { y: 2014, t: 'Apple presenta el Apple Watch, Apple Pay y los iPhone 6 y 6 Plus' },
-      { y: 2015, t: 'se presentan el iPhone 6s, el nuevo Apple TV con tvOS, el iPad Pro y el Apple Pencil en el evento "Hey Siri"' },
-      { y: 2024, t: 'se presenta el iPhone 16 en el evento "It\'s Glowtime"' },
-      { y: 2025, t: 'se presentan la familia iPhone 17, el iPhone Air (el teléfono más fino de la historia) y los AirPods Pro 3 en el evento "Awe Dropping"' }
-    ],
-    '09-10': [
-      { y: 2013, t: 'se presenta el iPhone 5s con sensor Touch ID y el chip A7, junto al iPhone 5c' },
-      { y: 2019, t: 'se presentan los primeros iPhone 11 Pro y 11 Pro Max en el evento "By Innovation Only"' }
-    ],
-    '09-12': [
-      { y: 2006, t: 'se presenta el iTV (nombre en clave del futuro Apple TV) en el evento "It\'s Showtime"' },
-      { y: 2012, t: 'se presenta el iPhone 5' },
-      { y: 2017, t: 'inauguración del Steve Jobs Theater con la presentación del iPhone X (Face ID y notch), el iPhone 8 y el Apple TV 4K' },
-      { y: 2018, t: 'se presentan el iPhone XS, el iPhone XR y el Apple Watch Series 4 (con ECG) en el evento "Gather Round"' },
-      { y: 2023, t: 'se presenta el iPhone 15 en el evento "Wonderlust"' }
-    ],
-    '09-13': [{ y: 2000, t: 'se lanza la beta pública de Mac OS X' }],
-    '09-14': [{ y: 2021, t: 'se presenta el iPhone 13 en el evento "California Streaming"' }],
-    '09-17': [{ y: 1985, t: 'Steve Jobs dimite de Apple tras perder una disputa interna de poder' }],
-    '09-18': [{ y: 2013, t: 'se lanza iOS 7, el mayor rediseño visual de la historia de iOS' }],
-    '09-19': [{ y: 2019, t: 'se lanza el servicio de videojuegos Apple Arcade' }],
-    '09-20': [{ y: 2016, t: 'se lanza macOS Sierra, la primera versión bajo la nomenclatura "macOS"' }],
-    '10-04': [{ y: 2011, t: 'se presenta el iPhone 4S junto con el asistente virtual Siri' }],
-    '10-05': [{ y: 2011, t: 'fallece Steve Jobs a los 56 años' }],
-    '10-12': [{ y: 2005, t: 'se presenta el primer iPod video (5ª generación)' }],
-    '10-13': [{ y: 2020, t: 'se presentan la familia iPhone 12 (incluyendo el formato compacto mini) y el HomePod mini en el evento "Hi, Speed"' }],
-    '10-16': [
-      { y: 2003, t: 'se lanza iTunes para Windows' },
-      { y: 2014, t: 'se lanza OS X Yosemite' }
-    ],
-    '10-18': [{ y: 2021, t: 'se presentan los MacBook Pro con chips M1 Pro y M1 Max, y los AirPods de 3ª generación en el evento "Unleashed"' }],
-    '10-21': [{ y: 1991, t: 'Apple presenta los primeros PowerBook (100, 140 y 170)' }],
-    '10-22': [{ y: 2013, t: 'se presentan el iPad Air de 1ª generación y el iPad mini 2 con Touch ID' }],
-    '10-23': [
-      { y: 2001, t: 'se anuncia el primer iPod clásico' },
-      { y: 2012, t: 'se presenta el primer iPad mini' }
-    ],
-    '10-27': [{ y: 2016, t: 'se presentan los MacBook Pro con Touch Bar y Touch ID integrado en el teclado en el evento "Hello Again"' }],
-    '10-28': [{ y: 2019, t: 'se presentan mediante nota de prensa los primeros AirPods Pro' }],
-    '10-30': [
-      { y: 2018, t: 'se presenta el iPad Pro de 3ª generación, el primer iPad con Face ID y sin botón de inicio' },
-      { y: 2020, t: 'se lanza el servicio de suscripciones Apple One' }
-    ],
-    '11-01': [{ y: 2019, t: 'se lanza el servicio de streaming Apple TV+' }],
-    '11-10': [
-      { y: 1997, t: 'abre la tienda online Apple Store' },
-      { y: 2020, t: 'Apple presenta los primeros Mac con chip M1, su primer procesador propio' }
-    ],
-    '12-08': [{ y: 2020, t: 'se presentan los auriculares de diadema AirPods Max' }],
-    '12-12': [{ y: 1980, t: 'Apple sale a bolsa en el NASDAQ' }],
-    '12-14': [{ y: 2020, t: 'se lanza el servicio Apple Fitness+' }]
-  };
+  '01-03': [{ y: 1977, t: 'Apple se constituye legalmente como Apple Computer Company.' }],
+  '01-05': [{ y: 2000, t: 'Se presenta iTools y se nombra a Steve Jobs como CEO oficial.' }],
+  '01-06': [{ y: 2004, t: 'Se presenta el primer iPod mini.' }],
+  '01-07': [
+    { y: 2002, t: 'Se presentan el iMac G4 (con su icónica pantalla giratoria sobre base semiesférica) y iPhoto.' },
+    { y: 2003, t: 'Se presenta el primer AirPort Extreme.' }
+  ],
+  '01-09': [
+    { y: 2001, t: 'Se presentan iTunes 1.0 y el PowerBook G4 de titanio en el Macworld de San Francisco.' },
+    { y: 2007, t: 'Steve Jobs presenta el primer iPhone en el Macworld de San Francisco y se cambia oficialmente el nombre a Apple Inc.' }
+  ],
+  '01-10': [{ y: 2006, t: 'Se presentan los primeros Mac con procesador Intel, el iMac y el MacBook Pro.' }],
+  '01-11': [{ y: 2005, t: 'Se presentan el Mac mini y el primer iPod shuffle.' }],
+  '01-15': [{ y: 2008, t: 'Se presenta el primer MacBook Air, que Steve Jobs sacó de un sobre de papel sobre el escenario.' }],
+  '01-18': [{ y: 2023, t: 'Se presenta el HomePod de 2ª generación.' }],
+  '01-19': [{ y: 1983, t: 'Se anuncia el Apple Lisa, el primer ordenador personal con interfaz gráfica y ratón de Apple.' }],
+  '01-20': [{ y: 2003, t: 'Se presenta el PowerBook G4 de 17 pulgadas y iLife.' }],
+  '01-24': [{ y: 1984, t: 'Se presenta el Macintosh, dos días después del mítico anuncio "1984" emitido durante la Super Bowl.' }],
+  '01-27': [{ y: 2010, t: 'Steve Jobs presenta el primer iPad.' }],
+  '03-04': [{ y: 2026, t: 'Presentación oficial del MacBook Neo, el ordenador portátil ultraligero y accesible impulsado por el chip A18 Pro.' }],
+  '03-06': [{ y: 2008, t: 'Anuncio del iPhone SDK y las bases de la App Store.' }],
+  '03-08': [{ y: 2022, t: 'Se presentan el primer Mac Studio, el Studio Display, el chip M1 Ultra y el iPhone SE de 3ª generación en el evento "Peek Performance".' }],
+  '03-09': [{ y: 2015, t: 'Se presenta el MacBook de 12 pulgadas y se detallan precio y fecha del Apple Watch en el evento "Spring Forward".' }],
+  '03-20': [{ y: 2019, t: 'Se presenta la 2ª generación de AirPods.' }],
+  '03-21': [{ y: 2016, t: 'Se presenta el iPhone SE de 1ª generación en el evento "Let Us Loop You In".' }],
+  '03-24': [{ y: 2001, t: 'Se lanza Mac OS X 10.0 "Cheetah", la primera versión pública del nuevo sistema operativo que cerraba definitivamente la etapa de Mac OS 9 y estrenaba la arquitectura moderna basada en UNIX..' }],
+  '03-25': [{ y: 2019, t: "Se presentan la Apple Card, Apple Arcade, Apple News+ y Apple TV+ en el evento \"It's show time\"." }],
+  '04-01': [{ y: 1976, t: 'Steve Jobs, Steve Wozniak y Ronald Wayne fundan Apple y presentan de forma informal el Apple I en el Homebrew Computer Club.' }],
+  '04-15': [{ y: 2020, t: 'Se presenta el iPhone SE de 2ª generación.' }],
+  '04-16': [{ y: 1977, t: 'Se presenta el Apple II en la West Coast Computer Faire de San Francisco.' }],
+  '04-28': [{ y: 2003, t: 'Abre sus puertas la iTunes Music Store.' }],
+  '05-06': [{ y: 1998, t: 'Se anuncia el iMac original (G3), con su icónico diseño translúcido.' }],
+  '05-16': [{ y: 2006, t: 'Se presenta el primer MacBook de policarbonato, que sustituye al iBook.' }],
+  '05-19': [{ y: 2001, t: 'Abren las dos primeras Apple Store del mundo, en Tysons Corner y Glendale.' }],
+  '05-29': [{ y: 1992, t: 'John Sculley presenta el Newton MessagePad, el primer PDA de Apple, en el Consumer Electronics Show de Chicago.' }],
+  '06-02': [{ y: 2014, t: 'Apple presenta el lenguaje de programación Swift en la WWDC.' }],
+  '06-03': [{ y: 2019, t: 'Se presenta iPadOS (separándolo de iOS), la 3ª generación del Mac Pro y el monitor Pro Display XDR en la WWDC.' }],
+  '06-05': [
+    { y: 2017, t: 'Se presentan el primer HomePod, el iMac Pro y los nuevos sistemas operativos en la WWDC.' },
+    { y: 2023, t: 'Apple presenta el primer Mac Pro con Apple Silicon y el visor Vision Pro con visionOS en la WWDC.' }
+  ],
+  '06-06': [
+    { y: 2005, t: 'Se anuncia oficialmente la histórica transición de procesadores PowerPC a Intel.' },
+    { y: 2011, t: 'Apple anuncia iCloud en la WWDC.' },
+    { y: 2022, t: 'Se presenta el MacBook Air con chip M2 en la WWDC.' }
+  ],
+  '06-07': [{ y: 2010, t: 'Se presenta el iPhone 4, FaceTime y la pantalla Retina en la WWDC.' }],
+  '06-08': [
+    { y: 2008, t: 'Se presenta el iPhone 3G, MobileMe y la App Store pública en la WWDC.' },
+    { y: 2015, t: 'Se presenta oficialmente el servicio de streaming Apple Music en la WWDC.' }
+  ],
+  '06-10': [
+    { y: 2013, t: 'Se presenta el nuevo Mac Pro de diseño cilíndrico en la WWDC.' },
+    { y: 2024, t: 'Se presenta Apple Intelligence, la plataforma de inteligencia artificial generativa, en la WWDC.' }
+  ],
+  '06-11': [{ y: 2012, t: 'Se presentan los MacBook Pro con pantalla Retina en la WWDC.' }],
+  '06-22': [{ y: 2020, t: 'Anuncio histórico en la WWDC del cambio hacia los chips propios Apple Silicon.' }],
+  '06-30': [{ y: 2015, t: 'Se lanza globalmente Apple Music.' }],
+  '07-10': [{ y: 2008, t: 'Se lanza oficialmente la App Store con 500 aplicaciones disponibles.' }],
+  '07-19': [{ y: 2000, t: 'Se presenta el Power Mac G4 Cube.' }],
+  '07-21': [{ y: 1999, t: 'Se presentan el iBook y la tecnología AirPort, con Steve Jobs atravesando un aro con el portátil.' }],
+  '08-02': [{ y: 2018, t: 'Apple se convierte en la primera empresa cotizada en superar el billón de dólares de valor en bolsa.' }],
+  '08-06': [{ y: 1997, t: 'Steve Jobs anuncia la inversión de 150 millones de dólares de Microsoft en el Macworld de Boston.' }],
+  '08-07': [{ y: 2006, t: 'Se presenta el primer Mac Pro con procesador Intel.' }],
+  '08-24': [{ y: 2011, t: 'Steve Jobs renuncia como CEO de Apple y Tim Cook toma el relevo.' }],
+  '09-01': [{ y: 2010, t: 'Se presenta la 2ª generación de Apple TV en el evento "Back to the Rock".' }],
+  '09-05': [{ y: 2007, t: 'Se presentan el primer iPod touch y el renovado iPod classic.' }],
+  '09-07': [
+    { y: 2005, t: 'Se presenta el primer iPod nano.' },
+    { y: 2016, t: 'Se presenta el iPhone 7 (eliminando el conector jack) y la primera generación de AirPods.' },
+    { y: 2022, t: 'Se presentan la familia iPhone 14, la vuelta del modelo Plus, los AirPods Pro de 2ª generación y el primer Apple Watch Ultra en el evento "Far Out".' }
+  ],
+  '09-09': [
+    { y: 2014, t: 'Apple presenta el primer Apple Watch, Apple Pay y los iPhone 6 y 6 Plus.' },
+    { y: 2015, t: 'Se presentan el iPhone 6s, el nuevo Apple TV con tvOS, el primer iPad Pro y el primer Apple Pencil en el evento "Hey Siri".' },
+    { y: 2024, t: 'Se presenta el iPhone 16 en el evento "It\'s Glowtime".' },
+    { y: 2025, t: 'Se presentan la familia iPhone 17, el iPhone Air (el teléfono más fino de la historia) y los AirPods Pro 3 en el evento "Awe Dropping".' }
+  ],
+  '09-10': [
+    { y: 2013, t: 'Se presenta el iPhone 5s con sensor Touch ID y el chip A7, junto al iPhone 5c.' },
+    { y: 2019, t: 'Se presentan los primeros “Pro”, con los iPhone 11 Pro y 11 Pro Max en el evento "By Innovation Only".' }
+  ],
+  '09-12': [
+    { y: 2006, t: 'Se presenta el iTV (nombre en clave del futuro Apple TV) en el evento "It\'s Showtime".' },
+    { y: 2012, t: 'Se presenta el iPhone 5.' },
+    { y: 2017, t: 'Inauguración del Steve Jobs Theater con la presentación del iPhone X (Face ID y notch), el iPhone 8 y el Apple TV 4K.' },
+    { y: 2018, t: 'Se presentan el iPhone XS, el iPhone XR y el Apple Watch Series 4 (el primeros con ECG) en el evento "Gather Round".' },
+    { y: 2023, t: 'Se presenta el iPhone 15 en el evento "Wonderlust".' }
+  ],
+  '09-13': [{ y: 2000, t: 'Se lanza la beta pública de Mac OS X.' }],
+  '09-14': [{ y: 2021, t: 'Se presenta el iPhone 13 en el evento "California Streaming".' }],
+  '09-18': [{ y: 2013, t: 'Se lanza iOS 7, el mayor rediseño visual de la historia de iOS.' }],
+  '09-19': [{ y: 2019, t: 'Se lanza el servicio de videojuegos Apple Arcade.' }],
+  '09-20': [{ y: 2016, t: 'Se lanza macOS Sierra, la primera versión bajo la nomenclatura "macOS".' }],
+  '10-04': [{ y: 2011, t: 'Se presenta el iPhone 4S junto con el asistente virtual Siri.' }],
+  '10-05': [{ y: 2011, t: 'Fallece Steve Jobs a los 56 años.' }],
+  '10-12': [{ y: 2005, t: 'Se presenta el primer iPod video (5ª generación).' }],
+  '10-13': [{ y: 2020, t: 'Se presentan la familia iPhone 12 (incluyendo el formato compacto mini) y el primer HomePod mini en el evento "Hi, Speed".' }],
+  '10-16': [
+    { y: 2003, t: 'Se lanza iTunes para Windows.' },
+    { y: 2014, t: 'Se lanza OS X Yosemite.' }
+  ],
+  '10-18': [{ y: 2021, t: 'Se presentan los MacBook Pro con chips M1 Pro y M1 Max, y los AirPods de 3ª generación en el evento "Unleashed".' }],
+  '10-21': [{ y: 1991, t: 'Apple presenta los primeros PowerBook (100, 140 y 170).' }],
+  '10-22': [{ y: 2013, t: 'Se presenta el iPad Air de 1ª generación y el iPad mini 2 con Touch ID.' }],
+  '10-23': [
+    { y: 2001, t: 'Se anuncia el primer iPod clásico.' },
+    { y: 2012, t: 'Se presenta el primer iPad mini.' }
+  ],
+  '10-27': [{ y: 2016, t: 'Se presentan los MacBook Pro con Touch Bar y Touch ID integrado en el teclado en el evento "Hello Again".' }],
+  '10-28': [{ y: 2019, t: 'Se presentan mediante nota de prensa los primeros AirPods Pro.' }],
+  '10-30': [
+    { y: 2018, t: 'Se presenta el iPad Pro de 3ª generación, el primer iPad con Face ID y sin botón de inicio.' },
+    { y: 2020, t: 'Se lanza el servicio de suscripciones Apple One.' }
+  ],
+  '11-01': [{ y: 2019, t: 'Se lanza el servicio de streaming Apple TV+.' }],
+  '11-10': [
+    { y: 1997, t: 'Abre la tienda online Apple Store.' },
+    { y: 2020, t: 'Apple presenta los primeros Mac con chip M1, su primer procesador propio.' }
+  ],
+  '12-08': [{ y: 2020, t: 'Se presentan los primeros AirPods Max.' }],
+  '12-12': [{ y: 1980, t: 'Apple sale a bolsa en el NASDAQ.' }],
+  '12-14': [{ y: 2020, t: 'Se lanza el servicio Apple Fitness+.' }]
+};
 
   var homeTodayDate = document.getElementById('homeTodayDate');
   var homeTodayFact = document.getElementById('homeTodayFact');
