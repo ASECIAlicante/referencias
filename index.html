@@ -700,8 +700,6 @@
           <p class="home-tip">💡 Al hacer clic en el EAN de cualquier producto se abrirá su código de barras listo para escanear.</p>
           <div class="home-stats">
             <span><strong>1667</strong> referencias</span>
-            <span><strong id="visitCountToday">-</strong> visitas hoy</span>
-            <span><strong id="visitCountTotal">-</strong> visitas históricas</span>
             <span class="home-updated">Última actualización: <strong>03/09/2026</strong></span>
           </div>
         </div>
@@ -14890,45 +14888,6 @@
   }
 
   setupEanClickables();
-
-  // Contador de visitas (KVDB.io - Key-Value store gratuito con CORS abierto)
-  (function initCounters(){
-    var todayEl = document.getElementById('visitCountToday');
-    var totalEl = document.getElementById('visitCountTotal');
-    if (!todayEl || !totalEl) return;
-
-    var todayKey = new Date().toISOString().slice(0, 10);
-    // Bucket público persistente para el catálogo
-    var bucket = 'k9Zf3Lp8QvB2mX'; 
-
-    // 1. Contador histórico (+1 y retorna el nuevo valor en texto plano)
-    fetch('https://kvdb.io/' + bucket + '/total?incr=1')
-      .then(function(res){
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-        return res.text();
-      })
-      .then(function(text){
-        var num = parseInt(text.trim(), 10);
-        if (!isNaN(num)) totalEl.textContent = num.toLocaleString('es-ES');
-      })
-      .catch(function(err){
-        console.warn('Visitas total error:', err);
-      });
-
-    // 2. Contador diario (+1 y retorna el nuevo valor en texto plano)
-    fetch('https://kvdb.io/' + bucket + '/day_' + todayKey + '?incr=1')
-      .then(function(res){
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-        return res.text();
-      })
-      .then(function(text){
-        var num = parseInt(text.trim(), 10);
-        if (!isNaN(num)) todayEl.textContent = num.toLocaleString('es-ES');
-      })
-      .catch(function(err){
-        console.warn('Visitas hoy error:', err);
-      });
-  })();
 })();
 </script>
 </body>
