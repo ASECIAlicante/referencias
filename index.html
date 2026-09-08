@@ -699,8 +699,9 @@
           <p class="home-subtitle">Selecciona una categoría en el menú superior o usa el buscador para acceder a las referencias.</p>
           <p class="home-tip">💡 Al hacer clic en el EAN de cualquier producto se abrirá su código de barras listo para escanear.</p>
           <div class="home-stats">
-            <span><strong>29</strong> hojas</span>
             <span><strong>1667</strong> referencias</span>
+            <span><strong id="visitCountToday">-</strong> visitas hoy</span>
+            <span><strong id="visitCountTotal">-</strong> visitas históricas</span>
             <span class="home-updated">Última actualización: <strong>03/09/2026</strong></span>
           </div>
         </div>
@@ -14889,6 +14890,32 @@
   }
 
   setupEanClickables();
+
+  // Contador de visitas (CounterAPI)
+  try {
+    var siteNamespace = 'catalogo-apple-eci';
+    var todayKey = new Date().toISOString().slice(0, 10);
+    var todayEl = document.getElementById('visitCountToday');
+    var totalEl = document.getElementById('visitCountTotal');
+
+    fetch('https://api.counterapi.dev/v1/' + siteNamespace + '/total/up')
+      .then(function(res){ return res.json(); })
+      .then(function(data){
+        if (totalEl && data && typeof data.count !== 'undefined') {
+          totalEl.textContent = Number(data.count).toLocaleString('es-ES');
+        }
+      })
+      .catch(function(){});
+
+    fetch('https://api.counterapi.dev/v1/' + siteNamespace + '/day_' + todayKey + '/up')
+      .then(function(res){ return res.json(); })
+      .then(function(data){
+        if (todayEl && data && typeof data.count !== 'undefined') {
+          todayEl.textContent = Number(data.count).toLocaleString('es-ES');
+        }
+      })
+      .catch(function(){});
+  } catch(e) {}
 })();
 </script>
 </body>
