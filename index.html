@@ -14366,22 +14366,19 @@
   var homeTodayFact = document.getElementById('homeTodayFact');
   if(homeTodayDate){
     var today = new Date();
-    var dateLabel = today.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-    homeTodayDate.textContent = dateLabel.charAt(0).toUpperCase() + dateLabel.slice(1);
-    var mm = String(today.getMonth() + 1).padStart(2, '0');
+    var weekday = today.toLocaleDateString('es-ES', { weekday: 'long' });
+    weekday = weekday.charAt(0).toUpperCase() + weekday.slice(1);
     var dd = String(today.getDate()).padStart(2, '0');
+    var mm = String(today.getMonth() + 1).padStart(2, '0');
+    var yyyy = today.getFullYear();
+    homeTodayDate.textContent = weekday + ' ' + dd + '/' + mm + '/' + yyyy;
     var events = APPLE_ON_THIS_DAY[mm + '-' + dd];
     if(homeTodayFact){
       if(events && events.length){
-        if(events.length === 1){
-          homeTodayFact.innerHTML = 'Tal día como hoy en ' + events[0].y + ', ' + events[0].t + '.';
-        } else {
-          var items = events.map(function(ev, i){
-            var prefix = i === 0 ? 'Tal día como hoy en <strong>' : 'En <strong>';
-            return '<li>' + prefix + ev.y + '</strong>, ' + ev.t + '.</li>';
-          }).join('');
-          homeTodayFact.innerHTML = '<ul class="home-today-list">' + items + '</ul>';
-        }
+        var items = events.map(function(ev){
+          return '<li><strong>' + dd + '/' + mm + '/' + ev.y + '</strong>: ' + ev.t + '</li>';
+        }).join('');
+        homeTodayFact.innerHTML = '<ul class="home-today-list">' + items + '</ul>';
       } else {
         homeTodayFact.innerHTML = '';
       }
