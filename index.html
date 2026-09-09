@@ -466,10 +466,9 @@
   }
   .home-today{
     display:flex;
-    flex-wrap:wrap;
-    align-items:baseline;
-    gap:8px;
-    margin:0 0 6px;
+    flex-direction:column;
+    gap:6px;
+    margin:0 0 10px;
   }
   .home-today-date{
     font-size:13px;
@@ -482,11 +481,27 @@
     color: var(--text-dim);
     line-height:1.5;
   }
-  .home-today-fact:before{
-    content:"· ";
+  .home-today-list{
+    list-style:none;
+    padding:0;
+    margin:0;
+    display:flex;
+    flex-direction:column;
+    gap:4px;
   }
-  .home-today-fact:empty:before{
-    content:"";
+  .home-today-list li{
+    position:relative;
+    padding-left:16px;
+    font-size:13.5px;
+    color: var(--text-dim);
+    line-height:1.45;
+  }
+  .home-today-list li:before{
+    content:"•";
+    position:absolute;
+    left:2px;
+    color: var(--accent);
+    font-weight:bold;
   }
   .home-subtitle{
     color: var(--text-dim);
@@ -14358,13 +14373,17 @@
     var events = APPLE_ON_THIS_DAY[mm + '-' + dd];
     if(homeTodayFact){
       if(events && events.length){
-        var sentences = events.map(function(ev, i){
-          var lead = i === 0 ? 'Tal día como hoy' : 'Además, ese mismo día';
-          return lead + ' en ' + ev.y + ', ' + ev.t + '.';
-        });
-        homeTodayFact.textContent = sentences.join(' ');
+        if(events.length === 1){
+          homeTodayFact.innerHTML = 'Tal día como hoy en ' + events[0].y + ', ' + events[0].t + '.';
+        } else {
+          var items = events.map(function(ev, i){
+            var prefix = i === 0 ? 'Tal día como hoy en <strong>' : 'En <strong>';
+            return '<li>' + prefix + ev.y + '</strong>, ' + ev.t + '.</li>';
+          }).join('');
+          homeTodayFact.innerHTML = '<ul class="home-today-list">' + items + '</ul>';
+        }
       } else {
-        homeTodayFact.textContent = '';
+        homeTodayFact.innerHTML = '';
       }
     }
   }
