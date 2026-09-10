@@ -1,0 +1,101 @@
+# Efemérides Apple — "Un día como hoy en Apple"
+# Formato: MM-DD | AÑO | Descripción del evento
+# Las líneas vacías o que empiecen con # se ignoran.
+
+01-03 | 1977 | Apple se constituye legalmente como Apple Computer Company.
+01-05 | 2000 | Se presenta iTools y se nombra a Steve Jobs como CEO oficial.
+01-06 | 2004 | Se presenta el primer iPod mini.
+01-07 | 2002 | Se presentan el iMac G4 (con su icónica pantalla giratoria sobre base semiesférica) y iPhoto.
+01-07 | 2003 | Se presenta el primer AirPort Extreme.
+01-09 | 2001 | Se presentan iTunes 1.0 y el PowerBook G4 de titanio en el Macworld de San Francisco.
+01-09 | 2007 | Steve Jobs presenta el primer iPhone en el Macworld de San Francisco y se cambia oficialmente el nombre a Apple Inc.
+01-10 | 2006 | Se presentan los primeros Mac con procesador Intel, el iMac y el MacBook Pro.
+01-11 | 2005 | Se presentan el Mac mini y el primer iPod shuffle.
+01-15 | 2008 | Se presenta el primer MacBook Air, que Steve Jobs sacó de un sobre de papel sobre el escenario.
+01-18 | 2023 | Se presenta el HomePod de 2ª generación.
+01-19 | 1983 | Se anuncia el Apple Lisa, el primer ordenador personal con interfaz gráfica y ratón de Apple.
+01-20 | 2003 | Se presenta el PowerBook G4 de 17 pulgadas y iLife.
+01-24 | 1984 | Se presenta el Macintosh, dos días después del mítico anuncio "1984" emitido durante la Super Bowl.
+01-27 | 2010 | Steve Jobs presenta el primer iPad.
+03-04 | 2026 | Presentación oficial del MacBook Neo, el ordenador portátil ultraligero y accesible impulsado por el chip A18 Pro.
+03-06 | 2008 | Anuncio del iPhone SDK y las bases de la App Store.
+03-08 | 2022 | Se presentan el primer Mac Studio, el Studio Display, el chip M1 Ultra y el iPhone SE de 3ª generación en el evento "Peek Performance".
+03-09 | 2015 | Se presenta el MacBook de 12 pulgadas y se detallan precio y fecha del Apple Watch en el evento "Spring Forward".
+03-20 | 2019 | Se presenta la 2ª generación de AirPods.
+03-21 | 2016 | Se presenta el iPhone SE de 1ª generación en el evento "Let Us Loop You In".
+03-24 | 2001 | Se lanza Mac OS X 10.0 "Cheetah", la primera versión pública del nuevo sistema operativo que cerraba definitivamente la etapa de Mac OS 9 y estrenaba la arquitectura moderna basada en UNIX.
+03-25 | 2019 | Se presentan la Apple Card, Apple Arcade, Apple News+ y Apple TV+ en el evento "It's show time".
+04-01 | 1976 | Steve Jobs, Steve Wozniak y Ronald Wayne fundan Apple y presentan de forma informal el Apple I en el Homebrew Computer Club.
+04-15 | 2020 | Se presenta el iPhone SE de 2ª generación.
+04-16 | 1977 | Se presenta el Apple II en la West Coast Computer Faire de San Francisco.
+04-28 | 2003 | Abre sus puertas la iTunes Music Store.
+05-06 | 1998 | Se anuncia el iMac original (G3), con su icónico diseño translúcido.
+05-16 | 2006 | Se presenta el primer MacBook de policarbonato, que sustituye al iBook.
+05-19 | 2001 | Abren las dos primeras Apple Store del mundo, en Tysons Corner y Glendale.
+05-29 | 1992 | John Sculley presenta el Newton MessagePad, el primer PDA de Apple, en el Consumer Electronics Show de Chicago.
+06-02 | 2014 | Apple presenta el lenguaje de programación Swift en la WWDC.
+06-03 | 2019 | Se presenta iPadOS (separándolo de iOS), la 3ª generación del Mac Pro y el monitor Pro Display XDR en la WWDC.
+06-05 | 2017 | Se presentan el primer HomePod, el iMac Pro y los nuevos sistemas operativos en la WWDC.
+06-05 | 2023 | Apple presenta el primer Mac Pro con Apple Silicon y el visor Vision Pro con visionOS en la WWDC.
+06-06 | 2005 | Se anuncia oficialmente la histórica transición de procesadores PowerPC a Intel.
+06-06 | 2011 | Apple anuncia iCloud en la WWDC.
+06-06 | 2022 | Se presenta el MacBook Air con chip M2 en la WWDC.
+06-07 | 2010 | Se presenta el iPhone 4, FaceTime y la pantalla Retina en la WWDC, incorporando el chip A4 a 45 nanómetros.
+06-08 | 2008 | Se presenta el iPhone 3G, MobileMe y la App Store pública en la WWDC.
+06-08 | 2015 | Se presenta oficialmente el servicio de streaming Apple Music en la WWDC.
+06-10 | 2013 | Se presenta el nuevo Mac Pro de diseño cilíndrico en la WWDC.
+06-10 | 2024 | Se presenta Apple Intelligence, la plataforma de inteligencia artificial generativa, en la WWDC.
+06-11 | 2012 | Se presentan los MacBook Pro con pantalla Retina en la WWDC.
+06-22 | 2020 | Anuncio histórico en la WWDC del cambio hacia los chips propios Apple Silicon.
+06-30 | 2015 | Se lanza globalmente Apple Music.
+07-10 | 2008 | Se lanza oficialmente la App Store con 500 aplicaciones disponibles.
+07-19 | 2000 | Se presenta el Power Mac G4 Cube.
+07-21 | 1999 | Se presentan el iBook y la tecnología AirPort, con Steve Jobs atravesando un aro con el portátil.
+08-02 | 2018 | Apple se convierte en la primera empresa cotizada en superar el billón de dólares de valor en bolsa.
+08-06 | 1997 | Steve Jobs anuncia la inversión de 150 millones de dólares de Microsoft en el Macworld de Boston.
+08-07 | 2006 | Se presenta el primer Mac Pro con procesador Intel.
+08-24 | 2011 | Steve Jobs renuncia como CEO de Apple y Tim Cook toma el relevo.
+09-01 | 2010 | Se presenta la 2ª generación de Apple TV en el evento "Back to the Rock".
+09-05 | 2007 | Se presentan el primer iPod touch y el renovado iPod classic.
+09-07 | 2005 | Se presenta el primer iPod nano.
+09-07 | 2016 | Se presenta el iPhone 7 (eliminando el conector jack), la primera generación de AirPods y el chip A10 Fusion a 16 nanómetros.
+09-07 | 2022 | Se presentan la familia iPhone 14, la vuelta del modelo Plus, los AirPods Pro de 2ª generación y el primer Apple Watch Ultra en el evento "Far Out".
+09-09 | 2014 | Apple presenta el primer Apple Watch, Apple Pay, los iPhone 6 y 6 Plus, y el chip A8 a 20 nanómetros.
+09-09 | 2015 | Se presentan el iPhone 6s, el nuevo Apple TV con tvOS, el primer iPad Pro, el primer Apple Pencil y el chip A9 a 16 nanómetros en el evento "Hey Siri".
+09-09 | 2024 | Se presenta el iPhone 16 en el evento "It's Glowtime".
+09-09 | 2025 | Se presentan la familia iPhone 17, el iPhone Air (el teléfono más fino de la historia) y los AirPods Pro 3 en el evento "Awe Dropping".
+09-09 | 2026 | Apple presenta el iPhone Duo (su primer iPhone plegable con el chip A20 Pro a 2 nanómetros), los nuevos iPhone 18 Pro y Pro Max que estrenan por primera vez una cámara con apertura variable, y los AirPods 5, los auriculares de diseño abierto con la mejor cancelación activa de ruido del mercado.
+09-10 | 2013 | Se presenta el iPhone 5s con sensor Touch ID y el chip A7 a 28 nanómetros, junto al iPhone 5c.
+09-10 | 2019 | Se presentan los primeros "Pro", con los iPhone 11 Pro y 11 Pro Max en el evento "By Innovation Only".
+09-12 | 2006 | Se presenta el iTV (nombre en clave del futuro Apple TV) en el evento "It's Showtime".
+09-12 | 2012 | Se presenta el iPhone 5 equipado con el chip A6 a 32 nanómetros.
+09-12 | 2017 | Inauguración del Steve Jobs Theater con la presentación del iPhone X (Face ID y notch), el iPhone 8, el Apple TV 4K y el chip A11 Bionic a 10 nanómetros.
+09-12 | 2018 | Se presentan el iPhone XS, el iPhone XR, el Apple Watch Series 4 (los primeros con ECG) y el chip A12 Bionic a 7 nanómetros en el evento "Gather Round".
+09-12 | 2023 | Se presenta el iPhone 15 en el evento "Wonderlust".
+09-13 | 2000 | Se lanza la beta pública de Mac OS X.
+09-14 | 2021 | Se presenta el iPhone 13 en el evento "California Streaming".
+09-18 | 2013 | Se lanza iOS 7, el mayor rediseño visual de la historia de iOS.
+09-19 | 2019 | Se lanza el servicio de videojuegos Apple Arcade.
+09-20 | 2016 | Se lanza macOS Sierra, la primera versión bajo la nomenclatura "macOS".
+10-04 | 2011 | Se presenta el iPhone 4S junto con el asistente virtual Siri.
+10-05 | 2011 | Fallece Steve Jobs a los 56 años.
+10-12 | 2005 | Se presenta el primer iPod video (5ª generación).
+10-13 | 2020 | Se presentan la familia iPhone 12 (incluyendo el formato compacto mini) y el primer HomePod mini en el evento "Hi, Speed".
+10-16 | 2003 | Se lanza iTunes para Windows.
+10-16 | 2014 | Se lanza OS X Yosemite.
+10-18 | 2021 | Se presentan los MacBook Pro con chips M1 Pro y M1 Max, y los AirPods de 3ª generación en el evento "Unleashed".
+10-21 | 1991 | Apple presenta los primeros PowerBook (100, 140 y 170).
+10-22 | 2013 | Se presenta el iPad Air de 1ª generación y el iPad mini 2 con Touch ID.
+10-23 | 2001 | Se anuncia el primer iPod clásico.
+10-23 | 2012 | Se presenta el primer iPad mini.
+10-27 | 2016 | Se presentan los MacBook Pro con Touch Bar y Touch ID integrado en el teclado en el evento "Hello Again".
+10-28 | 2019 | Se presentan mediante nota de prensa los primeros AirPods Pro.
+10-30 | 2018 | Se presenta el iPad Pro de 3ª generación, el primer iPad con Face ID y sin botón de inicio.
+10-30 | 2020 | Se lanza el servicio de suscripciones Apple One.
+10-30 | 2023 | Se presenta el chip M3 a 3 nanómetros.
+11-01 | 2019 | Se lanza el servicio de streaming Apple TV+.
+11-10 | 1997 | Abre la tienda online Apple Store.
+11-10 | 2020 | Apple presenta los primeros Mac con el chip M1 a 5 nanómetros, su primer procesador propio.
+12-08 | 2020 | Se presentan los primeros AirPods Max.
+12-12 | 1980 | Apple sale a bolsa en el NASDAQ.
+12-14 | 2020 | Se lanza el servicio Apple Fitness+.
