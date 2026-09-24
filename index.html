@@ -14,6 +14,7 @@
     <h1>Catálogo de referencias Apple</h1>
     <div class="topbar-actions">
       <button id="searchToggle" class="icon-btn" type="button" title="Buscar" aria-label="Buscar">🔎</button>
+      <button id="scanToggle" class="icon-btn" type="button" title="Escanear referencia" aria-label="Escanear referencia" style="display:none;">📷</button>
       <button id="themeToggle" class="icon-btn" type="button" title="Cambiar apariencia" aria-label="Cambiar apariencia">🌙</button>
     </div>
   </div>
@@ -35,8 +36,14 @@
             <span class="home-today-date" id="homeTodayDate"></span>
             <span class="home-today-fact" id="homeTodayFact"></span>
           </div>
-          <p class="home-subtitle">Selecciona una categoría en el menú superior o usa el buscador para acceder a las referencias.</p>
-          <p class="home-tip">💡 Al hacer clic en el EAN de cualquier producto se abrirá su código de barras listo para escanear.</p>
+          <p class="home-subtitle">Selecciona una categoría en el menú superior o usa el buscador 🔎 para empezar.</p>
+          <div class="home-tip">
+            <p class="home-tip-title">💡 Trucos útiles:</p>
+            <ul class="home-tip-list">
+              <li>Haz clic en el EAN para abrir el código de barras.</li>
+              <li>Usa 📷 desde tu móvil para escanear referencias directamente.</li>
+            </ul>
+          </div>
           <div class="home-stats">
             <span><strong>1870</strong> referencias</span>
             <span class="home-updated">Última actualización: <strong>24/09/2026</strong></span>
@@ -15120,6 +15127,35 @@
   </div>
 </div>
 
+<div class="scanner-modal-backdrop" id="scannerModal" aria-hidden="true" role="dialog">
+  <div class="scanner-modal-card">
+    <div class="scanner-modal-header">
+      <h4 class="scanner-modal-title">Identificar producto</h4>
+      <button type="button" class="barcode-modal-close" id="scannerCloseBtn" aria-label="Cerrar">&times;</button>
+    </div>
+    <div class="scanner-live-wrap" id="scannerLiveWrap">
+      <video id="scannerVideo" playsinline muted autoplay></video>
+      <div class="scanner-live-frame" id="scannerLiveFrame"></div>
+      <div class="scanner-live-badge"><span class="scanner-live-dot"></span>EN VIVO</div>
+      <div class="scanner-live-crop" id="scannerLiveCrop"></div>
+      <div class="scanner-live-overlay" id="scannerLiveOverlay">Iniciando camara...</div>
+    </div>
+    <div class="scanner-zoom-row" id="scannerZoomRow">
+      <span class="scanner-zoom-label">Zoom</span>
+      <input type="range" class="scanner-zoom-slider" id="scannerZoomSlider" min="10" max="40" step="1" value="10">
+      <span class="scanner-zoom-value" id="scannerZoomValue">1.0x</span>
+    </div>
+    <button type="button" class="scanner-live-stop" id="scannerLiveStopBtn" style="display:none;">Reiniciar escaner</button>
+    <div class="scanner-status" id="scannerStatus"></div>
+    <div class="scanner-detected" id="scannerDetected" style="display:none;">
+      <span class="scanner-detected-label">Numeros detectados:</span>
+      <span class="scanner-detected-text" id="scannerDetectedText"></span>
+    </div>
+    <div class="scanner-results" id="scannerResults"></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
 <script>
 (function(){
   // --- Load external data (data.json + events.txt) ---
@@ -15586,6 +15622,678 @@
     }
 
     setupEanClickables();
+
+    // ===== Identificar producto por foto (OCR) =====
+    var scanBtn = document.getElementById('scanToggle');
+    var scannerModal = document.getElementById('scannerModal');
+    var scannerCloseBtn = document.getElementById('scannerCloseBtn');
+    var scannerStatus = document.getElementById('scannerStatus');
+    var scannerResults = document.getElementById('scannerResults');
+    var scannerDetected = document.getElementById('scannerDetected');
+    var scannerDetectedText = document.getElementById('scannerDetectedText');
+    var scannerLiveWrap = document.getElementById('scannerLiveWrap');
+    var scannerVideo = document.getElementById('scannerVideo');
+    var scannerLiveOverlay = document.getElementById('scannerLiveOverlay');
+    var scannerLiveStopBtn = document.getElementById('scannerLiveStopBtn');
+    var scannerLiveFrame = document.getElementById('scannerLiveFrame');
+    var scannerLiveCrop = document.getElementById('scannerLiveCrop');
+    var scannerZoomRow = document.getElementById('scannerZoomRow');
+    var scannerZoomSlider = document.getElementById('scannerZoomSlider');
+    var scannerZoomValue = document.getElementById('scannerZoomValue');
+
+    // El escaner en vivo esta pensado para la camara trasera de un movil, no
+    // para la webcam de un portatil: mostrarlo en escritorio solo confunde y
+    // exhibe el video flotando sobre la pagina sin ningun caso de uso real.
+    // isMobileDevice() combina el sniffing clasico de UA con un heuristico
+    // moderno para iPadOS 13+, que se anuncia como escritorio pero es tactil.
+    function isMobileDevice() {
+      var ua = navigator.userAgent || '';
+      if (/Android|iPhone|iPad|iPod|Mobile/i.test(ua)) return true;
+      // iPadOS 13+ en modo escritorio: touch points > 1 y plataforma Mac.
+      if (/Macintosh/i.test(ua) && navigator.maxTouchPoints > 1) return true;
+      return false;
+    }
+
+    if (scanBtn && isMobileDevice() && hasGetUserMedia()) { scanBtn.style.display = 'flex'; }
+
+    // --- Live scanner state ---
+    var liveStream = null;
+    var liveTrack = null;
+    var liveTimer = null;
+    var liveBusy = false;
+    var liveActive = false;
+    var liveZoom = 1.0;              // digital zoom factor applied to the crop
+    var liveNativeZoom = null;       // {min,max,step} when the camera exposes optical/native zoom
+    var LIVE_INTERVAL_MS = 700;
+    // Alternates the OCR alphabet between ticks (digits-only / part-number) and
+    // keeps a short history of reads so both alphabets contribute to one match.
+    var liveProfileToggle = false;
+    var liveTextWindow = [];
+
+    // A single persistent Tesseract worker. Tesseract.recognize() spins up and
+    // tears down a worker on EVERY call (1-3s each), which made most live ticks
+    // no-ops. Reusing one worker also makes the digit whitelist actually apply —
+    // the convenience API silently ignores tessedit_* options.
+    var ocrWorker = null;
+    var ocrWorkerPromise = null;
+    var ocrWorkerMode = null;
+
+    function getOcrWorker() {
+      if (ocrWorkerPromise) return ocrWorkerPromise;
+      if (typeof Tesseract === 'undefined' || !Tesseract.createWorker) return null;
+      ocrWorkerPromise = Tesseract.createWorker()
+        .then(function(w) {
+          return w.loadLanguage('eng').then(function() {
+            return w.initialize('eng');
+          }).then(function() {
+            ocrWorker = w;
+            return w;
+          });
+        }).catch(function(err) {
+          ocrWorkerPromise = null;
+          throw err;
+        });
+      return ocrWorkerPromise;
+    }
+
+    // Two recognition profiles. The single mixed alphabet used before was the
+    // reason ECI codes failed while P/N worked: allowing A-Z lets Tesseract pick
+    // a letter for every ambiguous digit (5->S, 0->O, 1->I, 8->B), and an ECI is
+    // pure digits, so one letter anywhere destroys the whole 11-digit run. A P/N
+    // legitimately contains letters, hence it was unaffected.
+    var OCR_PROFILES = {
+      // Digits only — for ECI and EAN. Tesseract cannot emit a letter at all.
+      // Separators stay allowed: the extractor uses them to rebuild grouped
+      // codes like "0 195950 638813", and banning them makes Tesseract invent
+      // digits where a gap really is.
+      digits: '0123456789. -',
+      // Digits + the P/N alphabet (B, I, O and S excluded: they never occur in a
+      // real part number, so banning them removes the confusions at the source).
+      pn: '0123456789/ ACDEFGHJKLMNPQRTUVWXYZ'
+    };
+
+    function setOcrProfile(worker, profile, pageseg) {
+      var key = profile + '|' + pageseg;
+      if (ocrWorkerMode === key) return Promise.resolve();
+      ocrWorkerMode = key;
+      return worker.setParameters({
+        tessedit_char_whitelist: OCR_PROFILES[profile],
+        tessedit_pageseg_mode: pageseg
+      }).catch(function() {});
+    }
+
+    function hasGetUserMedia() {
+      return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+    }
+
+    function openScanner() {
+      if (!scannerModal) return;
+      scannerModal.classList.add('open');
+      scannerModal.setAttribute('aria-hidden', 'false');
+      resetScannerUI();
+      if (hasGetUserMedia()) {
+        startLiveScan();
+      } else {
+        scannerStatus.textContent = 'Este navegador no permite acceso a la camara. Usa el buscador de la pagina.';
+        scannerStatus.className = 'scanner-status error';
+      }
+    }
+
+    function closeScanner() {
+      if (!scannerModal) return;
+      scannerModal.classList.remove('open');
+      scannerModal.setAttribute('aria-hidden', 'true');
+      stopLiveScan();
+    }
+
+    function resetScannerUI() {
+      scannerResults.innerHTML = '';
+      scannerStatus.textContent = '';
+      scannerStatus.className = 'scanner-status';
+      scannerDetected.style.display = 'none';
+    }
+
+    // Restart scanning after a result: clear the previous hit and reopen the camera.
+    function restartLiveScan() {
+      resetScannerUI();
+      stopLiveScan();
+      startLiveScan();
+    }
+
+    // --- Live scanning: capture a frame every LIVE_INTERVAL_MS, run OCR on it,
+    // never overlap two OCR passes, and stop automatically on an exact match.
+    function startLiveScan() {
+      if (liveActive) return;
+      if (!hasGetUserMedia()) {
+        scannerLiveOverlay.textContent = 'Camara no disponible en este navegador.';
+        return;
+      }
+      liveActive = true;
+      liveTextWindow = [];
+      scannerLiveWrap.style.display = 'block';
+      scannerLiveStopBtn.style.display = 'block';
+      scannerZoomRow.classList.add('visible');
+      scannerLiveOverlay.textContent = 'Iniciando camara...';
+
+      // Ask for the highest sensible resolution: the crop is what gets OCR'd, so
+      // source pixels directly determine how legible small digits are.
+      var constraints = {
+        video: {
+          facingMode: { ideal: 'environment' },
+          width: { ideal: 1920 },
+          height: { ideal: 1080 },
+          focusMode: { ideal: 'continuous' }
+        }
+      };
+
+      // Start the OCR worker in parallel with the camera — it is the slow part.
+      var workerPromise = getOcrWorker();
+      if (!workerPromise) {
+        scannerLiveOverlay.textContent = 'Libreria OCR no cargada. Comprueba tu conexion.';
+        stopLiveScan();
+        return;
+      }
+
+      navigator.mediaDevices.getUserMedia(constraints)
+        .catch(function() {
+          // Fall back to a plain request if the ideal constraints are rejected.
+          return navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+        })
+        .then(function(stream) {
+          if (!liveActive) { stream.getTracks().forEach(function(t){ t.stop(); }); return null; }
+          liveStream = stream;
+          liveTrack = stream.getVideoTracks()[0] || null;
+          detectNativeZoom();
+          scannerVideo.srcObject = stream;
+          return scannerVideo.play();
+        }).then(function() {
+          if (!liveActive) return null;
+          scannerLiveOverlay.textContent = 'Preparando OCR...';
+          return workerPromise;
+        }).then(function() {
+          if (!liveActive) return;
+          applyZoom(liveZoom);
+          scannerLiveOverlay.textContent = 'Encuadra el numero dentro del recuadro...';
+          liveTimer = setInterval(liveScanTick, LIVE_INTERVAL_MS);
+        }).catch(function(err) {
+          scannerLiveOverlay.textContent = 'No se pudo iniciar la camara o el OCR. Revisa los permisos.';
+          stopLiveScan();
+        });
+    }
+
+    // Some cameras expose real zoom through MediaStreamTrack capabilities. iOS
+    // Safari usually does not, hence the digital-crop fallback in applyZoom.
+    function detectNativeZoom() {
+      liveNativeZoom = null;
+      if (!liveTrack || !liveTrack.getCapabilities) return;
+      try {
+        var caps = liveTrack.getCapabilities();
+        if (caps && caps.zoom && typeof caps.zoom.max === 'number' && caps.zoom.max > caps.zoom.min) {
+          liveNativeZoom = caps.zoom;
+        }
+      } catch (e) { liveNativeZoom = null; }
+    }
+
+    // Zoom has two independent effects and both help legibility:
+    //  - native zoom (when available) makes the sensor itself zoom in;
+    //  - the crop region shrinks, so the same OCR budget covers fewer, bigger pixels.
+    function applyZoom(z) {
+      liveZoom = z;
+      scannerZoomValue.textContent = z.toFixed(1) + 'x';
+
+      if (liveNativeZoom && liveTrack) {
+        var span = liveNativeZoom.max - liveNativeZoom.min;
+        // Map the first half of the slider range onto the native zoom range;
+        // beyond that the digital crop takes over.
+        var frac = Math.min(1, (z - 1) / 3);
+        var target = liveNativeZoom.min + span * frac;
+        try { liveTrack.applyConstraints({ advanced: [{ zoom: target }] }); } catch (e) {}
+      }
+
+      // Shrink the guide frame in step with the crop so what the user frames is
+      // exactly what gets analysed.
+      var wPct = 90 / z;
+      var hPct = 55 / z;
+      scannerLiveFrame.style.width = wPct + '%';
+      scannerLiveFrame.style.height = hPct + '%';
+      scannerLiveFrame.style.left = ((100 - wPct) / 2) + '%';
+      scannerLiveFrame.style.top = ((100 - hPct) / 2) + '%';
+    }
+
+    // keepRestart: after a successful read the camera stops, but the user must
+    // still be able to scan the next label without closing the modal.
+    function stopLiveScan(keepRestart) {
+      liveActive = false;
+      liveBusy = false;
+      if (liveTimer) { clearInterval(liveTimer); liveTimer = null; }
+      if (liveStream) {
+        liveStream.getTracks().forEach(function(t) { t.stop(); });
+        liveStream = null;
+      }
+      liveTrack = null;
+      if (scannerVideo) scannerVideo.srcObject = null;
+      if (scannerLiveWrap) scannerLiveWrap.style.display = 'none';
+      if (scannerLiveStopBtn) scannerLiveStopBtn.style.display = keepRestart ? 'block' : 'none';
+      if (scannerZoomRow) scannerZoomRow.classList.remove('visible');
+      if (scannerLiveCrop) scannerLiveCrop.textContent = '';
+    }
+
+    // Crop the guide-frame region out of the frame and scale it UP to a fixed
+    // working width. The previous version downscaled the whole frame to 1000px,
+    // which left an ECI code about 8px tall — far below what Tesseract can read.
+    function grabLiveCrop() {
+      var vw = scannerVideo.videoWidth;
+      var vh = scannerVideo.videoHeight;
+      if (!vw || !vh) return null;
+
+      var cropW = Math.round(vw * 0.90 / liveZoom);
+      var cropH = Math.round(vh * 0.55 / liveZoom);
+      var cropX = Math.round((vw - cropW) / 2);
+      var cropY = Math.round((vh - cropH) / 2);
+
+      // Upscale so the digits are comfortably large for OCR, capped to keep each
+      // pass fast enough for a live loop.
+      var TARGET_W = 1400;
+      var scale = Math.min(3, Math.max(1, TARGET_W / cropW));
+      var outW = Math.round(cropW * scale);
+      var outH = Math.round(cropH * scale);
+
+      var canvas = document.createElement('canvas');
+      canvas.width = outW;
+      canvas.height = outH;
+      var ctx = canvas.getContext('2d');
+      ctx.imageSmoothingEnabled = true;
+      if ('imageSmoothingQuality' in ctx) ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(scannerVideo, cropX, cropY, cropW, cropH, 0, 0, outW, outH);
+
+      // Grayscale + contrast stretch. Label print is high-contrast dark-on-light,
+      // so this mostly removes the noise that makes Tesseract hallucinate digits.
+      try {
+        var img = ctx.getImageData(0, 0, outW, outH);
+        var d = img.data;
+        var i;
+        var lo = 255, hi = 0;
+        for (i = 0; i < d.length; i += 4) {
+          var g = (d[i] * 0.299 + d[i + 1] * 0.587 + d[i + 2] * 0.114) | 0;
+          d[i] = d[i + 1] = d[i + 2] = g;
+          if (g < lo) lo = g;
+          if (g > hi) hi = g;
+        }
+        var range = hi - lo;
+        if (range > 20) {
+          var mul = 255 / range;
+          for (i = 0; i < d.length; i += 4) {
+            var v = (d[i] - lo) * mul;
+            v = v < 0 ? 0 : (v > 255 ? 255 : v);
+            d[i] = d[i + 1] = d[i + 2] = v;
+          }
+        }
+        ctx.putImageData(img, 0, 0);
+      } catch (e) { /* tainted canvas should not happen with a local stream */ }
+
+      scannerLiveCrop.textContent = outW + 'x' + outH;
+      return canvas;
+    }
+
+    function liveScanTick() {
+      if (liveBusy || !liveActive) return;
+      if (!ocrWorker) return;
+      if (!scannerVideo.videoWidth) return;
+
+      var canvas = grabLiveCrop();
+      if (!canvas) return;
+      liveBusy = true;
+
+      // PSM 6 = "single uniform block of text", the right model for a label crop.
+      // Two passes over the SAME crop with different alphabets. A single mixed
+      // alphabet is a bad compromise: it lets letters win on digit-only codes.
+      // Alternating profiles also spreads the cost — each tick does one pass.
+      liveProfileToggle = !liveProfileToggle;
+      var profile = liveProfileToggle ? 'digits' : 'pn';
+
+      setOcrProfile(ocrWorker, profile, '6').then(function() {
+        return ocrWorker.recognize(canvas);
+      }).then(function(result) {
+        liveBusy = false;
+        if (!liveActive) return;
+        var text = (result && result.data && result.data.text) || '';
+
+        // Keep the last few reads from both profiles, so a digit-pass ECI and a
+        // pn-pass P/N found on consecutive ticks are evaluated together.
+        liveTextWindow.push(text);
+        if (liveTextWindow.length > 3) liveTextWindow.shift();
+
+        var outcome = evaluateOcrText(liveTextWindow.join('\n'));
+        if (outcome.matches.length === 0) {
+          scannerLiveOverlay.textContent = outcome.reads.length
+            ? 'Leido: ' + outcome.reads.slice(0, 2).join(' | ') + ' — sin coincidencia, acerca o ajusta el zoom...'
+            : 'Buscando referencia... usa el zoom si los digitos se ven pequenos';
+          return;
+        }
+        if (outcome.exact) {
+          stopLiveScan(true);
+          scannerStatus.textContent = outcome.matches.length + ' producto' + (outcome.matches.length > 1 ? 's' : '') + ' encontrado' + (outcome.matches.length > 1 ? 's' : '');
+          scannerStatus.className = 'scanner-status found';
+          scannerDetectedText.textContent = outcome.reads.slice(0, 5).join(' | ');
+          scannerDetected.style.display = 'block';
+          displayScanResults(outcome.matches, false);
+        } else {
+          scannerLiveOverlay.textContent = outcome.matches.length + ' posible coincidencia — sigue encuadrando';
+          scannerStatus.textContent = 'Sin coincidencia exacta todavia. Las mas parecidas se muestran abajo.';
+          scannerStatus.className = 'scanner-status';
+          scannerDetectedText.textContent = outcome.reads.slice(0, 5).join(' | ');
+          scannerDetected.style.display = 'block';
+          displayScanResults(outcome.matches, true);
+        }
+      }).catch(function() {
+        liveBusy = false;
+      });
+    }
+
+    // OCR confuses letters for digits inside numeric runs. Aggressive mapping,
+    // used only when re-reading the text as digits.
+    function ocrDigitFix(s) {
+      return s
+        .replace(/[OoQD]/g, '0')
+        .replace(/[IilL|!\]\[]/g, '1')
+        .replace(/[Zz]/g, '2')
+        .replace(/[Ss]/g, '5')
+        .replace(/[Gg]/g, '6')
+        .replace(/[Tt]/g, '7')
+        .replace(/[Bb]/g, '8')
+        .replace(/[gq]/g, '9');
+    }
+
+    // Apple part numbers never contain B, I, O or S (verified against the whole
+    // catalogue), so those glyphs in a P/N read are certainly misread digits.
+    function pnFix(s) {
+      return s.replace(/O/g, '0').replace(/I/g, '1').replace(/S/g, '5').replace(/B/g, '8');
+    }
+
+    // Reduce a raw value to the canonical form both sides are compared in.
+    // Returns null when the value is not a recognisable reference.
+    function classifyRef(raw) {
+      var s = (raw || '').trim();
+      if (!s) return null;
+      if (/^[\d.\s]+$/.test(s)) {
+        var d = s.replace(/\D/g, '');
+        if (d.length === 11) return { kind: 'ECI', value: d };
+        if (d.length === 12 || d.length === 13) return { kind: 'EAN', value: d.replace(/^0/, '') };
+        return null;
+      }
+      var up = s.toUpperCase();
+      if (/^[A-Z0-9]{4,9}\/[A-Z]{1,2}$/.test(up)) {
+        return { kind: 'PN', value: up.replace(/[^A-Z0-9]/g, '') };
+      }
+      return null;
+    }
+
+    // Pure extraction + matching, shared by photo mode and live mode. Never
+    // touches the DOM, so live mode can call it every tick without side effects.
+    function evaluateOcrText(rawText) {
+      var empty = { tokens: [], matches: [], exact: false, reads: [] };
+      if (!rawText || !rawText.trim()) return empty;
+
+      var tokens = [];
+      var seen = {};
+
+      function addToken(value, kind) {
+        if (!value) return;
+        var key = kind + ':' + value;
+        if (value.length >= 5 && !seen[key]) {
+          seen[key] = true;
+          tokens.push({ value: value, kind: kind });
+        }
+      }
+
+      var up = rawText.toUpperCase();
+
+      // --- Numeric references: read the text twice, once as-is and once with
+      // letter->digit corrections, so a single bad glyph cannot hide a reference.
+      [up, ocrDigitFix(up)].forEach(function(text) {
+        var sep = '[.,:;\\u00b7\\-\\s]';
+
+        // ECI 3/3/4/1 — the variant seen on some labels. Must be tried BEFORE
+        // the 3/3/5 rule, whose prefix it shares.
+        var re4 = new RegExp('(\\d{3})\\s*' + sep + '\\s*(\\d{3})\\s*' + sep + '\\s*(\\d{4})\\s*' + sep + '\\s*(\\d)(?!\\d)', 'g');
+        var m;
+        while ((m = re4.exec(text)) !== null) addToken(m[1] + m[2] + m[3] + m[4], 'ECI');
+
+        // ECI 3/3/5 — the common form.
+        var re5 = new RegExp('(\\d{3})\\s*' + sep + '\\s*(\\d{3})\\s*' + sep + '\\s*(\\d{5})(?!\\d)', 'g');
+        while ((m = re5.exec(text)) !== null) addToken(m[1] + m[2] + m[3], 'ECI');
+
+        // Sliding windows over digit runs. Crucially the run is built by joining
+        // digit groups across in-line separators: EAN under a barcode is printed
+        // as "0 195950 638813", so requiring 12 CONTIGUOUS digits found nothing.
+        // Newlines are excluded so unrelated lines are never welded together.
+        var joinRe = /\d[\d .,\-·]*\d/g;
+        var jm;
+        while ((jm = joinRe.exec(text)) !== null) {
+          var run = jm[0].replace(/\D/g, '');
+          var i;
+          for (i = 0; i + 11 <= run.length; i++) addToken(run.substr(i, 11), 'ECI');
+          for (i = 0; i + 12 <= run.length; i++) addToken(run.substr(i, 12), 'EAN');
+          for (i = 0; i + 13 <= run.length; i++) addToken(run.substr(i, 13).replace(/^0/, ''), 'EAN');
+        }
+      });
+
+      // --- Part numbers: with the slash, and as a bare alphanumeric run in case
+      // the slash was not picked up.
+      var pnRe = /([A-Z0-9]{4,9})\s*\/\s*([A-Z]{1,2})/g;
+      var pm;
+      while ((pm = pnRe.exec(up)) !== null) addToken(pnFix(pm[1] + pm[2]), 'PN');
+      (up.match(/[A-Z0-9]{6,10}/g) || []).forEach(function(run) {
+        if (/[A-Z]/.test(run) && /\d/.test(run)) addToken(pnFix(run), 'PN');
+      });
+
+      if (tokens.length === 0) return empty;
+
+      var refIndex = getRefIndex();
+
+      // Score every catalogue reference against every read, keeping the best
+      // score per product row. Similarity = 1 - editDistance/length; anything
+      // below MIN_SIM is discarded.
+      var MIN_SIM = 0.8;
+      var best = {};
+      tokens.forEach(function(t) {
+        var bucket = refIndex[t.kind];
+        if (!bucket) return;
+        // 80% similarity means we tolerate at most 20% of the length in edits.
+        var maxDist = Math.max(1, Math.floor(t.value.length * (1 - MIN_SIM)));
+        bucket.forEach(function(entry) {
+          var ref = entry.cmp;
+          if (Math.abs(ref.length - t.value.length) > maxDist) return;
+          var dist = boundedEditDistance(ref, t.value, maxDist);
+          if (dist < 0) return;
+          var sim = 1 - dist / Math.max(ref.length, t.value.length);
+          if (sim < MIN_SIM) return;
+          var prev = best[entry.key];
+          if (!prev || sim > prev.sim || (sim === prev.sim && dist < prev.dist)) {
+            best[entry.key] = {
+              row: entry.row, kind: t.kind, ref: entry.display,
+              token: entry.display, read: t.value, dist: dist, sim: sim
+            };
+          }
+        });
+      });
+
+      var results = Object.keys(best).map(function(k) { return best[k]; });
+
+      if (results.length === 0) {
+        var longest = tokens.slice().sort(function(a, b) { return b.value.length - a.value.length; }).slice(0, 4);
+        return { tokens: tokens, matches: [], exact: false, reads: longest.map(function(t) { return t.kind + ': ' + t.value; }) };
+      }
+
+      // Exact reads first, then by similarity.
+      results.sort(function(a, b) { return b.sim - a.sim || a.ref.length - b.ref.length; });
+
+      var exact = results.filter(function(r) { return r.dist === 0; });
+      var shown = exact.length > 0 ? exact : results.slice(0, 8);
+
+      var usedReads = [];
+      var usedSeen = {};
+      shown.forEach(function(r) {
+        var k = r.kind + ':' + r.read;
+        if (!usedSeen[k]) { usedSeen[k] = true; usedReads.push(r.kind + ': ' + r.read); }
+      });
+
+      return { tokens: tokens, matches: shown, exact: exact.length > 0, reads: usedReads };
+    }
+
+    // Banded edit distance. Returns -1 as soon as it is provably above max,
+    // so scanning the whole catalogue stays cheap.
+    function boundedEditDistance(a, b, max) {
+      if (a === b) return 0;
+      if (Math.abs(a.length - b.length) > max) return -1;
+      var prev = new Array(b.length + 1);
+      var cur = new Array(b.length + 1);
+      for (var j = 0; j <= b.length; j++) prev[j] = j;
+      for (var i = 1; i <= a.length; i++) {
+        cur[0] = i;
+        var rowMin = cur[0];
+        var lo = Math.max(1, i - max);
+        var hi = Math.min(b.length, i + max);
+        for (var k = 1; k < lo; k++) cur[k] = max + 1;
+        for (var jj = lo; jj <= hi; jj++) {
+          var cost = a.charAt(i - 1) === b.charAt(jj - 1) ? 0 : 1;
+          cur[jj] = Math.min(
+            prev[jj] + 1,
+            cur[jj - 1] + 1,
+            prev[jj - 1] + cost
+          );
+          if (cur[jj] < rowMin) rowMin = cur[jj];
+        }
+        for (var k2 = hi + 1; k2 <= b.length; k2++) cur[k2] = max + 1;
+        if (rowMin > max) return -1;
+        var tmp = prev; prev = cur; cur = tmp;
+      }
+      var res = prev[b.length];
+      return res > max ? -1 : res;
+    }
+
+    // Index of every EAN / ECI / P-N value in the catalogue, in the same canonical
+    // form the OCR reads are reduced to. Classified by the SHAPE of the value, not
+    // by the column header — 111 references live in columns whose header is blank
+    // or product-specific and were previously invisible to the scanner.
+    var REF_INDEX = null;
+    function getRefIndex() {
+      if (REF_INDEX) return REF_INDEX;
+      REF_INDEX = { EAN: [], ECI: [], PN: [] };
+      var dedupe = {};
+      ALL_ROWS.forEach(function(r) {
+        var rowKey = r.slug + '|' + r.section;
+        r.cells.forEach(function(c) {
+          var cl = classifyRef(c.v);
+          if (!cl) return;
+          var key = rowKey + '|' + cl.kind + '|' + cl.value;
+          if (dedupe[key]) return;
+          dedupe[key] = true;
+          REF_INDEX[cl.kind].push({
+            // cmp: the string the reads are compared against. For part numbers the
+            // ambiguous glyphs are folded on BOTH sides so the comparison is fair.
+            cmp: cl.kind === 'PN' ? pnFix(cl.value) : cl.value,
+            display: cl.value,
+            row: r,
+            key: key
+          });
+        });
+      });
+      return REF_INDEX;
+    }
+
+    function displayScanResults(matches, isApprox) {
+      scannerResults.innerHTML = '';
+      var shown = matches.slice(0, 10);
+      shown.forEach(function(m) {
+        var r = m.row;
+        var item = document.createElement('div');
+        item.className = 'scanner-result-item';
+        var titleDiv = document.createElement('div');
+        titleDiv.className = 'scanner-result-title';
+        titleDiv.textContent = r.sheet + ' — ' + r.section;
+        item.appendChild(titleDiv);
+
+        if (isApprox && m.sim !== undefined && m.dist) {
+          var note = document.createElement('div');
+          note.className = 'scanner-approx-note';
+          note.textContent = Math.round(m.sim * 100) + '% · ' + m.kind + ' ' + m.ref +
+            ' (leido ' + m.read + ')';
+          item.appendChild(note);
+        }
+
+        var detailDiv = document.createElement('div');
+        detailDiv.className = 'scanner-result-detail';
+        // Highlight the cell that produced the hit, comparing in the same canonical
+        // form. Falls back to a substring test for free-text manual searches.
+        var tok = m.token || '';
+        var tokCanon = null;
+        if (m.kind) {
+          tokCanon = m.kind === 'PN' ? pnFix(tok.toUpperCase().replace(/[^A-Z0-9]/g, '')) : tok.replace(/\D/g, '');
+        }
+        r.cells.forEach(function(c) {
+          if (!c.v) return;
+          var chip = document.createElement('span');
+          chip.className = 'scanner-detail-chip';
+          if (tokCanon) {
+            var cl = classifyRef(c.v);
+            if (cl && cl.kind === m.kind) {
+              var cellCanon = cl.kind === 'PN' ? pnFix(cl.value) : cl.value;
+              if (cellCanon === tokCanon) chip.classList.add('scanner-detail-match');
+            }
+          } else if (tok && c.v.toLowerCase().indexOf(tok.toLowerCase()) !== -1) {
+            chip.classList.add('scanner-detail-match');
+          }
+          chip.textContent = (c.label ? c.label + ': ' : '') + c.v;
+          detailDiv.appendChild(chip);
+        });
+        item.appendChild(detailDiv);
+        item.addEventListener('click', function() {
+          closeScanner();
+          if (sheetSearch) {
+            // Search using the value exactly as it appears in the catalogue
+            // (with dots / slash), not the canonical form used for comparison.
+            var q = m.token;
+            if (tokCanon) {
+              for (var ci = 0; ci < r.cells.length; ci++) {
+                var cc = r.cells[ci];
+                var ccl = classifyRef(cc.v);
+                if (!ccl || ccl.kind !== m.kind) continue;
+                var ccanon = ccl.kind === 'PN' ? pnFix(ccl.value) : ccl.value;
+                if (ccanon === tokCanon) { q = cc.v; break; }
+              }
+            }
+            sheetSearch.value = q;
+            sheetSearch.dispatchEvent(new Event('input'));
+          }
+        });
+        scannerResults.appendChild(item);
+      });
+      if (matches.length > 10) {
+        var more = document.createElement('div');
+        more.className = 'scanner-no-match';
+        more.textContent = '... y ' + (matches.length - 10) + ' mas. Toca un resultado para ver en el catalogo.';
+        scannerResults.appendChild(more);
+      }
+    }
+
+    // --- Event listeners ---
+    if (scanBtn) scanBtn.addEventListener('click', openScanner);
+    if (scannerCloseBtn) scannerCloseBtn.addEventListener('click', closeScanner);
+    if (scannerLiveStopBtn) scannerLiveStopBtn.addEventListener('click', restartLiveScan);
+    if (scannerZoomSlider) {
+      scannerZoomSlider.addEventListener('input', function() {
+        applyZoom(parseInt(scannerZoomSlider.value, 10) / 10);
+      });
+    }
+    if (scannerModal) {
+      scannerModal.addEventListener('click', function(e) {
+        if (e.target === scannerModal) closeScanner();
+      });
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && scannerModal.classList.contains('open')) closeScanner();
+      });
+    }
   }
 
   // --- Parse events.txt ---
