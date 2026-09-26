@@ -15531,18 +15531,29 @@
     var barcodeProductImgWrap = document.getElementById('barcodeProductImgWrap');
     var barcodeProductImg = document.getElementById('barcodeProductImg');
 
-    // Muestra la foto del producto si existe en pictures/<hoja>/<ean>.jpeg;
+    // Muestra la foto del producto si existe en pictures/<hoja>/<ean>.webp;
     // la mayoria de referencias todavia no tienen imagen, asi que el fallo al
     // cargar (404) es el caso normal, no una excepcion: simplemente se oculta.
+    // Si no encuentra el .webp, prueba con .jpeg por compatibilidad con fotos
+    // antiguas que aun no se hayan migrado al nuevo formato.
     function updateBarcodeProductImage(sheetFolder, eanCode) {
       if (!barcodeProductImgWrap || !barcodeProductImg) return;
       barcodeProductImgWrap.style.display = 'none';
       barcodeProductImg.removeAttribute('src');
       if (!sheetFolder || !eanCode) return;
-      var path = 'pictures/' + encodeURIComponent(sheetFolder) + '/' + encodeURIComponent(eanCode) + '.jpeg';
+      var base = 'pictures/' + encodeURIComponent(sheetFolder) + '/' + encodeURIComponent(eanCode);
+      var triedFallback = false;
       barcodeProductImg.onload = function() { barcodeProductImgWrap.style.display = 'flex'; };
-      barcodeProductImg.onerror = function() { barcodeProductImgWrap.style.display = 'none'; barcodeProductImg.removeAttribute('src'); };
-      barcodeProductImg.src = path;
+      barcodeProductImg.onerror = function() {
+        if (!triedFallback) {
+          triedFallback = true;
+          barcodeProductImg.src = base + '.jpeg';
+          return;
+        }
+        barcodeProductImgWrap.style.display = 'none';
+        barcodeProductImg.removeAttribute('src');
+      };
+      barcodeProductImg.src = base + '.webp';
     }
 
     function openBarcodeModal(eanCode, sheetFolder) {
