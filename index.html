@@ -15178,11 +15178,12 @@
     }
 
     // --- Tamaño de letra (A- / A+) ---
-    // Zoom aplicado solo a los contenedores de tablas (.table-wrap: secciones
-    // de producto, matriz de compatibilidad y resultados de busqueda) via una
-    // variable CSS, para que escale unicamente el contenido de los campos de
-    // referencia y no afecte a cabeceras, botones ni al resto de la pagina.
-    // Se guarda en localStorage para que persista entre visitas.
+    // La variable --ref-zoom multiplica (via calc()) el font-size real de las
+    // celdas de las tablas de referencia (secciones de producto, matriz de
+    // compatibilidad y resultados de busqueda) — no se usa la propiedad CSS
+    // "zoom" porque Safari/iOS no la soporta. Asi escala solo el contenido de
+    // los campos de referencia y no afecta a cabeceras, botones ni al resto
+    // de la pagina. Se guarda en localStorage para que persista entre visitas.
     var FONT_SCALE_KEY = 'fontScale';
     var FONT_SCALE_MIN = 0.8, FONT_SCALE_MAX = 1.4, FONT_SCALE_STEP = 0.1;
     var fontDecBtn = document.getElementById('fontDecBtn');
