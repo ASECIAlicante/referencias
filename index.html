@@ -12,7 +12,7 @@
 <body class="light-mode">
 <div class="topbar">
   <div class="topbar-header">
-    <div class="brand-lockup">
+    <div class="brand-lockup" id="brandHome" role="button" tabindex="0" title="Volver a Inicio" aria-label="Volver a Inicio">
       <svg class="brand-arc-mark" viewBox="0 0 400 228" aria-hidden="true" focusable="false">
         <defs><linearGradient id="eciarcGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" class="arc-stop-start"/><stop offset="100%" class="arc-stop-end"/></linearGradient></defs>
         <path d="M 30 220 A 170 170 0 0 1 370 220" stroke="url(#eciarcGrad)" stroke-width="11" fill="none"/>
@@ -36,7 +36,7 @@
   <div class="search-bar-row" id="searchBarRow">
     <input type="text" id="sheetSearch" placeholder="Buscar por modelo, P/N, ECI o EAN...">
   </div>
-  <div class="btn-row level1" id="level1Row"><button type="button" class="nav-btn nav-btn-home active" data-target="home" title="Inicio" aria-label="Inicio">🏠</button><button type="button" class="nav-btn" data-lob="mac">Mac<span class="nav-btn-count">108</span></button><button type="button" class="nav-btn" data-target="display-2">Display<span class="nav-btn-count">12</span></button><button type="button" class="nav-btn" data-lob="ipad">iPad<span class="nav-btn-count">228</span></button><button type="button" class="nav-btn" data-lob="iphone">iPhone<span class="nav-btn-count">262</span></button><button type="button" class="nav-btn" data-lob="apple-watch">Apple Watch<span class="nav-btn-count">308</span></button><button type="button" class="nav-btn" data-target="audio-24">Audio<span class="nav-btn-count">19</span></button><button type="button" class="nav-btn" data-target="accesorios-apple-tv-25">Accesorios &amp; Apple TV<span class="nav-btn-count">68</span></button><button type="button" class="nav-btn" data-lob="eol">EOL<span class="nav-btn-count">878</span></button></div>
+  <div class="btn-row level1" id="level1Row"><button type="button" class="nav-btn" data-lob="mac">Mac<span class="nav-btn-count">108</span></button><button type="button" class="nav-btn" data-target="display-2">Display<span class="nav-btn-count">12</span></button><button type="button" class="nav-btn" data-lob="ipad">iPad<span class="nav-btn-count">228</span></button><button type="button" class="nav-btn" data-lob="iphone">iPhone<span class="nav-btn-count">262</span></button><button type="button" class="nav-btn" data-lob="apple-watch">Apple Watch<span class="nav-btn-count">308</span></button><button type="button" class="nav-btn" data-target="audio-24">Audio<span class="nav-btn-count">19</span></button><button type="button" class="nav-btn" data-target="accesorios-apple-tv-25">Accesorios &amp; Apple TV<span class="nav-btn-count">68</span></button><button type="button" class="nav-btn" data-lob="eol">EOL<span class="nav-btn-count">878</span></button></div>
   <div class="btn-row level2" id="lobrow-mac"><button type="button" class="nav-btn nav-btn-leaf" data-target="mac-macbook-0">MacBook<span class="nav-btn-count">77</span></button><button type="button" class="nav-btn nav-btn-leaf" data-target="mac-mac-1">Mac<span class="nav-btn-count">31</span></button></div>
 <div class="btn-row level2" id="lobrow-ipad"><button type="button" class="nav-btn nav-btn-leaf" data-target="ipad-a16-3">A16<span class="nav-btn-count">31</span></button><button type="button" class="nav-btn nav-btn-leaf" data-target="ipad-mini-7-4">Mini 7<span class="nav-btn-count">30</span></button><button type="button" class="nav-btn nav-btn-leaf" data-target="ipad-air-m4-5">Air M4<span class="nav-btn-count">80</span></button><button type="button" class="nav-btn nav-btn-leaf" data-target="ipad-pro-m5-6">Pro M5<span class="nav-btn-count">66</span></button><button type="button" class="nav-btn nav-btn-leaf" data-target="ipad-pencil-keyboard-7">Pencil &amp; Keyboard<span class="nav-btn-count">21</span></button></div>
 <div class="btn-row level2" id="lobrow-iphone"><button type="button" class="nav-btn nav-btn-leaf" data-target="iphone-duo-8">⚠️ Duo<span class="nav-btn-count">18</span></button><button type="button" class="nav-btn nav-btn-leaf" data-target="iphone-18-pro-max-9">18 Pro Max<span class="nav-btn-count">35</span></button><button type="button" class="nav-btn nav-btn-leaf" data-target="iphone-18-pro-10">18 Pro<span class="nav-btn-count">35</span></button><button type="button" class="nav-btn nav-btn-leaf" data-target="iphone-17-pro-max-11">17 Pro Max<span class="nav-btn-count">31</span></button><button type="button" class="nav-btn nav-btn-leaf" data-target="iphone-17-pro-12">17 Pro<span class="nav-btn-count">27</span></button><button type="button" class="nav-btn nav-btn-leaf" data-target="iphone-17-13">17<span class="nav-btn-count">23</span></button><button type="button" class="nav-btn nav-btn-leaf" data-target="iphone-air-14">Air<span class="nav-btn-count">25</span></button><button type="button" class="nav-btn nav-btn-leaf" data-target="iphone-17e-15">17e<span class="nav-btn-count">12</span></button><button type="button" class="nav-btn nav-btn-leaf" data-target="iphone-16-16">16<span class="nav-btn-count">10</span></button><button type="button" class="nav-btn nav-btn-leaf" data-target="iphone-strap-wallet-17">Strap &amp; Wallet<span class="nav-btn-count">21</span></button><button type="button" class="nav-btn nav-btn-leaf" data-target="iphone-demo-18">DEMO<span class="nav-btn-count">25</span></button></div>
@@ -51,12 +51,11 @@
             <span class="home-today-date" id="homeTodayDate"></span>
             <span class="home-today-fact" id="homeTodayFact"></span>
           </div>
-          <p class="home-subtitle">Selecciona una categoría en el menú superior o usa el buscador 🔎 para empezar.</p>
           <div class="home-tip">
-            <p class="home-tip-title">💡 Trucos útiles:</p>
             <ul class="home-tip-list">
-              <li>Haz clic en cualquier parte de la línea para ver el código de barras.</li>
-              <li>Usa 📷 desde tu móvil para escanear referencias directamente.</li>
+              <li>Menú o 🔎 para empezar.</li>
+              <li>👆 en una línea ➡️ código de barras.</li>
+              <li>📷 para escanear referencias.</li>
               <li><a href="https://pjexposito.github.io/planmy.html" target="_blank" rel="noopener noreferrer" class="home-tip-link">Enlace a la calculadora PlanMy</a></li>
             </ul>
           </div>
@@ -8031,23 +8030,23 @@
 <th>EAN</th>
       </tr></thead>
       <tbody>
-<tr data-search="magsafe 2 45w md592z/a 286.364.01631 885909611607">
+<tr data-search="magsafe 2 45w md592z/a 286.364.01631 0885909611607">
 <td style="background:#FFFFFF;color:#111318;"><span class="cell-text">Magsafe 2 45W</span></td>
 <td class="mono" style="background:#FFFFFF;color:#111318;"><span class="cell-text">MD592Z/A</span></td>
 <td style="background:#FFFFFF;color:#111318;"><span class="cell-text">286.364.01631</span></td>
-<td class="mono" style="background:#FFFFFF;color:#111318;"><span class="cell-text">885909611607</span></td>
+<td class="mono" style="background:#FFFFFF;color:#111318;"><span class="cell-text">0885909611607</span></td>
 </tr>
-<tr data-search="magsafe 2 60w md565z/a 286.364.01771 885909575763">
+<tr data-search="magsafe 2 60w md565z/a 286.364.01771 0885909575763">
 <td style="background:#FFFFFF;color:#111318;"><span class="cell-text">Magsafe 2 60W</span></td>
 <td class="mono" style="background:#FFFFFF;color:#111318;"><span class="cell-text">MD565Z/A</span></td>
 <td style="background:#FFFFFF;color:#111318;"><span class="cell-text">286.364.01771</span></td>
-<td class="mono" style="background:#FFFFFF;color:#111318;"><span class="cell-text">885909575763</span></td>
+<td class="mono" style="background:#FFFFFF;color:#111318;"><span class="cell-text">0885909575763</span></td>
 </tr>
-<tr data-search="magsafe 2 85w md506z/a 286.364.01649 885909611508">
+<tr data-search="magsafe 2 85w md506z/a 286.364.01649 0885909611508">
 <td style="background:#FFFFFF;color:#111318;"><span class="cell-text">Magsafe 2 85W</span></td>
 <td class="mono" style="background:#FFFFFF;color:#111318;"><span class="cell-text">MD506Z/A</span></td>
 <td style="background:#FFFFFF;color:#111318;"><span class="cell-text">286.364.01649</span></td>
-<td class="mono" style="background:#FFFFFF;color:#111318;"><span class="cell-text">885909611508</span></td>
+<td class="mono" style="background:#FFFFFF;color:#111318;"><span class="cell-text">0885909611508</span></td>
 </tr>
       </tbody>
     </table></div>
@@ -8301,11 +8300,11 @@
 <td style="background:#FFFFFF;color:#111318;"><span class="cell-text">385.472.28494</span></td>
 <td class="mono" style="background:#FFFFFF;color:#111318;"><span class="cell-text">0190198886866</span></td>
 </tr>
-<tr data-search="adaptador usb-c a usb-a mj1m2zm/a 385.472.22844 888462108454">
+<tr data-search="adaptador usb-c a usb-a mj1m2zm/a 385.472.22844 0888462108454">
 <td style="background:#FFFFFF;color:#111318;"><span class="cell-text">Adaptador USB-C a USB-A</span></td>
 <td class="mono" style="background:#FFFFFF;color:#111318;"><span class="cell-text">MJ1M2ZM/A</span></td>
 <td style="background:#FFFFFF;color:#111318;"><span class="cell-text">385.472.22844</span></td>
-<td class="mono" style="background:#FFFFFF;color:#111318;"><span class="cell-text">888462108454</span></td>
+<td class="mono" style="background:#FFFFFF;color:#111318;"><span class="cell-text">0888462108454</span></td>
 </tr>
 <tr data-search="adaptador usb-c a lightning muqx3zm/a 385.472.32363 0195949122880">
 <td style="background:#FFFFFF;color:#111318;"><span class="cell-text">Adaptador USB-C a Lightning</span></td>
@@ -8319,11 +8318,11 @@
 <td style="background:#FFFFFF;color:#111318;"><span class="cell-text">385.472.29997</span></td>
 <td class="mono" style="background:#FFFFFF;color:#111318;"><span class="cell-text">0190198914439</span></td>
 </tr>
-<tr data-search="usb-c a vga mj1l2zm/a 385.472.22869 888462075039">
+<tr data-search="usb-c a vga mj1l2zm/a 385.472.22869 0888462075039">
 <td style="background:#FFFFFF;color:#111318;"><span class="cell-text">USB-C a VGA</span></td>
 <td class="mono" style="background:#FFFFFF;color:#111318;"><span class="cell-text">MJ1L2ZM/A</span></td>
 <td style="background:#FFFFFF;color:#111318;"><span class="cell-text">385.472.22869</span></td>
-<td class="mono" style="background:#FFFFFF;color:#111318;"><span class="cell-text">888462075039</span></td>
+<td class="mono" style="background:#FFFFFF;color:#111318;"><span class="cell-text">0888462075039</span></td>
 </tr>
 <tr data-search="cable apple watch usb-c 1m mt0h3ty/a 890.109.01281 0195949102196">
 <td style="background:#FFFFFF;color:#111318;"><span class="cell-text">Cable Apple Watch USB-C 1m</span></td>
@@ -9348,17 +9347,17 @@
 <th>EAN</th>
       </tr></thead>
       <tbody>
-<tr data-search="mbp 14.2”/m5/16gb/10cpu/10gpu/512gb/sb mde04y/a 152.154.26055 195950489170">
+<tr data-search="mbp 14.2”/m5/16gb/10cpu/10gpu/512gb/sb mde04y/a 152.154.26055 0195950489170">
 <td style="background:#ADADAD;color:#FFFFFF;"><span class="cell-text">MBP 14.2”/M5/16GB/10CPU/10GPU/512GB/SB</span></td>
 <td class="mono" style="background:#ADADAD;color:#FFFFFF;"><span class="cell-text">MDE04Y/A</span></td>
 <td class="mono" style="background:#ADADAD;color:#FFFFFF;"><span class="cell-text">152.154.26055</span></td>
-<td class="mono" style="background:#ADADAD;color:#FFFFFF;"><span class="cell-text">195950489170</span></td>
+<td class="mono" style="background:#ADADAD;color:#FFFFFF;"><span class="cell-text">0195950489170</span></td>
 </tr>
-<tr data-search="mbp 14.2”/m5/16gb/10cpu/10gpu/512gb/s mde44y/a 152.154.26063 195950490589">
+<tr data-search="mbp 14.2”/m5/16gb/10cpu/10gpu/512gb/s mde44y/a 152.154.26063 0195950490589">
 <td style="background:#E8E8E8;color:#111318;"><span class="cell-text">MBP 14.2”/M5/16GB/10CPU/10GPU/512GB/S</span></td>
 <td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">MDE44Y/A</span></td>
 <td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">152.154.26063</span></td>
-<td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">195950490589</span></td>
+<td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">0195950490589</span></td>
 </tr>
       </tbody>
     </table></div>
@@ -13144,29 +13143,29 @@
 <th>EAN</th>
       </tr></thead>
       <tbody>
-<tr data-search="starlight aluminium case with s/m starlight sport band meh34ql/a 946.113.04018 195950386530">
+<tr data-search="starlight aluminium case with s/m starlight sport band meh34ql/a 946.113.04018 0195950386530">
 <td style="background:#FBE3D6;color:#111318;"><span class="cell-text">Starlight Aluminium Case with S/M Starlight Sport Band</span></td>
 <td class="mono" style="background:#FBE3D6;color:#111318;"><span class="cell-text">MEH34QL/A</span></td>
 <td class="mono" style="background:#FBE3D6;color:#111318;"><span class="cell-text">946.113.04018</span></td>
-<td class="mono" style="background:#FBE3D6;color:#111318;"><span class="cell-text">195950386530</span></td>
+<td class="mono" style="background:#FBE3D6;color:#111318;"><span class="cell-text">0195950386530</span></td>
 </tr>
-<tr data-search="starlight aluminium case with m/l starlight sport band meh54ql/a 946.113.03747 195950386738">
+<tr data-search="starlight aluminium case with m/l starlight sport band meh54ql/a 946.113.03747 0195950386738">
 <td style="background:#FBE3D6;color:#111318;"><span class="cell-text">Starlight Aluminium Case with M/L Starlight Sport Band</span></td>
 <td class="mono" style="background:#FBE3D6;color:#111318;"><span class="cell-text">MEH54QL/A</span></td>
 <td class="mono" style="background:#FBE3D6;color:#111318;"><span class="cell-text">946.113.03747</span></td>
-<td class="mono" style="background:#FBE3D6;color:#111318;"><span class="cell-text">195950386738</span></td>
+<td class="mono" style="background:#FBE3D6;color:#111318;"><span class="cell-text">0195950386738</span></td>
 </tr>
-<tr data-search="midnight aluminium case with s/m midnight sport band meh94ql/a 946.113.03754 195950387131">
+<tr data-search="midnight aluminium case with s/m midnight sport band meh94ql/a 946.113.03754 0195950387131">
 <td style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">Midnight Aluminium Case with S/M Midnight Sport Band</span></td>
 <td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">MEH94QL/A</span></td>
 <td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">946.113.03754</span></td>
-<td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">195950387131</span></td>
+<td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">0195950387131</span></td>
 </tr>
-<tr data-search="midnight aluminium case with m/l midnight sport band mehc4ql/a 946.113.03762 195950387339">
+<tr data-search="midnight aluminium case with m/l midnight sport band mehc4ql/a 946.113.03762 0195950387339">
 <td style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">Midnight Aluminium Case with M/L Midnight Sport Band</span></td>
 <td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">MEHC4QL/A</span></td>
 <td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">946.113.03762</span></td>
-<td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">195950387339</span></td>
+<td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">0195950387339</span></td>
 </tr>
       </tbody>
     </table></div>
@@ -13189,29 +13188,29 @@
 <th>EAN</th>
       </tr></thead>
       <tbody>
-<tr data-search="starlight aluminium case with s/m starlight sport band mep64ql/a 946.113.03770 195950429466">
+<tr data-search="starlight aluminium case with s/m starlight sport band mep64ql/a 946.113.03770 0195950429466">
 <td style="background:#FBE3D6;color:#111318;"><span class="cell-text">Starlight Aluminium Case with S/M Starlight Sport Band</span></td>
 <td class="mono" style="background:#FBE3D6;color:#111318;"><span class="cell-text">MEP64QL/A</span></td>
 <td class="mono" style="background:#FBE3D6;color:#111318;"><span class="cell-text">946.113.03770</span></td>
-<td class="mono" style="background:#FBE3D6;color:#111318;"><span class="cell-text">195950429466</span></td>
+<td class="mono" style="background:#FBE3D6;color:#111318;"><span class="cell-text">0195950429466</span></td>
 </tr>
-<tr data-search="starlight aluminium case with m/l starlight sport band mep74ql/a 946.113.04026 195950429640">
+<tr data-search="starlight aluminium case with m/l starlight sport band mep74ql/a 946.113.04026 0195950429640">
 <td style="background:#FBE3D6;color:#111318;"><span class="cell-text">Starlight Aluminium Case with M/L Starlight Sport Band</span></td>
 <td class="mono" style="background:#FBE3D6;color:#111318;"><span class="cell-text">MEP74QL/A</span></td>
 <td class="mono" style="background:#FBE3D6;color:#111318;"><span class="cell-text">946.113.04026</span></td>
-<td class="mono" style="background:#FBE3D6;color:#111318;"><span class="cell-text">195950429640</span></td>
+<td class="mono" style="background:#FBE3D6;color:#111318;"><span class="cell-text">0195950429640</span></td>
 </tr>
-<tr data-search="midnight aluminium case with s/m midnight sport band mep94ql/a 946.113.03788 195950430004">
+<tr data-search="midnight aluminium case with s/m midnight sport band mep94ql/a 946.113.03788 0195950430004">
 <td style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">Midnight Aluminium Case with S/M Midnight Sport Band</span></td>
 <td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">MEP94QL/A</span></td>
 <td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">946.113.03788</span></td>
-<td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">195950430004</span></td>
+<td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">0195950430004</span></td>
 </tr>
-<tr data-search="midnight aluminium case with m/l midnight sport band mepc4ql/a 946.113.03796 195950430189">
+<tr data-search="midnight aluminium case with m/l midnight sport band mepc4ql/a 946.113.03796 0195950430189">
 <td style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">Midnight Aluminium Case with M/L Midnight Sport Band</span></td>
 <td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">MEPC4QL/A</span></td>
 <td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">946.113.03796</span></td>
-<td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">195950430189</span></td>
+<td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">0195950430189</span></td>
 </tr>
       </tbody>
     </table></div>
@@ -13234,29 +13233,29 @@
 <th>EAN</th>
       </tr></thead>
       <tbody>
-<tr data-search="starlight aluminium case with s/m starlight sport band mehg4ql/a 946.114.03935 195950387735">
+<tr data-search="starlight aluminium case with s/m starlight sport band mehg4ql/a 946.114.03935 0195950387735">
 <td style="background:#FBE3D6;color:#111318;"><span class="cell-text">Starlight Aluminium Case with S/M Starlight Sport Band</span></td>
 <td class="mono" style="background:#FBE3D6;color:#111318;"><span class="cell-text">MEHG4QL/A</span></td>
 <td class="mono" style="background:#FBE3D6;color:#111318;"><span class="cell-text">946.114.03935</span></td>
-<td class="mono" style="background:#FBE3D6;color:#111318;"><span class="cell-text">195950387735</span></td>
+<td class="mono" style="background:#FBE3D6;color:#111318;"><span class="cell-text">0195950387735</span></td>
 </tr>
-<tr data-search="starlight aluminium case with m/l starlight sport band mehj4ql/a 946.114.03943 195950387933">
+<tr data-search="starlight aluminium case with m/l starlight sport band mehj4ql/a 946.114.03943 0195950387933">
 <td style="background:#FBE3D6;color:#111318;"><span class="cell-text">Starlight Aluminium Case with M/L Starlight Sport Band</span></td>
 <td class="mono" style="background:#FBE3D6;color:#111318;"><span class="cell-text">MEHJ4QL/A</span></td>
 <td class="mono" style="background:#FBE3D6;color:#111318;"><span class="cell-text">946.114.03943</span></td>
-<td class="mono" style="background:#FBE3D6;color:#111318;"><span class="cell-text">195950387933</span></td>
+<td class="mono" style="background:#FBE3D6;color:#111318;"><span class="cell-text">0195950387933</span></td>
 </tr>
-<tr data-search="midnight aluminium case with s/m midnight sport band mehn4ql/a 946.114.03950 195950388336">
+<tr data-search="midnight aluminium case with s/m midnight sport band mehn4ql/a 946.114.03950 0195950388336">
 <td style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">Midnight Aluminium Case with S/M Midnight Sport Band</span></td>
 <td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">MEHN4QL/A</span></td>
 <td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">946.114.03950</span></td>
-<td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">195950388336</span></td>
+<td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">0195950388336</span></td>
 </tr>
-<tr data-search="midnight aluminium case with m/l midnight sport band mehq4ql/a 946.114.03968 195950388534">
+<tr data-search="midnight aluminium case with m/l midnight sport band mehq4ql/a 946.114.03968 0195950388534">
 <td style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">Midnight Aluminium Case with M/L Midnight Sport Band</span></td>
 <td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">MEHQ4QL/A</span></td>
 <td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">946.114.03968</span></td>
-<td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">195950388534</span></td>
+<td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">0195950388534</span></td>
 </tr>
       </tbody>
     </table></div>
@@ -13279,29 +13278,29 @@
 <th>EAN</th>
       </tr></thead>
       <tbody>
-<tr data-search="starlight aluminium case with s/m starlight sport band mehg4ql/a 946.114.04214 195950430547">
+<tr data-search="starlight aluminium case with s/m starlight sport band mehg4ql/a 946.114.04214 0195950430547">
 <td style="background:#FBE3D6;color:#111318;"><span class="cell-text">Starlight Aluminium Case with S/M Starlight Sport Band</span></td>
 <td class="mono" style="background:#FBE3D6;color:#111318;"><span class="cell-text">MEHG4QL/A</span></td>
 <td class="mono" style="background:#FBE3D6;color:#111318;"><span class="cell-text">946.114.04214</span></td>
-<td class="mono" style="background:#FBE3D6;color:#111318;"><span class="cell-text">195950430547</span></td>
+<td class="mono" style="background:#FBE3D6;color:#111318;"><span class="cell-text">0195950430547</span></td>
 </tr>
-<tr data-search="starlight aluminium case with m/l starlight sport band mehj4ql/a 946.114.04222 195950430721">
+<tr data-search="starlight aluminium case with m/l starlight sport band mehj4ql/a 946.114.04222 0195950430721">
 <td style="background:#FBE3D6;color:#111318;"><span class="cell-text">Starlight Aluminium Case with M/L Starlight Sport Band</span></td>
 <td class="mono" style="background:#FBE3D6;color:#111318;"><span class="cell-text">MEHJ4QL/A</span></td>
 <td class="mono" style="background:#FBE3D6;color:#111318;"><span class="cell-text">946.114.04222</span></td>
-<td class="mono" style="background:#FBE3D6;color:#111318;"><span class="cell-text">195950430721</span></td>
+<td class="mono" style="background:#FBE3D6;color:#111318;"><span class="cell-text">0195950430721</span></td>
 </tr>
-<tr data-search="midnight aluminium case with s/m midnight sport band mehn4ql/a 946.114.03976 195950431087">
+<tr data-search="midnight aluminium case with s/m midnight sport band mehn4ql/a 946.114.03976 0195950431087">
 <td style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">Midnight Aluminium Case with S/M Midnight Sport Band</span></td>
 <td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">MEHN4QL/A</span></td>
 <td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">946.114.03976</span></td>
-<td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">195950431087</span></td>
+<td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">0195950431087</span></td>
 </tr>
-<tr data-search="midnight aluminium case with m/l midnight sport band mehq4ql/a 946.114.03984 195950431261">
+<tr data-search="midnight aluminium case with m/l midnight sport band mehq4ql/a 946.114.03984 0195950431261">
 <td style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">Midnight Aluminium Case with M/L Midnight Sport Band</span></td>
 <td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">MEHQ4QL/A</span></td>
 <td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">946.114.03984</span></td>
-<td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">195950431261</span></td>
+<td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">0195950431261</span></td>
 </tr>
       </tbody>
     </table></div>
@@ -13324,53 +13323,53 @@
 <th>EAN</th>
       </tr></thead>
       <tbody>
-<tr data-search="jet black with s/m black sport band  meqt4ql/a 946.113.03804 195950466775">
+<tr data-search="jet black with s/m black sport band  meqt4ql/a 946.113.03804 0195950466775">
 <td style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">Jet Black with S/M Black Sport Band </span></td>
 <td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">MEQT4QL/A</span></td>
 <td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">946.113.03804</span></td>
-<td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">195950466775</span></td>
+<td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">0195950466775</span></td>
 </tr>
-<tr data-search="jet black with m/l black sport band  mequ4ql/a 946.113.04034 195950460247">
+<tr data-search="jet black with m/l black sport band  mequ4ql/a 946.113.04034 0195950460247">
 <td style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">Jet Black with M/L Black Sport Band </span></td>
 <td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">MEQU4QL/A</span></td>
 <td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">946.113.04034</span></td>
-<td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">195950460247</span></td>
+<td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">0195950460247</span></td>
 </tr>
-<tr data-search="space gray with s/m black sport band  meqw4ql/a 946.113.03812 195950460629">
+<tr data-search="space gray with s/m black sport band  meqw4ql/a 946.113.03812 0195950460629">
 <td style="background:#D1D1D1;color:#111318;"><span class="cell-text">Space Gray with S/M Black Sport Band </span></td>
 <td class="mono" style="background:#D1D1D1;color:#111318;"><span class="cell-text">MEQW4QL/A</span></td>
 <td class="mono" style="background:#D1D1D1;color:#111318;"><span class="cell-text">946.113.03812</span></td>
-<td class="mono" style="background:#D1D1D1;color:#111318;"><span class="cell-text">195950460629</span></td>
+<td class="mono" style="background:#D1D1D1;color:#111318;"><span class="cell-text">0195950460629</span></td>
 </tr>
-<tr data-search="space gray with m/l black sport band meqx4ql/a 946.113.03820 195950460810">
+<tr data-search="space gray with m/l black sport band meqx4ql/a 946.113.03820 0195950460810">
 <td style="background:#D1D1D1;color:#111318;"><span class="cell-text">Space Gray with M/L Black Sport Band</span></td>
 <td class="mono" style="background:#D1D1D1;color:#111318;"><span class="cell-text">MEQX4QL/A</span></td>
 <td class="mono" style="background:#D1D1D1;color:#111318;"><span class="cell-text">946.113.03820</span></td>
-<td class="mono" style="background:#D1D1D1;color:#111318;"><span class="cell-text">195950460810</span></td>
+<td class="mono" style="background:#D1D1D1;color:#111318;"><span class="cell-text">0195950460810</span></td>
 </tr>
-<tr data-search="rose gold with s/m light blush sport band meu04ql/a 946.113.04042 195950461190">
+<tr data-search="rose gold with s/m light blush sport band meu04ql/a 946.113.04042 0195950461190">
 <td style="background:#F2CFEE;color:#111318;"><span class="cell-text">Rose Gold with S/M Light Blush Sport Band</span></td>
 <td class="mono" style="background:#F2CFEE;color:#111318;"><span class="cell-text">MEU04QL/A</span></td>
 <td class="mono" style="background:#F2CFEE;color:#111318;"><span class="cell-text">946.113.04042</span></td>
-<td class="mono" style="background:#F2CFEE;color:#111318;"><span class="cell-text">195950461190</span></td>
+<td class="mono" style="background:#F2CFEE;color:#111318;"><span class="cell-text">0195950461190</span></td>
 </tr>
-<tr data-search="rose gold with m/l light blush sport band meu44ql/a 946.113.04059 195950461381">
+<tr data-search="rose gold with m/l light blush sport band meu44ql/a 946.113.04059 0195950461381">
 <td style="background:#F2CFEE;color:#111318;"><span class="cell-text">Rose Gold with M/L Light Blush Sport Band</span></td>
 <td class="mono" style="background:#F2CFEE;color:#111318;"><span class="cell-text">MEU44QL/A</span></td>
 <td class="mono" style="background:#F2CFEE;color:#111318;"><span class="cell-text">946.113.04059</span></td>
-<td class="mono" style="background:#F2CFEE;color:#111318;"><span class="cell-text">195950461381</span></td>
+<td class="mono" style="background:#F2CFEE;color:#111318;"><span class="cell-text">0195950461381</span></td>
 </tr>
-<tr data-search="silver with s/m purple fog sport band meu64ql/a 946.113.03838 195950461763">
+<tr data-search="silver with s/m purple fog sport band meu64ql/a 946.113.03838 0195950461763">
 <td style="background:#E8E8E8;color:#111318;"><span class="cell-text">Silver with S/M Purple Fog Sport Band</span></td>
 <td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">MEU64QL/A</span></td>
 <td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">946.113.03838</span></td>
-<td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">195950461763</span></td>
+<td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">0195950461763</span></td>
 </tr>
-<tr data-search="silver with m/l purple fog band meu74ql/a 946.113.03846 195950461954">
+<tr data-search="silver with m/l purple fog band meu74ql/a 946.113.03846 0195950461954">
 <td style="background:#E8E8E8;color:#111318;"><span class="cell-text">Silver with M/L Purple Fog Band</span></td>
 <td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">MEU74QL/A</span></td>
 <td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">946.113.03846</span></td>
-<td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">195950461954</span></td>
+<td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">0195950461954</span></td>
 </tr>
       </tbody>
     </table></div>
@@ -13393,53 +13392,53 @@
 <th>EAN</th>
       </tr></thead>
       <tbody>
-<tr data-search="jet black with s/m black sport band  mf834ql/a 946.113.03853 195950468625">
+<tr data-search="jet black with s/m black sport band  mf834ql/a 946.113.03853 0195950468625">
 <td style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">Jet Black with S/M Black Sport Band </span></td>
 <td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">MF834QL/A</span></td>
 <td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">946.113.03853</span></td>
-<td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">195950468625</span></td>
+<td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">0195950468625</span></td>
 </tr>
-<tr data-search="jet black with m/l black sport band  mf854ql/a 946.113.03861 195950468809">
+<tr data-search="jet black with m/l black sport band  mf854ql/a 946.113.03861 0195950468809">
 <td style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">Jet Black with M/L Black Sport Band </span></td>
 <td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">MF854QL/A</span></td>
 <td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">946.113.03861</span></td>
-<td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">195950468809</span></td>
+<td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">0195950468809</span></td>
 </tr>
-<tr data-search="space gray with s/m black sport band  mf8a4ql/a 946.113.03879 195950469165">
+<tr data-search="space gray with s/m black sport band  mf8a4ql/a 946.113.03879 0195950469165">
 <td style="background:#D1D1D1;color:#111318;"><span class="cell-text">Space Gray with S/M Black Sport Band </span></td>
 <td class="mono" style="background:#D1D1D1;color:#111318;"><span class="cell-text">MF8A4QL/A</span></td>
 <td class="mono" style="background:#D1D1D1;color:#111318;"><span class="cell-text">946.113.03879</span></td>
-<td class="mono" style="background:#D1D1D1;color:#111318;"><span class="cell-text">195950469165</span></td>
+<td class="mono" style="background:#D1D1D1;color:#111318;"><span class="cell-text">0195950469165</span></td>
 </tr>
-<tr data-search="space gray with m/l black sport band mf8c4ql/a 946.113.03887 195950469349">
+<tr data-search="space gray with m/l black sport band mf8c4ql/a 946.113.03887 0195950469349">
 <td style="background:#D1D1D1;color:#111318;"><span class="cell-text">Space Gray with M/L Black Sport Band</span></td>
 <td class="mono" style="background:#D1D1D1;color:#111318;"><span class="cell-text">MF8C4QL/A</span></td>
 <td class="mono" style="background:#D1D1D1;color:#111318;"><span class="cell-text">946.113.03887</span></td>
-<td class="mono" style="background:#D1D1D1;color:#111318;"><span class="cell-text">195950469349</span></td>
+<td class="mono" style="background:#D1D1D1;color:#111318;"><span class="cell-text">0195950469349</span></td>
 </tr>
-<tr data-search="rose gold with s/m light blush sport band mf8e4ql/a 946.113.03895 195950469707">
+<tr data-search="rose gold with s/m light blush sport band mf8e4ql/a 946.113.03895 0195950469707">
 <td style="background:#F2CFEE;color:#111318;"><span class="cell-text">Rose Gold with S/M Light Blush Sport Band</span></td>
 <td class="mono" style="background:#F2CFEE;color:#111318;"><span class="cell-text">MF8E4QL/A</span></td>
 <td class="mono" style="background:#F2CFEE;color:#111318;"><span class="cell-text">946.113.03895</span></td>
-<td class="mono" style="background:#F2CFEE;color:#111318;"><span class="cell-text">195950469707</span></td>
+<td class="mono" style="background:#F2CFEE;color:#111318;"><span class="cell-text">0195950469707</span></td>
 </tr>
-<tr data-search="rose gold with m/l light blush sport band mf8f4ql/a 946.113.03903 195950469882">
+<tr data-search="rose gold with m/l light blush sport band mf8f4ql/a 946.113.03903 0195950469882">
 <td style="background:#F2CFEE;color:#111318;"><span class="cell-text">Rose Gold with M/L Light Blush Sport Band</span></td>
 <td class="mono" style="background:#F2CFEE;color:#111318;"><span class="cell-text">MF8F4QL/A</span></td>
 <td class="mono" style="background:#F2CFEE;color:#111318;"><span class="cell-text">946.113.03903</span></td>
-<td class="mono" style="background:#F2CFEE;color:#111318;"><span class="cell-text">195950469882</span></td>
+<td class="mono" style="background:#F2CFEE;color:#111318;"><span class="cell-text">0195950469882</span></td>
 </tr>
-<tr data-search="silver with s/m purple fog sport band mf8h4ql/a 946.113.04067 195950470246">
+<tr data-search="silver with s/m purple fog sport band mf8h4ql/a 946.113.04067 0195950470246">
 <td style="background:#E8E8E8;color:#111318;"><span class="cell-text">Silver with S/M Purple Fog Sport Band</span></td>
 <td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">MF8H4QL/A</span></td>
 <td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">946.113.04067</span></td>
-<td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">195950470246</span></td>
+<td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">0195950470246</span></td>
 </tr>
-<tr data-search="silver with m/l purple fog band mf8j4ql/a 946.113.03911 195950470420">
+<tr data-search="silver with m/l purple fog band mf8j4ql/a 946.113.03911 0195950470420">
 <td style="background:#E8E8E8;color:#111318;"><span class="cell-text">Silver with M/L Purple Fog Band</span></td>
 <td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">MF8J4QL/A</span></td>
 <td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">946.113.03911</span></td>
-<td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">195950470420</span></td>
+<td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">0195950470420</span></td>
 </tr>
       </tbody>
     </table></div>
@@ -13462,53 +13461,53 @@
 <th>EAN</th>
       </tr></thead>
       <tbody>
-<tr data-search="jet black with s/m black sport band  meuw4ql/a 946.114.04230 195950462579">
+<tr data-search="jet black with s/m black sport band  meuw4ql/a 946.114.04230 0195950462579">
 <td style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">Jet Black with S/M Black Sport Band </span></td>
 <td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">MEUW4QL/A</span></td>
 <td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">946.114.04230</span></td>
-<td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">195950462579</span></td>
+<td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">0195950462579</span></td>
 </tr>
-<tr data-search="jet black with m/l black sport band  meux4ql/a 946.114.03992 195950462760">
+<tr data-search="jet black with m/l black sport band  meux4ql/a 946.114.03992 0195950462760">
 <td style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">Jet Black with M/L Black Sport Band </span></td>
 <td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">MEUX4QL/A</span></td>
 <td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">946.114.03992</span></td>
-<td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">195950462760</span></td>
+<td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">0195950462760</span></td>
 </tr>
-<tr data-search="space gray with s/m black sport band  mev04ql/a 946.114.04008 195950463149">
+<tr data-search="space gray with s/m black sport band  mev04ql/a 946.114.04008 0195950463149">
 <td style="background:#D1D1D1;color:#111318;"><span class="cell-text">Space Gray with S/M Black Sport Band </span></td>
 <td class="mono" style="background:#D1D1D1;color:#111318;"><span class="cell-text">MEV04QL/A</span></td>
 <td class="mono" style="background:#D1D1D1;color:#111318;"><span class="cell-text">946.114.04008</span></td>
-<td class="mono" style="background:#D1D1D1;color:#111318;"><span class="cell-text">195950463149</span></td>
+<td class="mono" style="background:#D1D1D1;color:#111318;"><span class="cell-text">0195950463149</span></td>
 </tr>
-<tr data-search="space gray with m/l black sport band mev44ql/a 946.114.04016 195950463330">
+<tr data-search="space gray with m/l black sport band mev44ql/a 946.114.04016 0195950463330">
 <td style="background:#D1D1D1;color:#111318;"><span class="cell-text">Space Gray with M/L Black Sport Band</span></td>
 <td class="mono" style="background:#D1D1D1;color:#111318;"><span class="cell-text">MEV44QL/A</span></td>
 <td class="mono" style="background:#D1D1D1;color:#111318;"><span class="cell-text">946.114.04016</span></td>
-<td class="mono" style="background:#D1D1D1;color:#111318;"><span class="cell-text">195950463330</span></td>
+<td class="mono" style="background:#D1D1D1;color:#111318;"><span class="cell-text">0195950463330</span></td>
 </tr>
-<tr data-search="rose gold with s/m light blush sport band mev64ql/a 946.114.04024 195950463712">
+<tr data-search="rose gold with s/m light blush sport band mev64ql/a 946.114.04024 0195950463712">
 <td style="background:#F2CFEE;color:#111318;"><span class="cell-text">Rose Gold with S/M Light Blush Sport Band</span></td>
 <td class="mono" style="background:#F2CFEE;color:#111318;"><span class="cell-text">MEV64QL/A</span></td>
 <td class="mono" style="background:#F2CFEE;color:#111318;"><span class="cell-text">946.114.04024</span></td>
-<td class="mono" style="background:#F2CFEE;color:#111318;"><span class="cell-text">195950463712</span></td>
+<td class="mono" style="background:#F2CFEE;color:#111318;"><span class="cell-text">0195950463712</span></td>
 </tr>
-<tr data-search="rose gold with m/l light blush sport band mev74ql/a 946.114.04032 195950463903">
+<tr data-search="rose gold with m/l light blush sport band mev74ql/a 946.114.04032 0195950463903">
 <td style="background:#F2CFEE;color:#111318;"><span class="cell-text">Rose Gold with M/L Light Blush Sport Band</span></td>
 <td class="mono" style="background:#F2CFEE;color:#111318;"><span class="cell-text">MEV74QL/A</span></td>
 <td class="mono" style="background:#F2CFEE;color:#111318;"><span class="cell-text">946.114.04032</span></td>
-<td class="mono" style="background:#F2CFEE;color:#111318;"><span class="cell-text">195950463903</span></td>
+<td class="mono" style="background:#F2CFEE;color:#111318;"><span class="cell-text">0195950463903</span></td>
 </tr>
-<tr data-search="silver with s/m purple fog sport band mev94ql/a 946.114.04040 195950464283">
+<tr data-search="silver with s/m purple fog sport band mev94ql/a 946.114.04040 0195950464283">
 <td style="background:#E8E8E8;color:#111318;"><span class="cell-text">Silver with S/M Purple Fog Sport Band</span></td>
 <td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">MEV94QL/A</span></td>
 <td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">946.114.04040</span></td>
-<td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">195950464283</span></td>
+<td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">0195950464283</span></td>
 </tr>
-<tr data-search="silver with m/l purple fog band meva4ql/a 946.114.04057 195950464474">
+<tr data-search="silver with m/l purple fog band meva4ql/a 946.114.04057 0195950464474">
 <td style="background:#E8E8E8;color:#111318;"><span class="cell-text">Silver with M/L Purple Fog Band</span></td>
 <td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">MEVA4QL/A</span></td>
 <td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">946.114.04057</span></td>
-<td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">195950464474</span></td>
+<td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">0195950464474</span></td>
 </tr>
       </tbody>
     </table></div>
@@ -13531,53 +13530,53 @@
 <th>EAN</th>
       </tr></thead>
       <tbody>
-<tr data-search="jet black with s/m black sport band  mfc24ql/a 946.114.04065 195950475746">
+<tr data-search="jet black with s/m black sport band  mfc24ql/a 946.114.04065 0195950475746">
 <td style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">Jet Black with S/M Black Sport Band </span></td>
 <td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">MFC24QL/A</span></td>
 <td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">946.114.04065</span></td>
-<td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">195950475746</span></td>
+<td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">0195950475746</span></td>
 </tr>
-<tr data-search="jet black with m/l black sport band  mfc44ql/a 946.114.04073 195950476101">
+<tr data-search="jet black with m/l black sport band  mfc44ql/a 946.114.04073 0195950476101">
 <td style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">Jet Black with M/L Black Sport Band </span></td>
 <td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">MFC44QL/A</span></td>
 <td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">946.114.04073</span></td>
-<td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">195950476101</span></td>
+<td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">0195950476101</span></td>
 </tr>
-<tr data-search="space gray with s/m black sport band  mfc94ql/a 946.114.04081 195950476613">
+<tr data-search="space gray with s/m black sport band  mfc94ql/a 946.114.04081 0195950476613">
 <td style="background:#D1D1D1;color:#111318;"><span class="cell-text">Space Gray with S/M Black Sport Band </span></td>
 <td class="mono" style="background:#D1D1D1;color:#111318;"><span class="cell-text">MFC94QL/A</span></td>
 <td class="mono" style="background:#D1D1D1;color:#111318;"><span class="cell-text">946.114.04081</span></td>
-<td class="mono" style="background:#D1D1D1;color:#111318;"><span class="cell-text">195950476613</span></td>
+<td class="mono" style="background:#D1D1D1;color:#111318;"><span class="cell-text">0195950476613</span></td>
 </tr>
-<tr data-search="space gray with m/l black sport band mfca4ql/a 946.114.04248 195950476798">
+<tr data-search="space gray with m/l black sport band mfca4ql/a 946.114.04248 0195950476798">
 <td style="background:#D1D1D1;color:#111318;"><span class="cell-text">Space Gray with M/L Black Sport Band</span></td>
 <td class="mono" style="background:#D1D1D1;color:#111318;"><span class="cell-text">MFCA4QL/A</span></td>
 <td class="mono" style="background:#D1D1D1;color:#111318;"><span class="cell-text">946.114.04248</span></td>
-<td class="mono" style="background:#D1D1D1;color:#111318;"><span class="cell-text">195950476798</span></td>
+<td class="mono" style="background:#D1D1D1;color:#111318;"><span class="cell-text">0195950476798</span></td>
 </tr>
-<tr data-search="rose gold with s/m light blush sport band mfcg4ql/a 946.114.04099 195950477184">
+<tr data-search="rose gold with s/m light blush sport band mfcg4ql/a 946.114.04099 0195950477184">
 <td style="background:#F2CFEE;color:#111318;"><span class="cell-text">Rose Gold with S/M Light Blush Sport Band</span></td>
 <td class="mono" style="background:#F2CFEE;color:#111318;"><span class="cell-text">MFCG4QL/A</span></td>
 <td class="mono" style="background:#F2CFEE;color:#111318;"><span class="cell-text">946.114.04099</span></td>
-<td class="mono" style="background:#F2CFEE;color:#111318;"><span class="cell-text">195950477184</span></td>
+<td class="mono" style="background:#F2CFEE;color:#111318;"><span class="cell-text">0195950477184</span></td>
 </tr>
-<tr data-search="rose gold with m/l light blush sport band mfcj4ql/a 946.114.04255 195950477368">
+<tr data-search="rose gold with m/l light blush sport band mfcj4ql/a 946.114.04255 0195950477368">
 <td style="background:#F2CFEE;color:#111318;"><span class="cell-text">Rose Gold with M/L Light Blush Sport Band</span></td>
 <td class="mono" style="background:#F2CFEE;color:#111318;"><span class="cell-text">MFCJ4QL/A</span></td>
 <td class="mono" style="background:#F2CFEE;color:#111318;"><span class="cell-text">946.114.04255</span></td>
-<td class="mono" style="background:#F2CFEE;color:#111318;"><span class="cell-text">195950477368</span></td>
+<td class="mono" style="background:#F2CFEE;color:#111318;"><span class="cell-text">0195950477368</span></td>
 </tr>
-<tr data-search="silver with s/m purple fog sport band mfcp4ql/a 946.114.04107 195950477757">
+<tr data-search="silver with s/m purple fog sport band mfcp4ql/a 946.114.04107 0195950477757">
 <td style="background:#E8E8E8;color:#111318;"><span class="cell-text">Silver with S/M Purple Fog Sport Band</span></td>
 <td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">MFCP4QL/A</span></td>
 <td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">946.114.04107</span></td>
-<td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">195950477757</span></td>
+<td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">0195950477757</span></td>
 </tr>
-<tr data-search="silver with m/l purple fog band mfcr4ql/a 946.114.04115 195950477948">
+<tr data-search="silver with m/l purple fog band mfcr4ql/a 946.114.04115 0195950477948">
 <td style="background:#E8E8E8;color:#111318;"><span class="cell-text">Silver with M/L Purple Fog Band</span></td>
 <td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">MFCR4QL/A</span></td>
 <td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">946.114.04115</span></td>
-<td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">195950477948</span></td>
+<td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">0195950477948</span></td>
 </tr>
       </tbody>
     </table></div>
@@ -13600,59 +13599,59 @@
 <th>EAN</th>
       </tr></thead>
       <tbody>
-<tr data-search="natural with s/m stone grey sport band mf8m4ql/a 946.113.03929 195950470789">
+<tr data-search="natural with s/m stone grey sport band mf8m4ql/a 946.113.03929 0195950470789">
 <td style="background:#E8E8E8;color:#111318;"><span class="cell-text">Natural with S/M Stone Grey Sport Band</span></td>
 <td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">MF8M4QL/A</span></td>
 <td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">946.113.03929</span></td>
-<td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">195950470789</span></td>
+<td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">0195950470789</span></td>
 </tr>
-<tr data-search="natural with m/l stone grey sport band mf8n4ql/a 946.113.03937 195950470963">
+<tr data-search="natural with m/l stone grey sport band mf8n4ql/a 946.113.03937 0195950470963">
 <td style="background:#E8E8E8;color:#111318;"><span class="cell-text">Natural with M/L Stone Grey Sport Band</span></td>
 <td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">MF8N4QL/A</span></td>
 <td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">946.113.03937</span></td>
-<td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">195950470963</span></td>
+<td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">0195950470963</span></td>
 </tr>
-<tr data-search="natural with natural milanese loop mf8p4ql/a 946.113.03945 195950471144">
+<tr data-search="natural with natural milanese loop mf8p4ql/a 946.113.03945 0195950471144">
 <td style="background:#E8E8E8;color:#111318;"><span class="cell-text">Natural with Natural Milanese Loop</span></td>
 <td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">MF8P4QL/A</span></td>
 <td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">946.113.03945</span></td>
-<td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">195950471144</span></td>
+<td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">0195950471144</span></td>
 </tr>
-<tr data-search="slate with s/m black sport band mf8r4ql/a 946.113.03952 195950471502">
+<tr data-search="slate with s/m black sport band mf8r4ql/a 946.113.03952 0195950471502">
 <td style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">Slate with S/M Black Sport Band</span></td>
 <td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">MF8R4QL/A</span></td>
 <td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">946.113.03952</span></td>
-<td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">195950471502</span></td>
+<td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">0195950471502</span></td>
 </tr>
-<tr data-search="slate with m/l black sport band mf8t4ql/a 946.113.03960 195950471687">
+<tr data-search="slate with m/l black sport band mf8t4ql/a 946.113.03960 0195950471687">
 <td style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">Slate with M/L Black Sport Band</span></td>
 <td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">MF8T4QL/A</span></td>
 <td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">946.113.03960</span></td>
-<td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">195950471687</span></td>
+<td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">0195950471687</span></td>
 </tr>
-<tr data-search="slate with slate milanese loop mf8u4ql/a 946.113.03978 195950471861">
+<tr data-search="slate with slate milanese loop mf8u4ql/a 946.113.03978 0195950471861">
 <td style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">Slate with Slate Milanese Loop</span></td>
 <td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">MF8U4QL/A</span></td>
 <td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">946.113.03978</span></td>
-<td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">195950471861</span></td>
+<td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">0195950471861</span></td>
 </tr>
-<tr data-search="gold with s/m light blush sport band mf8w4ql/a 946.113.03986 195950472226">
+<tr data-search="gold with s/m light blush sport band mf8w4ql/a 946.113.03986 0195950472226">
 <td style="background:#FBE3D6;color:#111318;"><span class="cell-text">Gold with S/M Light Blush Sport Band</span></td>
 <td class="mono" style="background:#FBE3D6;color:#111318;"><span class="cell-text">MF8W4QL/A</span></td>
 <td class="mono" style="background:#FBE3D6;color:#111318;"><span class="cell-text">946.113.03986</span></td>
-<td class="mono" style="background:#FBE3D6;color:#111318;"><span class="cell-text">195950472226</span></td>
+<td class="mono" style="background:#FBE3D6;color:#111318;"><span class="cell-text">0195950472226</span></td>
 </tr>
-<tr data-search="gold with m/l light blush sport band mf8x4ql/a 946.113.03994 195950472400">
+<tr data-search="gold with m/l light blush sport band mf8x4ql/a 946.113.03994 0195950472400">
 <td style="background:#FBE3D6;color:#111318;"><span class="cell-text">Gold with M/L Light Blush Sport Band</span></td>
 <td class="mono" style="background:#FBE3D6;color:#111318;"><span class="cell-text">MF8X4QL/A</span></td>
 <td class="mono" style="background:#FBE3D6;color:#111318;"><span class="cell-text">946.113.03994</span></td>
-<td class="mono" style="background:#FBE3D6;color:#111318;"><span class="cell-text">195950472400</span></td>
+<td class="mono" style="background:#FBE3D6;color:#111318;"><span class="cell-text">0195950472400</span></td>
 </tr>
-<tr data-search="gold with gold milanese loop mf8y4ql/a 946.113.04000 195950472585">
+<tr data-search="gold with gold milanese loop mf8y4ql/a 946.113.04000 0195950472585">
 <td style="background:#FBE3D6;color:#111318;"><span class="cell-text">Gold with Gold Milanese Loop</span></td>
 <td class="mono" style="background:#FBE3D6;color:#111318;"><span class="cell-text">MF8Y4QL/A</span></td>
 <td class="mono" style="background:#FBE3D6;color:#111318;"><span class="cell-text">946.113.04000</span></td>
-<td class="mono" style="background:#FBE3D6;color:#111318;"><span class="cell-text">195950472585</span></td>
+<td class="mono" style="background:#FBE3D6;color:#111318;"><span class="cell-text">0195950472585</span></td>
 </tr>
       </tbody>
     </table></div>
@@ -13675,77 +13674,77 @@
 <th>EAN</th>
       </tr></thead>
       <tbody>
-<tr data-search="natural with s/m stone grey sport band mfcw4ql/a 946.114.04123 195950478303">
+<tr data-search="natural with s/m stone grey sport band mfcw4ql/a 946.114.04123 0195950478303">
 <td style="background:#E8E8E8;color:#111318;"><span class="cell-text">Natural with S/M Stone Grey Sport Band</span></td>
 <td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">MFCW4QL/A</span></td>
 <td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">946.114.04123</span></td>
-<td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">195950478303</span></td>
+<td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">0195950478303</span></td>
 </tr>
-<tr data-search="natural with m/l stone grey sport band mfcx4ql/a 946.114.04131 195950478488">
+<tr data-search="natural with m/l stone grey sport band mfcx4ql/a 946.114.04131 0195950478488">
 <td style="background:#E8E8E8;color:#111318;"><span class="cell-text">Natural with M/L Stone Grey Sport Band</span></td>
 <td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">MFCX4QL/A</span></td>
 <td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">946.114.04131</span></td>
-<td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">195950478488</span></td>
+<td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">0195950478488</span></td>
 </tr>
-<tr data-search="natural with natural milanese loop s/m mfcy4ql/a 946.114.04149 195950478662">
+<tr data-search="natural with natural milanese loop s/m mfcy4ql/a 946.114.04149 0195950478662">
 <td style="background:#E8E8E8;color:#111318;"><span class="cell-text">Natural with Natural Milanese Loop S/M</span></td>
 <td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">MFCY4QL/A</span></td>
 <td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">946.114.04149</span></td>
-<td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">195950478662</span></td>
+<td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">0195950478662</span></td>
 </tr>
-<tr data-search="natural with natural milanese loop m/l mfd04ql/a 946.114.04156 195950478846">
+<tr data-search="natural with natural milanese loop m/l mfd04ql/a 946.114.04156 0195950478846">
 <td style="background:#E8E8E8;color:#111318;"><span class="cell-text">Natural with Natural Milanese Loop M/L</span></td>
 <td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">MFD04QL/A</span></td>
 <td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">946.114.04156</span></td>
-<td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">195950478846</span></td>
+<td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">0195950478846</span></td>
 </tr>
-<tr data-search="slate with s/m black sport band mfd14ql/a 946.114.04164 195950479027">
+<tr data-search="slate with s/m black sport band mfd14ql/a 946.114.04164 0195950479027">
 <td style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">Slate with S/M Black Sport Band</span></td>
 <td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">MFD14QL/A</span></td>
 <td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">946.114.04164</span></td>
-<td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">195950479027</span></td>
+<td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">0195950479027</span></td>
 </tr>
-<tr data-search="slate with m/l black sport band mfd24ql/a 946.114.04172 195950479201">
+<tr data-search="slate with m/l black sport band mfd24ql/a 946.114.04172 0195950479201">
 <td style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">Slate with M/L Black Sport Band</span></td>
 <td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">MFD24QL/A</span></td>
 <td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">946.114.04172</span></td>
-<td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">195950479201</span></td>
+<td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">0195950479201</span></td>
 </tr>
-<tr data-search="slate with slate milanese loop s/m mfd34ql/a 946.114.04180 195950479386">
+<tr data-search="slate with slate milanese loop s/m mfd34ql/a 946.114.04180 0195950479386">
 <td style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">Slate with Slate Milanese Loop S/M</span></td>
 <td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">MFD34QL/A</span></td>
 <td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">946.114.04180</span></td>
-<td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">195950479386</span></td>
+<td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">0195950479386</span></td>
 </tr>
-<tr data-search="slate with slate milanese loop m/l mfd44ql/a 946.114.04263 195950479560">
+<tr data-search="slate with slate milanese loop m/l mfd44ql/a 946.114.04263 0195950479560">
 <td style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">Slate with Slate Milanese Loop M/L</span></td>
 <td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">MFD44QL/A</span></td>
 <td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">946.114.04263</span></td>
-<td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">195950479560</span></td>
+<td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">0195950479560</span></td>
 </tr>
-<tr data-search="gold with s/m light blush sport band mfd54ql/a 946.114.04198 195950479744">
+<tr data-search="gold with s/m light blush sport band mfd54ql/a 946.114.04198 0195950479744">
 <td style="background:#FBE3D6;color:#111318;"><span class="cell-text">Gold with S/M Light Blush Sport Band</span></td>
 <td class="mono" style="background:#FBE3D6;color:#111318;"><span class="cell-text">MFD54QL/A</span></td>
 <td class="mono" style="background:#FBE3D6;color:#111318;"><span class="cell-text">946.114.04198</span></td>
-<td class="mono" style="background:#FBE3D6;color:#111318;"><span class="cell-text">195950479744</span></td>
+<td class="mono" style="background:#FBE3D6;color:#111318;"><span class="cell-text">0195950479744</span></td>
 </tr>
-<tr data-search="gold with m/l light blush sport band mfd64ql/a 946.114.04271 195950479928">
+<tr data-search="gold with m/l light blush sport band mfd64ql/a 946.114.04271 0195950479928">
 <td style="background:#FBE3D6;color:#111318;"><span class="cell-text">Gold with M/L Light Blush Sport Band</span></td>
 <td class="mono" style="background:#FBE3D6;color:#111318;"><span class="cell-text">MFD64QL/A</span></td>
 <td class="mono" style="background:#FBE3D6;color:#111318;"><span class="cell-text">946.114.04271</span></td>
-<td class="mono" style="background:#FBE3D6;color:#111318;"><span class="cell-text">195950479928</span></td>
+<td class="mono" style="background:#FBE3D6;color:#111318;"><span class="cell-text">0195950479928</span></td>
 </tr>
-<tr data-search="gold with gold milanese loop s/m mfd74ql/a 946.114.04206 195950480108">
+<tr data-search="gold with gold milanese loop s/m mfd74ql/a 946.114.04206 0195950480108">
 <td style="background:#FBE3D6;color:#111318;"><span class="cell-text">Gold with Gold Milanese Loop S/M</span></td>
 <td class="mono" style="background:#FBE3D6;color:#111318;"><span class="cell-text">MFD74QL/A</span></td>
 <td class="mono" style="background:#FBE3D6;color:#111318;"><span class="cell-text">946.114.04206</span></td>
-<td class="mono" style="background:#FBE3D6;color:#111318;"><span class="cell-text">195950480108</span></td>
+<td class="mono" style="background:#FBE3D6;color:#111318;"><span class="cell-text">0195950480108</span></td>
 </tr>
-<tr data-search="gold with gold milanese loop m/l mfd84ql/a 946.114.04289 195950480283">
+<tr data-search="gold with gold milanese loop m/l mfd84ql/a 946.114.04289 0195950480283">
 <td style="background:#FBE3D6;color:#111318;"><span class="cell-text">Gold with Gold Milanese Loop M/L</span></td>
 <td class="mono" style="background:#FBE3D6;color:#111318;"><span class="cell-text">MFD84QL/A</span></td>
 <td class="mono" style="background:#FBE3D6;color:#111318;"><span class="cell-text">946.114.04289</span></td>
-<td class="mono" style="background:#FBE3D6;color:#111318;"><span class="cell-text">195950480283</span></td>
+<td class="mono" style="background:#FBE3D6;color:#111318;"><span class="cell-text">0195950480283</span></td>
 </tr>
       </tbody>
     </table></div>
@@ -13768,113 +13767,113 @@
 <th>EAN</th>
       </tr></thead>
       <tbody>
-<tr data-search="natural titanium / ocean band / anchor blue mewh4ql/a 946.117.01288 195950608823">
+<tr data-search="natural titanium / ocean band / anchor blue mewh4ql/a 946.117.01288 0195950608823">
 <td style="background:#E8E8E8;color:#111318;"><span class="cell-text">Natural Titanium / Ocean Band / Anchor Blue</span></td>
 <td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">MEWH4QL/A</span></td>
 <td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">946.117.01288</span></td>
-<td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">195950608823</span></td>
+<td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">0195950608823</span></td>
 </tr>
-<tr data-search="natural titanium / alpine loop / light blue / s mewk4ql/a 946.117.01130 195950608953">
+<tr data-search="natural titanium / alpine loop / light blue / s mewk4ql/a 946.117.01130 0195950608953">
 <td style="background:#E8E8E8;color:#111318;"><span class="cell-text">Natural Titanium / Alpine Loop / Light Blue / S</span></td>
 <td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">MEWK4QL/A</span></td>
 <td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">946.117.01130</span></td>
-<td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">195950608953</span></td>
+<td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">0195950608953</span></td>
 </tr>
-<tr data-search="natural titanium / alpine loop / light blue / m mewm4ql/a 946.117.01148 195950609080">
+<tr data-search="natural titanium / alpine loop / light blue / m mewm4ql/a 946.117.01148 0195950609080">
 <td style="background:#E8E8E8;color:#111318;"><span class="cell-text">Natural Titanium / Alpine Loop / Light Blue / M</span></td>
 <td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">MEWM4QL/A</span></td>
 <td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">946.117.01148</span></td>
-<td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">195950609080</span></td>
+<td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">0195950609080</span></td>
 </tr>
-<tr data-search="natural titanium / alpine loop / light blue / l mewp4ql/a 946.117.01155 195950609219">
+<tr data-search="natural titanium / alpine loop / light blue / l mewp4ql/a 946.117.01155 0195950609219">
 <td style="background:#E8E8E8;color:#111318;"><span class="cell-text">Natural Titanium / Alpine Loop / Light Blue / L</span></td>
 <td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">MEWP4QL/A</span></td>
 <td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">946.117.01155</span></td>
-<td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">195950609219</span></td>
+<td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">0195950609219</span></td>
 </tr>
-<tr data-search="natural titanium / trail loop / bright blue s/m mewr4ql/a 946.117.01163 195950609349">
+<tr data-search="natural titanium / trail loop / bright blue s/m mewr4ql/a 946.117.01163 0195950609349">
 <td style="background:#E8E8E8;color:#111318;"><span class="cell-text">Natural Titanium / Trail Loop / Bright Blue S/M</span></td>
 <td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">MEWR4QL/A</span></td>
 <td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">946.117.01163</span></td>
-<td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">195950609349</span></td>
+<td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">0195950609349</span></td>
 </tr>
-<tr data-search="natural titanium / trail loop / bright blue m/l mewu4ql/a 946.117.01171 195950609479">
+<tr data-search="natural titanium / trail loop / bright blue m/l mewu4ql/a 946.117.01171 0195950609479">
 <td style="background:#E8E8E8;color:#111318;"><span class="cell-text">Natural Titanium / Trail Loop / Bright Blue M/L</span></td>
 <td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">MEWU4QL/A</span></td>
 <td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">946.117.01171</span></td>
-<td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">195950609479</span></td>
+<td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">0195950609479</span></td>
 </tr>
-<tr data-search="natural titanium / milanese loop / s meww4ql/a 946.117.01189 195950609608">
+<tr data-search="natural titanium / milanese loop / s meww4ql/a 946.117.01189 0195950609608">
 <td style="background:#E8E8E8;color:#111318;"><span class="cell-text">Natural Titanium / Milanese Loop / S</span></td>
 <td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">MEWW4QL/A</span></td>
 <td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">946.117.01189</span></td>
-<td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">195950609608</span></td>
+<td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">0195950609608</span></td>
 </tr>
-<tr data-search="natural titanium / milanese loop / m mewy4ql/a 946.117.01197 195950609738">
+<tr data-search="natural titanium / milanese loop / m mewy4ql/a 946.117.01197 0195950609738">
 <td style="background:#E8E8E8;color:#111318;"><span class="cell-text">Natural Titanium / Milanese Loop / M</span></td>
 <td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">MEWY4QL/A</span></td>
 <td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">946.117.01197</span></td>
-<td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">195950609738</span></td>
+<td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">0195950609738</span></td>
 </tr>
-<tr data-search="natural titanium / milanese loop / l mf0e4ql/a 946.117.01205 195950609868">
+<tr data-search="natural titanium / milanese loop / l mf0e4ql/a 946.117.01205 0195950609868">
 <td style="background:#E8E8E8;color:#111318;"><span class="cell-text">Natural Titanium / Milanese Loop / L</span></td>
 <td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">MF0E4QL/A</span></td>
 <td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">946.117.01205</span></td>
-<td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">195950609868</span></td>
+<td class="mono" style="background:#E8E8E8;color:#111318;"><span class="cell-text">0195950609868</span></td>
 </tr>
-<tr data-search="black titanium / ocean band / black mf0j4ql/a 946.117.01213 195950609998">
+<tr data-search="black titanium / ocean band / black mf0j4ql/a 946.117.01213 0195950609998">
 <td style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">Black Titanium / Ocean Band / Black</span></td>
 <td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">MF0J4QL/A</span></td>
 <td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">946.117.01213</span></td>
-<td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">195950609998</span></td>
+<td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">0195950609998</span></td>
 </tr>
-<tr data-search="black titanium / alpine loop / black / s mf0q4ql/a 946.117.01296 195950610123">
+<tr data-search="black titanium / alpine loop / black / s mf0q4ql/a 946.117.01296 0195950610123">
 <td style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">Black Titanium / Alpine Loop / Black / S</span></td>
 <td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">MF0Q4QL/A</span></td>
 <td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">946.117.01296</span></td>
-<td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">195950610123</span></td>
+<td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">0195950610123</span></td>
 </tr>
-<tr data-search="black titanium / alpine loop / black / m mf0v4ql/a 946.117.01221 195950610253">
+<tr data-search="black titanium / alpine loop / black / m mf0v4ql/a 946.117.01221 0195950610253">
 <td style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">Black Titanium / Alpine Loop / Black / M</span></td>
 <td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">MF0V4QL/A</span></td>
 <td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">946.117.01221</span></td>
-<td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">195950610253</span></td>
+<td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">0195950610253</span></td>
 </tr>
-<tr data-search="black titanium / alpine loop / black / l mf0x4ql/a 946.117.01239 195950610383">
+<tr data-search="black titanium / alpine loop / black / l mf0x4ql/a 946.117.01239 0195950610383">
 <td style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">Black Titanium / Alpine Loop / Black / L</span></td>
 <td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">MF0X4QL/A</span></td>
 <td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">946.117.01239</span></td>
-<td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">195950610383</span></td>
+<td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">0195950610383</span></td>
 </tr>
-<tr data-search="black titanium / trail loop / charcoal s/m mf1d4ql/a 946.117.01247 195950610512">
+<tr data-search="black titanium / trail loop / charcoal s/m mf1d4ql/a 946.117.01247 0195950610512">
 <td style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">Black Titanium / Trail Loop / Charcoal S/M</span></td>
 <td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">MF1D4QL/A</span></td>
 <td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">946.117.01247</span></td>
-<td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">195950610512</span></td>
+<td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">0195950610512</span></td>
 </tr>
-<tr data-search="black titanium / trail loop / charcoal m/l mf1h4ql/a 946.117.01254 195950610642">
+<tr data-search="black titanium / trail loop / charcoal m/l mf1h4ql/a 946.117.01254 0195950610642">
 <td style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">Black Titanium / Trail Loop / Charcoal M/L</span></td>
 <td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">MF1H4QL/A</span></td>
 <td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">946.117.01254</span></td>
-<td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">195950610642</span></td>
+<td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">0195950610642</span></td>
 </tr>
-<tr data-search="black titanium / milanese loop / s mf1n4ql/a 946.117.01262 195950610772">
+<tr data-search="black titanium / milanese loop / s mf1n4ql/a 946.117.01262 0195950610772">
 <td style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">Black Titanium / Milanese Loop / S</span></td>
 <td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">MF1N4QL/A</span></td>
 <td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">946.117.01262</span></td>
-<td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">195950610772</span></td>
+<td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">0195950610772</span></td>
 </tr>
-<tr data-search="black titanium / milanese loop / m mf1q4ql/a 946.117.01270 195950610901">
+<tr data-search="black titanium / milanese loop / m mf1q4ql/a 946.117.01270 0195950610901">
 <td style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">Black Titanium / Milanese Loop / M</span></td>
 <td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">MF1Q4QL/A</span></td>
 <td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">946.117.01270</span></td>
-<td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">195950610901</span></td>
+<td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">0195950610901</span></td>
 </tr>
-<tr data-search="black titanium / milanese loop / l mf1t4ql/a 946.117.01304 195950611038">
+<tr data-search="black titanium / milanese loop / l mf1t4ql/a 946.117.01304 0195950611038">
 <td style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">Black Titanium / Milanese Loop / L</span></td>
 <td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">MF1T4QL/A</span></td>
 <td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">946.117.01304</span></td>
-<td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">195950611038</span></td>
+<td class="mono" style="background:#AEAEAE;color:#FFFFFF;"><span class="cell-text">0195950611038</span></td>
 </tr>
       </tbody>
     </table></div>
@@ -15373,6 +15372,21 @@
       homeBtn.addEventListener('click', function(e){
         e.preventDefault();
         resetToHome();
+      });
+    }
+
+    // La zona de marca (arcos + ECIarc) hace de boton Inicio: clic o Enter/Espacio.
+    var brandHome = document.getElementById('brandHome');
+    if(brandHome){
+      brandHome.addEventListener('click', function(e){
+        e.preventDefault();
+        resetToHome();
+      });
+      brandHome.addEventListener('keydown', function(e){
+        if(e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar'){
+          e.preventDefault();
+          resetToHome();
+        }
       });
     }
 
