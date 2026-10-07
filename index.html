@@ -4,11 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default" id="statusBarMeta">
+<meta name="theme-color" content="#ffffff" id="themeColorMeta">
 <title>El Corte Inglés Apple Reference Catalog</title>
 <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="light-mode">
 <div class="topbar">
   <div class="topbar-header">
     <div class="brand-lockup">
@@ -24,8 +25,8 @@
       <h1 title="El Corte Inglés Apple Reference Catalog"><span class="brand-eci">ECI</span><span class="brand-arc">arc</span></h1>
     </div>
     <div class="topbar-actions">
-      <button id="fontDecBtn" class="icon-btn icon-btn-font" type="button" title="Reducir tamaño de letra" aria-label="Reducir tamaño de letra">A<span class="font-btn-sign">−</span></button>
-      <button id="fontIncBtn" class="icon-btn icon-btn-font" type="button" title="Aumentar tamaño de letra" aria-label="Aumentar tamaño de letra">A<span class="font-btn-sign">+</span></button>
+      <button id="fontDecBtn" class="icon-btn icon-btn-font" type="button" title="Reducir tamaño de letra" aria-label="Reducir tamaño de letra" style="display:none;">A<span class="font-btn-sign">−</span></button>
+      <button id="fontIncBtn" class="icon-btn icon-btn-font" type="button" title="Aumentar tamaño de letra" aria-label="Aumentar tamaño de letra" style="display:none;">A<span class="font-btn-sign">+</span></button>
       <button id="searchToggle" class="icon-btn" type="button" title="Buscar" aria-label="Buscar">🔎</button>
       <button id="scanToggle" class="icon-btn" type="button" title="Escanear referencia" aria-label="Escanear referencia" style="display:none;">📷</button>
       <button id="eventsToggle" class="icon-btn icon-btn-events" type="button" title="Un día como hoy en Apple" aria-label="Un día como hoy en Apple" style="display:none;">🎁</button>
@@ -15202,9 +15203,13 @@
 
     // --- Theme: claro por defecto; el usuario puede pasar a oscuro con la luna ---
     var themeToggle = document.getElementById('themeToggle');
+    var statusBarMeta = document.getElementById('statusBarMeta');
+    var themeColorMeta = document.getElementById('themeColorMeta');
     function applyTheme(theme){
       document.body.classList.toggle('light-mode', theme === 'light');
       if(themeToggle){ themeToggle.textContent = theme === 'light' ? '🌙' : '☀️'; }
+      if(statusBarMeta){ statusBarMeta.setAttribute('content', theme === 'light' ? 'default' : 'black'); }
+      if(themeColorMeta){ themeColorMeta.setAttribute('content', theme === 'light' ? '#ffffff' : '#131620'); }
     }
 
     var THEME_KEY = 'catalogTheme';
@@ -15251,6 +15256,14 @@
     applyFontScale();
     if(fontIncBtn){ fontIncBtn.addEventListener('click', function(){ setFontScale(fontScale + FONT_SCALE_STEP); }); }
     if(fontDecBtn){ fontDecBtn.addEventListener('click', function(){ setFontScale(fontScale - FONT_SCALE_STEP); }); }
+
+    // Los botones A-/A+ solo tienen sentido cuando hay una tabla de referencias
+    // en pantalla (hoja de producto o resultados de busqueda); se ocultan en Inicio.
+    function toggleFontButtons(show){
+      var disp = show ? 'flex' : 'none';
+      if(fontIncBtn){ fontIncBtn.style.display = disp; }
+      if(fontDecBtn){ fontDecBtn.style.display = disp; }
+    }
 
     // --- Search bar toggle ---
     var searchToggle = document.getElementById('searchToggle');
@@ -15317,6 +15330,7 @@
       if(searchBarRow){ searchBarRow.classList.remove('open'); }
       if(resultsBody){ resultsBody.innerHTML = ''; }
       if(resultsCount){ resultsCount.textContent = ''; }
+      toggleFontButtons(false);
       var existingEmpty = document.querySelector('#search-results .no-results');
       if(existingEmpty){ existingEmpty.remove(); }
       if(history.replaceState){ history.replaceState(null, '', '#home'); }
@@ -15327,6 +15341,7 @@
       if(slug === 'home'){ resetToHome(); return; }
       panels.forEach(function(p){ p.classList.toggle('active', p.id === slug); });
       syncNav(slug);
+      toggleFontButtons(true);
       if(history.replaceState){ history.replaceState(null, '', '#' + slug); }
     }
 
