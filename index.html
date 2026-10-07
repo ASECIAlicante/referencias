@@ -22,7 +22,7 @@
         <path d="M 130 220 A 70 70 0 0 1 270 220" stroke="url(#eciarcGrad)" stroke-width="11" fill="none"/>
         <path d="M 155 220 A 45 45 0 0 1 245 220" stroke="url(#eciarcGrad)" stroke-width="11" fill="none"/>
       </svg>
-      <h1 title="El Corte Inglés Apple Reference Catalog"><span class="brand-eci">ECI</span><span class="brand-arc">arc</span></h1>
+      <h1 title="El Corte Inglés Apple Reference Catalog"><span class="brand-eci">ECI</span><span class="brand-colon">:</span><span class="brand-arc">arc</span></h1>
     </div>
     <div class="topbar-actions">
       <button id="fontDecBtn" class="icon-btn icon-btn-font" type="button" title="Reducir tamaño de letra" aria-label="Reducir tamaño de letra" style="display:none;">A<span class="font-btn-sign">−</span></button>
@@ -15049,6 +15049,7 @@
 <div class="barcode-modal-backdrop" id="barcodeModal" aria-hidden="true" role="dialog">
   <div class="barcode-modal-card">
     <div class="barcode-modal-header">
+      <h4 class="barcode-modal-title" id="barcodeModalTitle"></h4>
       <button type="button" class="barcode-modal-close" id="barcodeCloseBtn" aria-label="Cerrar">&times;</button>
     </div>
     <div class="barcode-product-img-wrap" id="barcodeProductImgWrap" style="display:none;">
@@ -15474,6 +15475,8 @@
         var eanCell = r.cells.filter(function(c){ return c.label && c.label.trim().toUpperCase() === 'EAN'; })[0];
         var rowEan = (eanCell && eanCell.v && /^\d{8,14}$/.test(eanCell.v.trim())) ? eanCell.v.trim() : '';
         tr.dataset.ean = rowEan;
+        var eciCell = r.cells.filter(function(c){ return c.label && c.label.trim().toUpperCase() === 'ECI'; })[0];
+        tr.dataset.eci = (eciCell && eciCell.v) ? eciCell.v.trim() : '';
 
         var tdSheet = document.createElement('td');
         tdSheet.className = 'result-sheet-cell';
@@ -15631,6 +15634,7 @@
 
     var barcodeModal = document.getElementById('barcodeModal');
     var barcodeCloseBtn = document.getElementById('barcodeCloseBtn');
+    var barcodeModalTitle = document.getElementById('barcodeModalTitle');
     var barcodeProductImgWrap = document.getElementById('barcodeProductImgWrap');
     var barcodeProductImg = document.getElementById('barcodeProductImg');
 
@@ -15701,8 +15705,11 @@
       barcodeProductImg.src = url;
     }
 
-    function openBarcodeModal(eanCode, sheetFolder) {
+    function openBarcodeModal(eanCode, sheetFolder, eciValue) {
       if (!eanCode || !barcodeModal) return;
+      if (barcodeModalTitle) {
+        barcodeModalTitle.textContent = eciValue || '';
+      }
       renderBarcodeSVG(eanCode);
       updateBarcodeProductImage(sheetFolder, eanCode);
       setModalOpen(barcodeModal, true);
@@ -15754,7 +15761,10 @@
                 e.stopPropagation();
                 var panelEl = tr.closest('.panel');
                 var sheetFolder = panelEl ? panelEl.dataset.sheetFolder : null;
-                openBarcodeModal(val, sheetFolder);
+                var eciCell = cells[2];
+                var eciSpan = eciCell ? (eciCell.querySelector('.cell-text') || eciCell) : null;
+                var eciValue = eciSpan ? eciSpan.textContent.trim() : '';
+                openBarcodeModal(val, sheetFolder, eciValue);
               });
             });
           }
@@ -15784,7 +15794,8 @@
               if (eanVal && /^\d{8,14}$/.test(eanVal)) {
                 e.stopPropagation();
                 var sheetFolder = rowTr ? rowTr.dataset.sheetFolder : null;
-                openBarcodeModal(eanVal, sheetFolder);
+                var eciValue = rowTr ? rowTr.dataset.eci : '';
+                openBarcodeModal(eanVal, sheetFolder, eciValue);
               }
             }
           }
