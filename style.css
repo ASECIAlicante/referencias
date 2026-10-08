@@ -107,6 +107,10 @@ table{width:100%;border-collapse:collapse;font-size: calc(13.5px * var(--ref-zoo
 thead th{text-align:left;padding:9px 16px;font-size: calc(11.5px * var(--ref-zoom, 1));text-transform:uppercase;letter-spacing:.03em;color: var(--text-dim);background: rgba(255,255,255,.02);border-bottom:1px solid var(--border);white-space:nowrap;}
 tbody td{padding:9px 16px;border-bottom:1px solid rgba(255,255,255,.04);white-space:nowrap;}
 tbody tr:last-child td{border-bottom:none;}
+/* Celdas combinadas (notas largas tipo "Requiere un iPhone 11...") no deben
+   forzar su frase a una sola linea: eso infla el ancho minimo de toda la
+   tabla y dispara el scroll horizontal en movil. Se les permite envolver. */
+tbody td[colspan]{white-space:normal;word-break:break-word;}
 td.mono, td.mono .cell-text{font-family: var(--mono);font-size: calc(12.5px * var(--ref-zoom, 1));}
 tr.row-hidden{display:none;}
 mark{background: #ffdf5e;color:#1a1a1a;padding:0 2px;border-radius:3px;}
@@ -121,6 +125,8 @@ tr.matrix-spacer td{border:none; padding:4px;}
 #searchResultsTable tr:hover td{background: rgba(255,255,255,.02);}
 #searchResultsTable tr.result-accessory td:first-child{border-left:3px solid var(--accessory-border);}
 .result-sheet-cell{min-width:180px;white-space:nowrap;}
+#searchResultsTable td[colspan] .result-cell-inner,
+#searchResultsTable td[colspan] .result-cell-value{white-space:normal;word-break:break-word;}
 .result-sheet-link{display:inline-block;font-weight:700;font-size:13.5px;color: var(--accent);cursor:pointer;}
 .result-sheet-link:hover{text-decoration: underline;}
 .result-section-name{font-size:11.5px;color: var(--text-dim);margin-top:2px;white-space:nowrap;}
