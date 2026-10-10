@@ -228,6 +228,10 @@ body.light-mode .ean-clickable:hover{background: rgba(11, 122, 62, 0.15);}
 .barcode-modal-header .barcode-modal-close{position:absolute;right:0;top:50%;transform:translateY(-50%);}
 .barcode-modal-close{background: transparent;border: 1px solid var(--border);color: var(--text-dim);font-size: 18px;cursor: pointer;line-height: 1;width: 32px;height: 32px;border-radius: 8px;display: flex;align-items: center;justify-content: center;transition: color 0.15s, border-color 0.15s, background 0.15s;}
 .barcode-modal-close:hover{color: var(--text);border-color: var(--accent);background: var(--panel-2);}
+.barcode-modal-header .barcode-share-btn{position:absolute;left:0;top:50%;transform:translateY(-50%);}
+.barcode-share-btn{background: transparent;border: 1px solid var(--border);color: var(--text-dim);cursor: pointer;line-height: 1;width: 32px;height: 32px;border-radius: 8px;display: flex;align-items: center;justify-content: center;transition: color 0.15s, border-color 0.15s, background 0.15s;}
+.barcode-share-btn:hover{color: var(--text);border-color: var(--accent);background: var(--panel-2);}
+.barcode-share-btn:disabled{opacity:.5;cursor:default;}
 .events-modal-card{width: 440px;text-align: left;}
 .events-modal-header{display: flex;justify-content: space-between;align-items: center;gap: 12px;margin-bottom: 6px;}
 .events-modal-date{font-size: 12.5px;font-weight: 700;color: var(--accent);text-transform: capitalize;margin: 0 0 12px;}
