@@ -94,8 +94,6 @@ body.light-mode .topbar-header h1 .brand-colon{background:linear-gradient(90deg,
     linear-gradient(135deg, var(--fam-wash)) padding-box,
     linear-gradient(var(--panel-2),var(--panel-2)) padding-box,
     linear-gradient(135deg, var(--fam-grad)) border-box;}
-.nav-btn-count{font-size:10.5px;font-weight:700;color: inherit;opacity:.75;background: rgba(255,255,255,.12);padding:1px 6px;border-radius:20px;min-width:18px;text-align:center;}
-.nav-btn.active .nav-btn-count{background: rgba(255,255,255,.28);opacity:1;}
 .nav-btn-home{padding:0;width:38px;min-width:38px;justify-content:center;font-size:16px;}
 .main{padding: 18px 16px calc(60px + env(safe-area-inset-bottom, 0));padding-left: calc(16px + env(safe-area-inset-left, 0));padding-right: calc(16px + env(safe-area-inset-right, 0));max-width:1000px;margin:0 auto;}
 .panel{display:none;}
