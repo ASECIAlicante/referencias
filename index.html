@@ -15975,11 +15975,12 @@
     // ===== Compartir la ventana de codigo de barras (referencia + foto +
     // codigo de barras) como una unica imagen PNG, via Web Share API con
     // fallback a descarga directa donde no hay share nativo (escritorio). =====
-    function svgToCanvas(svgEl, scale, cb) {
+    function svgToCanvas(svgEl, targetWidth, cb) {
       if (!svgEl) { cb(null); return; }
       var vb = (svgEl.getAttribute('viewBox') || '0 0 300 150').split(' ');
       var w = parseFloat(vb[2]) || 300;
       var h = parseFloat(vb[3]) || 150;
+      var scale = targetWidth / w;
       var clone = svgEl.cloneNode(true);
       clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
       clone.setAttribute('width', w);
@@ -16004,29 +16005,39 @@
     }
 
     // Compone en un unico canvas, de arriba a abajo: referencia ECI, foto del
-    // producto (si la hay) y el codigo de barras — exactamente lo que se ve en
-    // la ventana — para que el PNG compartido sea autocontenido.
+    // producto (si la hay) y el codigo de barras — con las mismas proporciones
+    // relativas que se ven en la ventana modal (misma escala para todos los
+    // elementos, solo renderizado a mayor resolucion para que no se vea
+    // pixelado) — para que el PNG compartido sea autocontenido.
     function buildShareCanvas(cb) {
       var title = (barcodeModalTitle && barcodeModalTitle.textContent) || '';
       var hasImg = !!(barcodeProductImgWrap && barcodeProductImgWrap.style.display !== 'none' &&
         barcodeProductImg && barcodeProductImg.complete && barcodeProductImg.naturalWidth > 0);
-      svgToCanvas(document.getElementById('barcodeSvg'), 3, function(barcodeCanvas) {
+      // Escala respecto al ancho real de la tarjeta del modal en pantalla, para
+      // que el codigo de barras no salga mas grande de lo que se ve ahi.
+      var cardWidth = (function() {
+        var card = barcodeModal && barcodeModal.querySelector('.barcode-modal-card');
+        return (card && card.clientWidth) || 340;
+      })();
+      var exportScale = 3;
+      var padding = Math.round(22 * exportScale);
+      var contentWidth = Math.round((cardWidth - 44) * exportScale);
+      svgToCanvas(document.getElementById('barcodeSvg'), contentWidth, function(barcodeCanvas) {
         if (!barcodeCanvas) { cb(null); return; }
-        var padding = 32;
-        var titleHeight = title ? 56 : 0;
-        var imgAreaHeight = hasImg ? 260 : 0;
-        var gap = hasImg ? 20 : 0;
-        var contentWidth = Math.max(barcodeCanvas.width, 520);
+        var titleFontSize = Math.round(20 * exportScale);
+        var titleHeight = title ? Math.round(titleFontSize * 1.5) : 0;
+        var imgMaxHeight = hasImg ? Math.round(220 * exportScale) : 0;
+        var gap = hasImg ? Math.round(14 * exportScale) : 0;
         var canvas = document.createElement('canvas');
         canvas.width = contentWidth + padding * 2;
-        canvas.height = padding * 2 + titleHeight + imgAreaHeight + gap + barcodeCanvas.height;
+        canvas.height = padding * 2 + titleHeight + imgMaxHeight + gap + barcodeCanvas.height;
         var ctx = canvas.getContext('2d');
         ctx.fillStyle = '#ffffff';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         var y = padding;
         if (title) {
           ctx.fillStyle = '#000000';
-          ctx.font = '700 34px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+          ctx.font = '700 ' + titleFontSize + 'px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
           ctx.textAlign = 'center';
           ctx.textBaseline = 'top';
           ctx.fillText(title, canvas.width / 2, y);
@@ -16040,13 +16051,13 @@
         if (hasImg) {
           var pImg = new Image();
           pImg.onload = function() {
-            var maxW = contentWidth * 0.6;
-            var maxH = imgAreaHeight;
+            var maxW = contentWidth;
+            var maxH = imgMaxHeight;
             var ratio = Math.min(maxW / pImg.naturalWidth, maxH / pImg.naturalHeight, 1);
             var dw = pImg.naturalWidth * ratio;
             var dh = pImg.naturalHeight * ratio;
-            ctx.drawImage(pImg, (canvas.width - dw) / 2, y + (imgAreaHeight - dh) / 2, dw, dh);
-            y += imgAreaHeight + gap;
+            ctx.drawImage(pImg, (canvas.width - dw) / 2, y + (imgMaxHeight - dh) / 2, dw, dh);
+            y += imgMaxHeight + gap;
             drawBarcodeAndFinish();
           };
           pImg.onerror = drawBarcodeAndFinish;
