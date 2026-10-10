@@ -79,6 +79,21 @@ body.light-mode .topbar-header h1 .brand-colon{background:linear-gradient(90deg,
 .nav-btn.active{background: linear-gradient(90deg, var(--accent), var(--accent-2));color:#fff;border-color: transparent;}
 .nav-btn-leaf{font-size:12.5px;padding:8px 12px;min-height:36px;}
 .nav-btn-model{font-size:12.5px;padding:8px 12px;min-height:34px;background: var(--panel-2);}
+/* Colorear por "familia" de producto. La paleta ya NO es un tono HSL fijo:
+   son los colores reales de las celdas de las tarjetas (--fam-grad, lista de
+   paradas; --fam-wash, esas mismas paradas a baja opacidad), calculados en el
+   build desde Database.xlsx. Un MacBook Pro sale con 2 colores, un Neo con 4.
+   Marco con degradado via padding-box/border-box (compatible Safari/iOS): la
+   capa padding-box pinta el fondo del boton, la border-box el degradado del
+   borde. El mismo degradado se repite en el boton del submenu y en el borde de
+   la tarjeta a la que apunta, para percibirlos como el mismo grupo. */
+.nav-btn-fam{border:1.5px solid transparent;background:
+    linear-gradient(var(--panel-2),var(--panel-2)) padding-box,
+    linear-gradient(135deg, var(--fam-grad)) border-box;}
+.nav-btn-fam:hover{color: var(--text);background:
+    linear-gradient(135deg, var(--fam-wash)) padding-box,
+    linear-gradient(var(--panel-2),var(--panel-2)) padding-box,
+    linear-gradient(135deg, var(--fam-grad)) border-box;}
 .nav-btn-count{font-size:10.5px;font-weight:700;color: inherit;opacity:.75;background: rgba(255,255,255,.12);padding:1px 6px;border-radius:20px;min-width:18px;text-align:center;}
 .nav-btn.active .nav-btn-count{background: rgba(255,255,255,.28);opacity:1;}
 .nav-btn-home{padding:0;width:38px;min-width:38px;justify-content:center;font-size:16px;}
@@ -94,6 +109,17 @@ body.light-mode .topbar-header h1 .brand-colon{background:linear-gradient(90deg,
 .matrix-hint{color:var(--text-dim); font-size:13px; margin:0;}
 .card{background: var(--panel);border:1px solid var(--border);border-radius: var(--radius);margin-bottom:14px;overflow:hidden;}
 .card.accessory-card{background: var(--accessory-bg);border:1px dashed var(--accessory-border);}
+/* Mismo degradado de familia que el boton del submenu, repetido en el borde
+   de la tarjeta para que cabecera y cuerpo desplegable se perciban como el
+   mismo grupo del boton que los abre. Al abrir, un lavado sutil (--fam-wash)
+   tinta el fondo sin comprometer la legibilidad. */
+.card.fam-card{border:1.5px solid transparent;background:
+    linear-gradient(var(--panel),var(--panel)) padding-box,
+    linear-gradient(135deg, var(--fam-grad)) border-box;}
+.card.fam-card.open{background:
+    linear-gradient(135deg, var(--fam-wash)) padding-box,
+    linear-gradient(var(--panel),var(--panel)) padding-box,
+    linear-gradient(135deg, var(--fam-grad)) border-box;}
 .card-header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;min-height:52px;cursor:pointer;user-select:none;touch-action: manipulation;-webkit-tap-highlight-color: transparent;}
 .card-title-wrap{display:flex;align-items:center;gap:10px;min-width:0;}
 .chevron{display:inline-block;font-size:11px;color: var(--text-dim);transition: transform .15s ease;flex-shrink:0;}
@@ -103,24 +129,24 @@ body.light-mode .topbar-header h1 .brand-colon{background:linear-gradient(90deg,
 .card-body{max-height:0;overflow:hidden;transition: max-height .25s ease;}
 .card.open .card-body{max-height:8000px;}
 .table-wrap{overflow-x:auto;border-top:1px solid var(--border);}
-table{width:100%;border-collapse:collapse;font-size: calc(13.5px * var(--ref-zoom, 1));}
-thead th{text-align:left;padding:9px 16px;font-size: calc(11.5px * var(--ref-zoom, 1));text-transform:uppercase;letter-spacing:.03em;color: var(--text-dim);background: rgba(255,255,255,.02);border-bottom:1px solid var(--border);white-space:nowrap;}
+table{width:100%;border-collapse:collapse;font-size: calc(14.5px * var(--ref-zoom, 1));}
+thead th{text-align:left;padding:9px 16px;font-size: calc(12px * var(--ref-zoom, 1));text-transform:uppercase;letter-spacing:.03em;color: var(--text-dim);background: rgba(255,255,255,.02);border-bottom:1px solid var(--border);white-space:nowrap;}
 tbody td{padding:9px 16px;border-bottom:1px solid rgba(255,255,255,.04);white-space:nowrap;}
 tbody tr:last-child td{border-bottom:none;}
 /* Celdas combinadas (notas largas tipo "Requiere un iPhone 11...") no deben
    forzar su frase a una sola linea: eso infla el ancho minimo de toda la
    tabla y dispara el scroll horizontal en movil. Se les permite envolver. */
 tbody td[colspan]{white-space:normal;word-break:break-word;}
-td.mono, td.mono .cell-text{font-family: var(--mono);font-size: calc(12.5px * var(--ref-zoom, 1));}
+td.mono, td.mono .cell-text{font-family: var(--mono);font-size: calc(13px * var(--ref-zoom, 1));}
 tr.row-hidden{display:none;}
 mark{background: #ffdf5e;color:#1a1a1a;padding:0 2px;border-radius:3px;}
 .matrix-card{background:var(--panel);}
-.matrix-table td{padding:8px 12px;font-size: calc(12.5px * var(--ref-zoom, 1));border:1px solid rgba(255,255,255,.06);white-space:normal;}
+.matrix-table td{padding:8px 12px;font-size: calc(13px * var(--ref-zoom, 1));border:1px solid rgba(255,255,255,.06);white-space:normal;}
 .matrix-table td.th-cell{font-weight:700;}
 tr.matrix-spacer td{border:none; padding:4px;}
 .no-results{padding:40px 20px;text-align:center;color: var(--text-dim);font-size:14px;}
 .search-results-count{color: var(--text-dim);font-size:13.5px;margin:4px 0 18px;}
-#searchResultsTable{width:100%;border-collapse:collapse;font-size: calc(13.5px * var(--ref-zoom, 1));}
+#searchResultsTable{width:100%;border-collapse:collapse;font-size: calc(14.5px * var(--ref-zoom, 1));}
 #searchResultsTable td{padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06);vertical-align:top;}
 #searchResultsTable tr:hover td{background: rgba(255,255,255,.02);}
 #searchResultsTable tr.result-accessory td:first-child{border-left:3px solid var(--accessory-border);}
@@ -132,8 +158,8 @@ tr.matrix-spacer td{border:none; padding:4px;}
 .result-section-name{font-size:11.5px;color: var(--text-dim);margin-top:2px;white-space:nowrap;}
 .result-cell-inner{display:flex;flex-direction:column;gap:2px;white-space:nowrap;}
 .result-cell-label{font-size:10px;text-transform:uppercase;letter-spacing:.03em;color: var(--text-dim);opacity:.75;}
-.result-cell-value{font-size: calc(13.5px * var(--ref-zoom, 1));}
-#searchResultsTable td.mono .result-cell-value{font-family: var(--mono);font-size: calc(12.5px * var(--ref-zoom, 1));}
+.result-cell-value{font-size: calc(14.5px * var(--ref-zoom, 1));}
+#searchResultsTable td.mono .result-cell-value{font-family: var(--mono);font-size: calc(13px * var(--ref-zoom, 1));}
 .home-header{margin-bottom:22px;}
 .home-header h2{font-size:26px;}
 .home-today{display:flex;flex-direction:column;gap:6px;margin:0 0 10px;}
@@ -173,9 +199,9 @@ tr.matrix-spacer td{border:none; padding:4px;}
   .panel-header h2{font-size:18px;}
   .card-header{padding:12px 13px; min-height:48px;}
   .card-title{font-size:14px;}
-  thead th{padding:7px 8px; font-size: calc(10.5px * var(--ref-zoom, 1));}
-  tbody td{padding:7px 8px; font-size: calc(12.5px * var(--ref-zoom, 1));}
-  td.mono, td.mono .cell-text{font-size: calc(11px * var(--ref-zoom, 1));}
+  thead th{padding:7px 8px; font-size: calc(11px * var(--ref-zoom, 1));}
+  tbody td{padding:7px 8px; font-size: calc(13.5px * var(--ref-zoom, 1));}
+  td.mono, td.mono .cell-text{font-size: calc(12px * var(--ref-zoom, 1));}
   .table-wrap{-webkit-overflow-scrolling:touch;}
   .panel-actions{gap:6px;}
   .btn-expand, .btn-collapse{flex:1; text-align:center; padding:10px 8px; font-size:12px;}
@@ -185,7 +211,7 @@ tr.matrix-spacer td{border:none; padding:4px;}
   .home-updated{padding-left:0; border-left:none; border-top:1px solid var(--border); padding-top:10px;}
   thead th{padding:6px 6px;}
   tbody td{padding:6px 6px;}
-  td.mono, td.mono .cell-text{font-size: calc(10.5px * var(--ref-zoom, 1));}
+  td.mono, td.mono .cell-text{font-size: calc(11.5px * var(--ref-zoom, 1));}
 }
 @supports (padding: max(0px)){
   .btn-row.level1{ padding-left: max(14px, env(safe-area-inset-left)); padding-right: max(14px, env(safe-area-inset-right)); }
