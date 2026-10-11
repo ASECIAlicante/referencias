@@ -100,6 +100,18 @@ body.light-mode .topbar-header h1 .brand-colon{background:linear-gradient(90deg,
 .nav-btn-fam.active{color:#fff;background:
     linear-gradient(90deg, var(--accent), var(--accent-2)) padding-box,
     linear-gradient(135deg, var(--fam-grad)) border-box;}
+/* Un boton activo no debe cambiar de aspecto al pasar el raton por encima.
+   Con solo ".active" y ":hover" sueltos, los tres empataban en
+   especificidad y quien ganaba dependia del orden de declaracion -- lo que
+   hacia que, segun el nivel de menu, el estado "activo" se perdiera visualmente
+   al hacer hover (se veia bien en nivel 1 y 3 pero no en nivel 2, por ejemplo).
+   Estas dos reglas, con mas especificidad que cualquier ".active" o ":hover"
+   suelto, fijan el aspecto activo tambien en hover, en los tres niveles por
+   igual. */
+.nav-btn.active:hover{background: linear-gradient(90deg, var(--accent), var(--accent-2));color:#fff;border-color: transparent;}
+.nav-btn-fam.active:hover{color:#fff;background:
+    linear-gradient(90deg, var(--accent), var(--accent-2)) padding-box,
+    linear-gradient(135deg, var(--fam-grad)) border-box;}
 .nav-btn-home{padding:0;width:38px;min-width:38px;justify-content:center;font-size:16px;}
 .main{padding: 18px 16px calc(60px + env(safe-area-inset-bottom, 0));padding-left: calc(16px + env(safe-area-inset-left, 0));padding-right: calc(16px + env(safe-area-inset-right, 0));max-width:1000px;margin:0 auto;}
 .panel{display:none;}
