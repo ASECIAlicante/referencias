@@ -266,7 +266,12 @@ body.light-mode .ean-clickable:hover{background: rgba(11, 122, 62, 0.15);}
 .barcode-modal-backdrop.open .barcode-modal-card{transform: translateY(0) scale(1);}
 .barcode-modal-header{display: flex;justify-content: center;align-items: center;margin-bottom: 8px;gap:8px;position:relative;}
 .barcode-modal-title{font-size: 13.5px;font-weight: 700;color: var(--text-dim);text-transform: uppercase;letter-spacing: 0.05em;margin: 0;}
-#barcodeModalTitle{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center;color:#000000;font-size: 20px;}
+/* Por defecto (modo oscuro) la referencia ECI va en un color claro, ya que
+   el fondo del marco del modal es oscuro (var(--panel)): un negro fijo
+   quedaba ilegible ahi. En modo claro el fondo es claro, asi que se
+   mantiene el negro original. */
+#barcodeModalTitle{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center;color:#f0f2f6;font-size: 20px;}
+body.light-mode #barcodeModalTitle{color:#000000;}
 #barcodeModalTitle:empty{display:none;}
 .barcode-modal-header .barcode-modal-close{position:absolute;right:0;top:50%;transform:translateY(-50%);}
 .barcode-modal-close{background: transparent;border: 1px solid var(--border);color: var(--text-dim);font-size: 18px;cursor: pointer;line-height: 1;width: 32px;height: 32px;border-radius: 8px;display: flex;align-items: center;justify-content: center;transition: color 0.15s, border-color 0.15s, background 0.15s;}
