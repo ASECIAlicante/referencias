@@ -213,6 +213,26 @@ tr.matrix-spacer td{border:none; padding:4px;}
 .home-tip-list li{margin:2px 0;}
 .home-tip-link{color: var(--accent);font-weight:600;text-decoration: underline dotted var(--accent);text-underline-offset: 3px;}
 .home-tip-link:hover{text-decoration-style: solid;}
+.home-links{display:flex;flex-direction:column;gap:10px;width:100%;margin:0 0 16px;}
+.home-link{display:flex;align-items:center;gap:9px;padding:13px 16px;border:1px solid var(--border);border-radius:12px;background:var(--panel-2);color:var(--text);font-size:14.5px;font-weight:600;text-decoration:none;transition:border-color .15s ease, background .15s ease;box-sizing:border-box;}
+.home-link:hover{border-color: var(--accent);background: var(--panel);}
+.home-link-icon{font-size:17px;line-height:1;}
+.home-link-primary{border-color: var(--accent);}
+.help-modal-card{width:460px;}
+.help-modal-list{list-style:decimal;margin:0;padding-left:20px;display:flex;flex-direction:column;gap:12px;}
+.help-modal-list li{font-size:13.5px;color: var(--text-dim);line-height:1.5;}
+.help-modal-list li strong{color: var(--text);font-weight:700;}
+.help-inline-icon{vertical-align:middle;margin:0 2px;color: var(--accent);position:relative;top:-1px;}
+.incident-modal-card{width:420px;text-align:left;}
+.incident-textarea{width:100%;box-sizing:border-box;resize:vertical;min-height:120px;background: var(--panel-2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;font:inherit;font-size:13.5px;color: var(--text);margin-bottom:12px;}
+.incident-textarea:focus{outline:none;border-color: var(--accent);}
+.incident-actions{display:flex;align-items:center;gap:12px;}
+.incident-send-btn{background: var(--accent);color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:13.5px;font-weight:700;cursor:pointer;transition:opacity .15s ease;}
+.incident-send-btn:hover{opacity:.88;}
+.incident-send-btn:disabled{opacity:.5;cursor:default;}
+.incident-status{font-size:12.5px;color: var(--text-dim);}
+.incident-status.ok{color:#3ea25a;}
+.incident-status.err{color:#d9534f;}
 .home-stats{display:flex;flex-wrap:wrap;gap:22px;font-size:13px;color: var(--text-dim);}
 .home-stats strong{color: var(--text);font-size:18px;display:block;}
 .home-updated{align-self:center;padding-left:22px;border-left:1px solid var(--border);}

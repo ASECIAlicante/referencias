@@ -1283,13 +1283,10 @@ def main():
           <div class="home-today">
             <span class="home-today-date" id="homeTodayDate"></span>
           </div>
-          <div class="home-tip">
-            <ul class="home-tip-list">
-              <li>Menú o 🔎 para empezar.</li>
-              <li>👆 en una línea ➡️ código de barras.</li>
-              <li>📷 para escanear referencias.</li>
-              <li><a href="https://pjexposito.github.io/planmy.html" target="_blank" rel="noopener noreferrer" class="home-tip-link">Enlace a la calculadora PlanMy</a></li>
-            </ul>
+          <div class="home-links">
+            <a href="#" id="homeHelpLink" class="home-link home-link-primary"><span class="home-link-icon">❓</span> Ayuda — cómo usar la página</a>
+            <a href="https://pjexposito.github.io/planmy.html" target="_blank" rel="noopener noreferrer" class="home-link"><span class="home-link-icon">🧮</span> Calculadora PlanMy</a>
+            <a href="#" id="homeIncidentLink" class="home-link"><span class="home-link-icon">✉️</span> Reportar una incidencia</a>
           </div>
           <div class="home-stats">
             <span><strong>{total_refs_all}</strong> referencias</span>
@@ -1698,6 +1695,26 @@ tr.matrix-spacer td{border:none; padding:4px;}
 .home-tip-list li{margin:2px 0;}
 .home-tip-link{color: var(--accent);font-weight:600;text-decoration: underline dotted var(--accent);text-underline-offset: 3px;}
 .home-tip-link:hover{text-decoration-style: solid;}
+.home-links{display:flex;flex-direction:column;gap:10px;width:100%;margin:0 0 16px;}
+.home-link{display:flex;align-items:center;gap:9px;padding:13px 16px;border:1px solid var(--border);border-radius:12px;background:var(--panel-2);color:var(--text);font-size:14.5px;font-weight:600;text-decoration:none;transition:border-color .15s ease, background .15s ease;box-sizing:border-box;}
+.home-link:hover{border-color: var(--accent);background: var(--panel);}
+.home-link-icon{font-size:17px;line-height:1;}
+.home-link-primary{border-color: var(--accent);}
+.help-modal-card{width:460px;}
+.help-modal-list{list-style:decimal;margin:0;padding-left:20px;display:flex;flex-direction:column;gap:12px;}
+.help-modal-list li{font-size:13.5px;color: var(--text-dim);line-height:1.5;}
+.help-modal-list li strong{color: var(--text);font-weight:700;}
+.help-inline-icon{vertical-align:middle;margin:0 2px;color: var(--accent);position:relative;top:-1px;}
+.incident-modal-card{width:420px;text-align:left;}
+.incident-textarea{width:100%;box-sizing:border-box;resize:vertical;min-height:120px;background: var(--panel-2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;font:inherit;font-size:13.5px;color: var(--text);margin-bottom:12px;}
+.incident-textarea:focus{outline:none;border-color: var(--accent);}
+.incident-actions{display:flex;align-items:center;gap:12px;}
+.incident-send-btn{background: var(--accent);color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:13.5px;font-weight:700;cursor:pointer;transition:opacity .15s ease;}
+.incident-send-btn:hover{opacity:.88;}
+.incident-send-btn:disabled{opacity:.5;cursor:default;}
+.incident-status{font-size:12.5px;color: var(--text-dim);}
+.incident-status.ok{color:#3ea25a;}
+.incident-status.err{color:#d9534f;}
 .home-stats{display:flex;flex-wrap:wrap;gap:22px;font-size:13px;color: var(--text-dim);}
 .home-stats strong{color: var(--text);font-size:18px;display:block;}
 .home-updated{align-self:center;padding-left:22px;border-left:1px solid var(--border);}
@@ -1903,6 +1920,40 @@ __PANELS__
   </div>
 </div>
 
+<div class="barcode-modal-backdrop" id="helpModal" aria-hidden="true" role="dialog" aria-labelledby="helpModalTitle">
+  <div class="barcode-modal-card events-modal-card help-modal-card">
+    <div class="events-modal-header">
+      <h4 class="barcode-modal-title" id="helpModalTitle">Cómo usar la página</h4>
+      <button type="button" class="barcode-modal-close" id="helpCloseBtn" aria-label="Cerrar">&times;</button>
+    </div>
+    <div class="events-modal-body">
+      <ol class="help-modal-list">
+        <li><strong>Menús de arriba:</strong> navega entre los distintos productos; en el desplegable de cada uno también aparecen sus accesorios relacionados.</li>
+        <li><strong>Buscar (🔎):</strong> busca por EAN, referencia ECI, Part Number o descripción del producto.</li>
+        <li><strong>Clic en una línea de producto:</strong> abre una ventana con el código de barras y la foto del artículo. Arriba aparece la referencia ECI; a la izquierda, el botón <svg class="help-inline-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4"/><path d="M8 8l4-4 4 4"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg> para compartir esa ventana (mensaje, correo, etc.).</li>
+        <li><strong>Escanear (📷):</strong> desde el móvil, apunta a la etiqueta de la caja para identificar el artículo.</li>
+        <li><strong>Logo ECI:arc:</strong> haz clic para volver al inicio y resetear la página.</li>
+        <li><strong>Modo claro/oscuro (🌙/☀️):</strong> cambia la apariencia de la página.</li>
+        <li><strong>Paquete regalo (🎁):</strong> solo aparece en fechas señaladas; al hacer clic, muestra qué presentó Apple ese mismo día en años anteriores.</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<div class="barcode-modal-backdrop" id="incidentModal" aria-hidden="true" role="dialog" aria-labelledby="incidentModalTitle">
+  <div class="barcode-modal-card events-modal-card incident-modal-card">
+    <div class="events-modal-header">
+      <h4 class="barcode-modal-title" id="incidentModalTitle">Reportar una incidencia</h4>
+      <button type="button" class="barcode-modal-close" id="incidentCloseBtn" aria-label="Cerrar">&times;</button>
+    </div>
+    <textarea id="incidentText" class="incident-textarea" placeholder="Describe lo que quieres reportar..." rows="5"></textarea>
+    <div class="incident-actions">
+      <button type="button" id="incidentSendBtn" class="incident-send-btn">Enviar</button>
+      <span class="incident-status" id="incidentStatus"></span>
+    </div>
+  </div>
+</div>
+
 <div class="scanner-modal-backdrop" id="scannerModal" aria-hidden="true" role="dialog">
   <div class="scanner-modal-card">
     <div class="scanner-modal-header">
@@ -1934,6 +1985,7 @@ __PANELS__
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script>
 (function(){
   // --- Load external data (data.json + events.txt) ---
@@ -2019,6 +2071,97 @@ __PANELS__
         closeEventsModal();
       }
     });
+
+    // --- Modal de Ayuda (se abre desde el enlace del landing) ---
+    var homeHelpLink = document.getElementById('homeHelpLink');
+    var helpModal = document.getElementById('helpModal');
+    var helpCloseBtn = document.getElementById('helpCloseBtn');
+    function openHelpModal(){ setModalOpen(helpModal, true); }
+    function closeHelpModal(){ setModalOpen(helpModal, false); }
+    if(homeHelpLink){
+      homeHelpLink.addEventListener('click', function(e){
+        e.preventDefault();
+        openHelpModal();
+      });
+    }
+    if(helpCloseBtn){ helpCloseBtn.addEventListener('click', closeHelpModal); }
+    if(helpModal){
+      helpModal.addEventListener('click', function(e){
+        if(e.target === helpModal) closeHelpModal();
+      });
+    }
+    document.addEventListener('keydown', function(e){
+      if(e.key === 'Escape' && helpModal && helpModal.classList.contains('open')){
+        closeHelpModal();
+      }
+    });
+
+    // --- Modal de incidencia: envia el texto por EmailJS, sin salir de la pagina ---
+    var EMAILJS_PUBLIC_KEY = 'LUJwdk3MQpdADb5Nm';
+    var EMAILJS_SERVICE_ID = 'service_jqp3osl';
+    var EMAILJS_TEMPLATE_ID = 'template_1146g92';
+    if(window.emailjs && typeof window.emailjs.init === 'function'){
+      window.emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+    }
+    var homeIncidentLink = document.getElementById('homeIncidentLink');
+    var incidentModal = document.getElementById('incidentModal');
+    var incidentCloseBtn = document.getElementById('incidentCloseBtn');
+    var incidentText = document.getElementById('incidentText');
+    var incidentSendBtn = document.getElementById('incidentSendBtn');
+    var incidentStatus = document.getElementById('incidentStatus');
+    function openIncidentModal(){
+      if(incidentStatus){ incidentStatus.textContent = ''; incidentStatus.className = 'incident-status'; }
+      if(incidentSendBtn){ incidentSendBtn.disabled = false; incidentSendBtn.textContent = 'Enviar'; }
+      setModalOpen(incidentModal, true);
+      if(incidentText){ setTimeout(function(){ incidentText.focus(); }, 50); }
+    }
+    function closeIncidentModal(){
+      setModalOpen(incidentModal, false);
+      if(incidentText){ incidentText.value = ''; }
+    }
+    if(homeIncidentLink){
+      homeIncidentLink.addEventListener('click', function(e){
+        e.preventDefault();
+        openIncidentModal();
+      });
+    }
+    if(incidentCloseBtn){ incidentCloseBtn.addEventListener('click', closeIncidentModal); }
+    if(incidentModal){
+      incidentModal.addEventListener('click', function(e){
+        if(e.target === incidentModal) closeIncidentModal();
+      });
+    }
+    document.addEventListener('keydown', function(e){
+      if(e.key === 'Escape' && incidentModal && incidentModal.classList.contains('open')){
+        closeIncidentModal();
+      }
+    });
+    if(incidentSendBtn){
+      incidentSendBtn.addEventListener('click', function(){
+        var msg = incidentText ? incidentText.value.trim() : '';
+        if(!msg){
+          if(incidentStatus){ incidentStatus.textContent = 'Escribe algo antes de enviar.'; incidentStatus.className = 'incident-status err'; }
+          return;
+        }
+        if(!window.emailjs){
+          if(incidentStatus){ incidentStatus.textContent = 'No se pudo cargar el servicio de envio.'; incidentStatus.className = 'incident-status err'; }
+          return;
+        }
+        incidentSendBtn.disabled = true;
+        incidentSendBtn.textContent = 'Enviando...';
+        if(incidentStatus){ incidentStatus.textContent = ''; incidentStatus.className = 'incident-status'; }
+        window.emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, { message: msg }).then(function(){
+          if(incidentStatus){ incidentStatus.textContent = 'Enviado. ¡Gracias!'; incidentStatus.className = 'incident-status ok'; }
+          incidentSendBtn.textContent = 'Enviado';
+          if(incidentText){ incidentText.value = ''; }
+          setTimeout(closeIncidentModal, 1400);
+        }).catch(function(){
+          if(incidentStatus){ incidentStatus.textContent = 'No se pudo enviar. Intentalo de nuevo.'; incidentStatus.className = 'incident-status err'; }
+          incidentSendBtn.disabled = false;
+          incidentSendBtn.textContent = 'Enviar';
+        });
+      });
+    }
 
     // --- Theme: claro por defecto; el usuario puede pasar a oscuro con la luna ---
     var themeToggle = document.getElementById('themeToggle');
