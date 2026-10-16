@@ -1928,13 +1928,13 @@ __PANELS__
     </div>
     <div class="events-modal-body">
       <ol class="help-modal-list">
-        <li><strong>Menús de arriba:</strong> navega entre los distintos productos; en el desplegable de cada uno también aparecen sus accesorios relacionados.</li>
-        <li><strong>Buscar (🔎):</strong> busca por EAN, referencia ECI, Part Number o descripción del producto.</li>
-        <li><strong>Clic en una línea de producto:</strong> abre una ventana con el código de barras y la foto del artículo. Arriba aparece la referencia ECI; a la izquierda, el botón <svg class="help-inline-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4"/><path d="M8 8l4-4 4 4"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg> para compartir esa ventana (mensaje, correo, etc.).</li>
-        <li><strong>Escanear (📷):</strong> desde el móvil, apunta a la etiqueta de la caja para identificar el artículo.</li>
-        <li><strong>Logo ECI:arc:</strong> haz clic para volver al inicio y resetear la página.</li>
+        <li><strong>Menús:</strong> navega entre productos; en los desplegables encontrarás los accesorios relacionados.</li>
+        <li><strong>🔎:</strong> busca por EAN, referencia ECI, Part Number o descripción del producto.</li>
+        <li><strong>👆 en una línea de producto:</strong> ➡️ ventana con código de barras y foto del artículo. <svg class="help-inline-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4"/><path d="M8 8l4-4 4 4"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg> para compartir (mensaje, correo, etc.).</li>
+        <li><strong>📷:</strong> desde el móvil, apunta a la etiqueta de la caja para identificar el artículo.</li>
+        <li>Haz clic sobre el logo <strong>ECI:arc</strong> para volver al inicio y resetear la página.</li>
         <li><strong>Modo claro/oscuro (🌙/☀️):</strong> cambia la apariencia de la página.</li>
-        <li><strong>Paquete regalo (🎁):</strong> solo aparece en fechas señaladas; al hacer clic, muestra qué presentó Apple ese mismo día en años anteriores.</li>
+        <li><strong>🎁:</strong> solo aparece en fechas señaladas; 👆 para descubrir su contenido.</li>
       </ol>
     </div>
   </div>
