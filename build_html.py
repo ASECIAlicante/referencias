@@ -164,6 +164,27 @@ def load_term_synonyms():
                 if v not in bucket:
                     bucket.append(v)
 
+    # Plurales en consonante ("azul"->"azules", "lapiz"->"lapices"): al teclear
+    # el plural, fold_es solo quita una 's' ("azules"->"azule", "lapices"->
+    # "lapice"), forma que NO coincide con la clave singular. No se puede tocar
+    # el plegado para arreglarlo sin romper los plurales en vocal (que ya
+    # convergen: "verdes"->"verde", "estrellas"->"estrella"), porque "Xes" es
+    # estructuralmente identico y su singular difiere. En su lugar registramos
+    # esa forma plegada del plural como alias de la misma clase de equivalencia.
+    _VOWELS = set('aeiou')
+    for key, vals in list(syn.items()):
+        if ' ' in key or len(key) <= 3 or not _ALPHA_WORD.match(key):
+            continue
+        last = key[-1]
+        if last == 'z':
+            alias = key[:-1] + 'ce'      # lapiz -> lapice (plegado de "lapices")
+        elif last not in _VOWELS:
+            alias = key + 'e'            # azul  -> azule  (plegado de "azules")
+        else:
+            continue                     # vocal: lo cubre ya el quitar una "s"
+        if alias not in syn:
+            syn[alias] = vals
+
     pairs = syn
     max_words = max((len(k.split()) for k in pairs), key=int, default=1)
     report = (f'Diccionario de busqueda: {len(pairs)} terminos en '
@@ -2337,13 +2358,21 @@ __PANELS__
           var vals = TERM_SYNONYMS[phrase];
           if(vals){ hit = vals; end = j; break; }
           // Prefijo: solo si este trozo es lo ultimo que hay tecleado (todavia
-          // puede faltar por escribir) y tiene longitud suficiente.
-          if(isLast && j === maxJ && phrase.length >= TERM_PREFIX_MIN){
+          // puede faltar por escribir) y tiene longitud suficiente. Se compara
+          // el prefijo en DOS formas, porque el plegado de genero/plural (a->o,
+          // -s) altera la ultima letra de la palabra a medio escribir y rompe
+          // la coincidencia ("media" plegado seria "medio", que no es prefijo
+          // de "medianoche"): (1) plegado, para tolerar genero/plural ya
+          // completos ("rojas"->"rojo"); (2) solo sin acentos, que conserva la
+          // palabra parcial intacta ("media" sigue siendo "media").
+          var phraseAcc = acc.slice(i, j).join(' ');
+          if(isLast && j === maxJ && phraseAcc.length >= TERM_PREFIX_MIN){
             var merged = null;
             for(var k = 0; k < TERM_KEYS.length; k++){
-              if(TERM_KEYS[k].indexOf(phrase) === 0){
+              var tk = TERM_KEYS[k];
+              if(tk.indexOf(phrase) === 0 || tk.indexOf(phraseAcc) === 0){
                 merged = merged || [];
-                var cand = TERM_SYNONYMS[TERM_KEYS[k]];
+                var cand = TERM_SYNONYMS[tk];
                 for(var m = 0; m < cand.length; m++){
                   if(merged.indexOf(cand[m]) === -1){ merged.push(cand[m]); }
                 }
@@ -2355,6 +2384,7 @@ __PANELS__
         groups.push({
           lit: lit.slice(i, end).join(' '),
           acc: acc.slice(i, end).join(' '),
+          fold: fold.slice(i, end).join(' '),
           alts: hit
         });
         i = end;
@@ -2397,6 +2427,14 @@ __PANELS__
           // 1) Lo tecleado, tal cual, como substring: permite ir escribiendo a
           //    medias ("macb", "mhfa") y cubre P/N, descripcion e ingles directo.
           if (hay.indexOf(g.acc) !== -1) return true;
+          // 1b) Igual pero sobre el texto plegado (plural/genero): asi "indigos"
+          //    o "indigos" encuentran el dato ingles "Indigo" directamente, y en
+          //    general la busqueda literal tolera plural y genero ("correas" ->
+          //    "Correa"). r._sf es r.search plegado, calculado una sola vez.
+          if (g.fold) {
+            var hayF = r._sf || (r._sf = foldES(r.search));
+            if (hayF.indexOf(g.fold) !== -1) return true;
+          }
           // 2) Equivalentes del diccionario, por palabra completa (si se
           //    buscasen como substring, valores cortos como "S" o "M" saldrian
           //    en casi cualquier fila).
