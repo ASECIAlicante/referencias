@@ -2286,6 +2286,20 @@ __PANELS__
     // el resultado deja de ser util).
     var TERM_PREFIX_MIN = 2;
 
+    // Palabras de relleno del lenguaje natural (preposiciones, articulos,
+    // conjunciones). Si el empleado escribe "reloj de titanio dorado con correa
+    // corta", los conectores "de"/"con" no son datos: se descartan para llegar
+    // al resultado. Solo se descartan cuando quedan SUELTOS entre terminos; si
+    // forman parte de una traduccion del diccionario ("correa de muñeca",
+    // "todo en uno") el emparejado por frase los absorbe antes y no llegan aqui.
+    // Se comparan contra la forma sin acentos del token.
+    var STOPWORDS = {
+      'de':1,'del':1,'con':1,'y':1,'o':1,'u':1,'e':1,'para':1,'por':1,
+      'el':1,'la':1,'los':1,'las':1,'un':1,'una':1,'unos':1,'unas':1,
+      'en':1,'al':1,'a':1,'sin':1,'su':1,'sus':1,'lo':1,
+      'the':1,'of':1,'with':1,'and':1,'for':1
+    };
+
     // Minusculas y sin acentos, SIN tocar plural ni genero. Es el nivel con el
     // que se casa el texto literal (P/N, EAN, ECI, descripcion) y los terminos
     // del diccionario contra la fila: conserva la grafia real del dato.
@@ -2352,7 +2366,6 @@ __PANELS__
       while(i < fold.length){
         var hit = null, end = i + 1;
         var maxJ = Math.min(fold.length, i + TERM_MAX_WORDS);
-        var isLast = (end === fold.length) && !endsWithSpace;
         for(var j = maxJ; j > i; j--){
           var phrase = fold.slice(i, j).join(' ');
           var vals = TERM_SYNONYMS[phrase];
@@ -2366,7 +2379,8 @@ __PANELS__
           // completos ("rojas"->"rojo"); (2) solo sin acentos, que conserva la
           // palabra parcial intacta ("media" sigue siendo "media").
           var phraseAcc = acc.slice(i, j).join(' ');
-          if(isLast && j === maxJ && phraseAcc.length >= TERM_PREFIX_MIN){
+          var atTail = (j === fold.length) && !endsWithSpace;
+          if(atTail && phraseAcc.length >= TERM_PREFIX_MIN){
             var merged = null;
             for(var k = 0; k < TERM_KEYS.length; k++){
               var tk = TERM_KEYS[k];
@@ -2380,6 +2394,20 @@ __PANELS__
             }
             if(merged){ hit = merged; end = j; break; }
           }
+        }
+        // Stopwords del lenguaje natural: si una palabra suelta (no absorbida por
+        // ninguna frase del diccionario ni traducida) es un conector ("de", "con"
+        // ...), se descarta para que "reloj de titanio ... con correa corta"
+        // llegue al resultado. No se descarta si es el ultimo token aun tecleado
+        // (podria ser prefijo de un dato real: "de"->"desierto"). Se compara con
+        // la forma SIN acentos (acc), porque el plegado deforma los conectores
+        // ("para"->"paro"). Las traducciones multi-palabra con conectores
+        // ("correa de muñeca", "todo en uno") ya han sido absorbidas arriba por
+        // el emparejado por frase (greedy, de mas largo a mas corto).
+        if(hit === null && end === i + 1){
+          var sw = acc.slice(i, end).join(' ');
+          var tail = (end === fold.length) && !endsWithSpace;
+          if(!tail && STOPWORDS[sw]){ i = end; continue; }
         }
         groups.push({
           lit: lit.slice(i, end).join(' '),
