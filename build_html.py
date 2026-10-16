@@ -149,15 +149,17 @@ def load_term_synonyms():
 
     # Los terminos de varias palabras ("Blanco estrella") se indexan tambien
     # palabra a palabra, para que buscar solo "estrella" siga encontrando
-    # Starlight. No se pisa una clave que ya exista por si sola: si "Rosa" ya
-    # es una entrada, se queda con la suya y no hereda la de "Rosa nube".
-    singles = dict(syn)
+    # Starlight. Esto se hace incluso si esa palabra YA es una entrada propia
+    # ("Verde" = Green): se AMPLIA su lista de equivalentes (nunca se pisa,
+    # solo se añade), para que buscar "verde" tambien encuentre "Verde oliva",
+    # "Verde salvia" o "Verde azulado", y no solo las filas literalmente
+    # etiquetadas "Verde"/"Green".
     for key, vals in list(syn.items()):
         words = key.split()
         if len(words) < 2:
             continue
         for w in words:
-            if len(w) < 4 or w in singles:
+            if len(w) < 4:
                 continue
             bucket = syn.setdefault(w, [])
             for v in vals:

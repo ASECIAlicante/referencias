@@ -33,6 +33,7 @@ Mist Blue = Azul neblina
 White = Blanco
 Anchor Blue = Azul náutico
 Light Moss = Musgo claro
+Light Moss = Verde
 Soft Pink = Rosa palo
 Vanilla = Vainilla
 Bright Guava = Guayaba intenso
