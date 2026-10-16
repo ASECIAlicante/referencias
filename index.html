@@ -34,7 +34,10 @@
     </div>
   </div>
   <div class="search-bar-row" id="searchBarRow">
-    <input type="text" id="sheetSearch" placeholder="Buscar por modelo, P/N, ECI o EAN...">
+    <div class="search-input-wrap">
+      <input type="text" id="sheetSearch" placeholder="Buscar por modelo, P/N, ECI o EAN...">
+      <button type="button" id="sheetSearchClear" class="search-clear-btn" aria-label="Borrar busqueda" title="Borrar busqueda" style="display:none;">&times;</button>
+    </div>
   </div>
   <div class="btn-row level1"><button type="button" class="nav-btn" data-lob="mac">Mac</button><button type="button" class="nav-btn" data-target="display-2">Display</button><button type="button" class="nav-btn" data-lob="ipad">iPad</button><button type="button" class="nav-btn" data-lob="iphone">iPhone</button><button type="button" class="nav-btn" data-lob="watch">Watch</button><button type="button" class="nav-btn" data-target="audio-20">Audio</button><button type="button" class="nav-btn" data-target="apple-tv-acc-21">Apple TV &amp; Acc.</button><button type="button" class="nav-btn" data-lob="eol">EOL</button></div>
   <div class="btn-row level2" id="lobrow-mac"><button type="button" class="nav-btn nav-btn-leaf nav-btn-fam" style="--fam-grad:#7D8EBF, #FFFA3D, #2896FF, #B08D8D, #FF813D, #B08D8D;--fam-wash:rgba(125,142,191,0.14), rgba(255,250,61,0.14), rgba(40,150,255,0.14), rgba(176,141,141,0.14), rgba(255,129,61,0.14), rgba(176,141,141,0.14)" data-target="mac-macbook-0">MacBook</button><button type="button" class="nav-btn nav-btn-leaf nav-btn-fam" style="--fam-grad:#3DC8FF, #FF3DE9, #71FF3D, #B08D8D, #B08D8D;--fam-wash:rgba(61,200,255,0.14), rgba(255,61,233,0.14), rgba(113,255,61,0.14), rgba(176,141,141,0.14), rgba(176,141,141,0.14)" data-target="mac-mac-1">Mac</button></div>
@@ -15181,6 +15184,7 @@
   function initApp() {
     var panels = document.querySelectorAll('.panel');
     var sheetSearch = document.getElementById('sheetSearch');
+    var sheetSearchClear = document.getElementById('sheetSearchClear');
     var level1Buttons = document.querySelectorAll('.btn-row.level1 .nav-btn');
     var lobRows = document.querySelectorAll('.btn-row.level2');
     var leafButtons = document.querySelectorAll('.nav-btn-leaf');
@@ -15374,14 +15378,18 @@
     }
 
     // --- Reset to Home ---
-    function resetToHome(){
+    function resetToHome(opts){
+      var keepSearchOpen = !!(opts && opts.keepSearchOpen);
       panels.forEach(function(p){ p.classList.toggle('active', p.id === 'home'); });
       level1Buttons.forEach(function(b){ b.classList.remove('active'); });
       lobRows.forEach(function(r){ r.classList.remove('open'); });
       leafButtons.forEach(function(b){ b.classList.remove('active'); });
       collapseAllCards();
-      if(sheetSearch){ sheetSearch.value = ''; sheetSearch.blur(); }
-      if(searchBarRow){ searchBarRow.classList.remove('open'); }
+      if(!keepSearchOpen){
+        if(sheetSearch){ sheetSearch.value = ''; sheetSearch.blur(); }
+        if(sheetSearchClear){ sheetSearchClear.style.display = 'none'; }
+        if(searchBarRow){ searchBarRow.classList.remove('open'); }
+      }
       if(resultsBody){ resultsBody.innerHTML = ''; }
       if(resultsCount){ resultsCount.textContent = ''; }
       toggleFontButtons(false);
@@ -15391,8 +15399,8 @@
       window.scrollTo({top: 0, behavior: 'smooth'});
     }
 
-    function activate(slug){
-      if(slug === 'home'){ resetToHome(); return; }
+    function activate(slug, opts){
+      if(slug === 'home'){ resetToHome(opts); return; }
       collapseAllCards();
       panels.forEach(function(p){ p.classList.toggle('active', p.id === slug); });
       syncNav(slug);
@@ -15795,6 +15803,7 @@
 
     sheetSearch.addEventListener('input', function(){
       var raw = sheetSearch.value.trim();
+      if(sheetSearchClear){ sheetSearchClear.style.display = sheetSearch.value ? 'flex' : 'none'; }
       var term = raw.toLowerCase();
       var tokens = term.split(/\s+/).filter(Boolean);
       var existingEmpty = document.querySelector('#search-results .no-results');
@@ -15808,6 +15817,20 @@
       renderResults(raw, tokens);
       activate('search-results');
     });
+
+    if(sheetSearchClear){
+      sheetSearchClear.addEventListener('click', function(){
+        sheetSearch.value = '';
+        sheetSearchClear.style.display = 'none';
+        var existingEmpty = document.querySelector('#search-results .no-results');
+        if(existingEmpty){ existingEmpty.remove(); }
+        if(document.getElementById('search-results').classList.contains('active')){
+          activate('home', {keepSearchOpen:true});
+        }
+        if(searchBarRow){ searchBarRow.classList.add('open'); }
+        sheetSearch.focus();
+      });
+    }
 
     // Initial load
     var initial = (location.hash || '').replace('#','') || 'home';

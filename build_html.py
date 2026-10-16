@@ -1551,8 +1551,11 @@ body.light-mode .topbar-header h1 .brand-colon{background:linear-gradient(90deg,
 .font-btn-sign{font-size:9px;position:relative;top:-3px;}
 .search-bar-row{max-height:0;overflow:hidden;transition: max-height .18s ease, padding .18s ease;padding:0 14px;}
 .search-bar-row.open{max-height:60px;padding:0 14px 10px;}
-.search-bar-row input{width:100%;padding:11px 12px;border-radius:10px;border:1px solid var(--border);background: var(--panel);color: var(--text);font-size:16px;outline:none;-webkit-appearance:none;appearance:none;}
+.search-input-wrap{position:relative;display:flex;align-items:center;}
+.search-bar-row input{width:100%;padding:11px 36px 11px 12px;border-radius:10px;border:1px solid var(--border);background: var(--panel);color: var(--text);font-size:16px;outline:none;-webkit-appearance:none;appearance:none;}
 .search-bar-row input:focus{border-color: var(--accent);}
+.search-clear-btn{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:26px;height:26px;border:none;border-radius:50%;background:transparent;color:var(--muted, #888);font-size:20px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;}
+.search-clear-btn:hover{background: var(--border);color: var(--text);}
 .btn-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:9px 14px;row-gap:8px;}
 .btn-row.level1{border-top:1px solid var(--border);}
 .btn-row.level2{display:none;padding:0 14px;flex-wrap:wrap;}
@@ -1859,7 +1862,10 @@ TEMPLATE = r"""<!DOCTYPE html>
     </div>
   </div>
   <div class="search-bar-row" id="searchBarRow">
-    <input type="text" id="sheetSearch" placeholder="Buscar por modelo, P/N, ECI o EAN...">
+    <div class="search-input-wrap">
+      <input type="text" id="sheetSearch" placeholder="Buscar por modelo, P/N, ECI o EAN...">
+      <button type="button" id="sheetSearchClear" class="search-clear-btn" aria-label="Borrar busqueda" title="Borrar busqueda" style="display:none;">&times;</button>
+    </div>
   </div>
   <div class="btn-row level1">__LEVEL1_BTNS__</div>
   __LEVEL2_ROWS__
@@ -1940,6 +1946,7 @@ __PANELS__
   function initApp() {
     var panels = document.querySelectorAll('.panel');
     var sheetSearch = document.getElementById('sheetSearch');
+    var sheetSearchClear = document.getElementById('sheetSearchClear');
     var level1Buttons = document.querySelectorAll('.btn-row.level1 .nav-btn');
     var lobRows = document.querySelectorAll('.btn-row.level2');
     var leafButtons = document.querySelectorAll('.nav-btn-leaf');
@@ -2133,14 +2140,18 @@ __PANELS__
     }
 
     // --- Reset to Home ---
-    function resetToHome(){
+    function resetToHome(opts){
+      var keepSearchOpen = !!(opts && opts.keepSearchOpen);
       panels.forEach(function(p){ p.classList.toggle('active', p.id === 'home'); });
       level1Buttons.forEach(function(b){ b.classList.remove('active'); });
       lobRows.forEach(function(r){ r.classList.remove('open'); });
       leafButtons.forEach(function(b){ b.classList.remove('active'); });
       collapseAllCards();
-      if(sheetSearch){ sheetSearch.value = ''; sheetSearch.blur(); }
-      if(searchBarRow){ searchBarRow.classList.remove('open'); }
+      if(!keepSearchOpen){
+        if(sheetSearch){ sheetSearch.value = ''; sheetSearch.blur(); }
+        if(sheetSearchClear){ sheetSearchClear.style.display = 'none'; }
+        if(searchBarRow){ searchBarRow.classList.remove('open'); }
+      }
       if(resultsBody){ resultsBody.innerHTML = ''; }
       if(resultsCount){ resultsCount.textContent = ''; }
       toggleFontButtons(false);
@@ -2150,8 +2161,8 @@ __PANELS__
       window.scrollTo({top: 0, behavior: 'smooth'});
     }
 
-    function activate(slug){
-      if(slug === 'home'){ resetToHome(); return; }
+    function activate(slug, opts){
+      if(slug === 'home'){ resetToHome(opts); return; }
       collapseAllCards();
       panels.forEach(function(p){ p.classList.toggle('active', p.id === slug); });
       syncNav(slug);
@@ -2554,6 +2565,7 @@ __PANELS__
 
     sheetSearch.addEventListener('input', function(){
       var raw = sheetSearch.value.trim();
+      if(sheetSearchClear){ sheetSearchClear.style.display = sheetSearch.value ? 'flex' : 'none'; }
       var term = raw.toLowerCase();
       var tokens = term.split(/\s+/).filter(Boolean);
       var existingEmpty = document.querySelector('#search-results .no-results');
@@ -2567,6 +2579,20 @@ __PANELS__
       renderResults(raw, tokens);
       activate('search-results');
     });
+
+    if(sheetSearchClear){
+      sheetSearchClear.addEventListener('click', function(){
+        sheetSearch.value = '';
+        sheetSearchClear.style.display = 'none';
+        var existingEmpty = document.querySelector('#search-results .no-results');
+        if(existingEmpty){ existingEmpty.remove(); }
+        if(document.getElementById('search-results').classList.contains('active')){
+          activate('home', {keepSearchOpen:true});
+        }
+        if(searchBarRow){ searchBarRow.classList.add('open'); }
+        sheetSearch.focus();
+      });
+    }
 
     // Initial load
     var initial = (location.hash || '').replace('#','') || 'home';
