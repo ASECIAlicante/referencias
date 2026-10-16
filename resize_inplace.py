@@ -30,7 +30,7 @@ def consolidate_duplicates(root):
     Devuelve (borrados, rescatados) para el resumen.
     """
     deleted, rescued = [], []
-    for dirpath, dirnames, filenames in os.walk(root):
+    for dirpath, _dirnames, filenames in os.walk(root):
         webps = [f for f in filenames if f.lower().endswith('.webp')]
         stems = set(f[:-5] for f in webps)
         for fname in sorted(webps):
@@ -118,7 +118,7 @@ processed = []
 skipped_already_ok = 0
 tmp_path = os.path.join(ROOT, "_tmp_convert.webp")
 
-for dirpath, dirnames, filenames in os.walk(ROOT):
+for dirpath, _dirnames, filenames in os.walk(ROOT):
     for fname in sorted(filenames):
         lower = fname.lower()
         if not lower.endswith(SOURCE_EXTS):

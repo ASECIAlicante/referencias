@@ -81,6 +81,7 @@
 10-05 | 2011 | Fallece Steve Jobs a los 56 años.
 10-12 | 2005 | Se presenta el primer iPod video (5ª generación).
 10-13 | 2020 | Se presentan la familia iPhone 12 (incluyendo el formato compacto mini) y el primer HomePod mini en el evento "Hi, Speed".
+10-13 | 2026 | Apple presenta el HomeView, su primera pantalla para el hogar, junto con la 2ª generación del HomePod mini.
 10-16 | 2003 | Se lanza iTunes para Windows.
 10-16 | 2014 | Se lanza OS X Yosemite.
 10-18 | 2021 | Se presentan los MacBook Pro con chips M1 Pro y M1 Max, y los AirPods de 3ª generación en el evento "Unleashed".

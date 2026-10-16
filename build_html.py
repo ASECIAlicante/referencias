@@ -11,6 +11,168 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 EXCEL_PATH = os.path.join(BASE_DIR, 'Database.xlsx')
 HTML_PATH = os.path.join(BASE_DIR, 'index.html')
 
+# Diccionario de busqueda ES->EN. Se lee en CADA build desde el fichero
+# "Colors" del proyecto (.rtf, .txt o sin extension), de modo que basta con
+# editar ese fichero y relanzar el build para que el buscador se actualice.
+# Formato de cada linea:  <termino en ingles> = <termino en espanol>
+# Las lineas SIN "=" se ignoran (aun sin traducir), igual que las que tengan
+# cualquiera de los dos lados vacio. Un mismo termino ingles puede repetirse
+# con varias traducciones (Pencil = Lapiz / Pencil = Boli) y una misma
+# traduccion puede apuntar a varios terminos ingleses (Blanco estrella ->
+# Starlight y Star White): ambos casos se acumulan.
+COLORS_CANDIDATES = ('Colors.rtf', 'Colors.txt', 'Colors', 'Colours.rtf', 'Colours.txt')
+
+_ACCENTS = str.maketrans({
+    'á': 'a', 'à': 'a', 'ä': 'a', 'â': 'a', 'ã': 'a',
+    'é': 'e', 'è': 'e', 'ë': 'e', 'ê': 'e',
+    'í': 'i', 'ì': 'i', 'ï': 'i', 'î': 'i',
+    'ó': 'o', 'ò': 'o', 'ö': 'o', 'ô': 'o', 'õ': 'o',
+    'ú': 'u', 'ù': 'u', 'ü': 'u', 'û': 'u',
+    'ñ': 'n', 'ç': 'c',
+})
+
+_ALPHA_WORD = re.compile(r'^[a-z]+$')
+
+
+def strip_accents(s):
+    """Minusculas y sin acentos, SIN tocar plural ni genero. Es el nivel que se
+    usa para casar texto literal (P/N, EAN, ECI, descripcion) y los terminos
+    del diccionario contra la fila: conserva la grafia real del dato."""
+    return str(s).lower().translate(_ACCENTS)
+
+
+def fold_es(s):
+    """strip_accents() y ademas sin marca de plural ni de genero. Debe producir
+    EXACTAMENTE el mismo resultado que foldES() en el JavaScript del buscador:
+    si las dos divergen, el diccionario deja de casar.
+    'Pequeña' -> 'pequeno', 'Burdeos' -> 'burdeo', 'Rosa nube' -> 'roso nube'.
+
+    Solo se recorta en palabras puramente alfabeticas. Un P/N ('MHFA4Y/A'), un
+    EAN, una referencia ECI o una talla ('S/M') llevan digitos o barras y se
+    dejan intactos. Este nivel se usa UNICAMENTE para buscar la clave en el
+    diccionario, nunca para casar contra la fila.
+    """
+    out = []
+    for w in strip_accents(s).split():
+        if _ALPHA_WORD.match(w):
+            if len(w) > 3 and w.endswith('s'):
+                w = w[:-1]
+            if len(w) > 3 and w.endswith('a'):
+                w = w[:-1] + 'o'
+        out.append(w)
+    return ' '.join(out)
+
+
+def _rtf_to_text(raw):
+    """Extrae el texto plano de un RTF simple (el que genera TextEdit)."""
+    for grp in ('fonttbl', 'colortbl', 'expandedcolortbl', 'stylesheet', 'info'):
+        raw = re.sub(r'\{\\\*?\\' + grp + r'[^{}]*(?:\{[^{}]*\}[^{}]*)*\}', '', raw)
+    # Caracteres acentuados escapados como \'e9 (cp1252)
+    raw = re.sub(r"\\'([0-9a-fA-F]{2})",
+                 lambda m: bytes([int(m.group(1), 16)]).decode('cp1252', 'replace'), raw)
+    raw = raw.replace('\\\r\n', '\n').replace('\\\n', '\n')
+    raw = re.sub(r'\\par[d]?\b', '\n', raw)
+    raw = re.sub(r'\\[a-zA-Z]+-?\d*\s?', '', raw)
+    return raw.replace('{', '').replace('}', '')
+
+
+def load_term_synonyms():
+    """Lee el fichero Colors y devuelve (dict, max_palabras, informe).
+
+    Cada linea "A = B" declara que A y B son el MISMO concepto. No importa que
+    lado es ingles y cual espanol, ni el orden de las lineas: los terminos se
+    agrupan en clases de equivalencia, de modo que teclear cualquiera de ellos
+    encuentra las filas escritas con cualquier otro. Las lineas que comparten
+    un termino se fusionan solas ('Display = Pantalla' + 'Display = Monitor'
+    -> pantalla, monitor y display son intercambiables).
+
+    dict: {clave_normalizada: [termino, ...]} con todos los equivalentes.
+    """
+    path = next((p for p in (os.path.join(BASE_DIR, n) for n in COLORS_CANDIDATES)
+                 if os.path.exists(p)), None)
+    if not path:
+        return {}, 1, 'Diccionario de busqueda: no se encontro el fichero Colors (buscador sin traduccion)'
+
+    with open(path, 'rb') as f:
+        data = f.read()
+    text = data.decode('utf-8', 'replace')
+    if text.lstrip().startswith('{\\rtf') or os.path.basename(path).lower().endswith('.rtf'):
+        text = _rtf_to_text(data.decode('cp1252', 'replace'))
+
+    # --- Union-find sobre los terminos normalizados ---
+    parent, label = {}, {}
+
+    def find(x):
+        parent.setdefault(x, x)
+        while parent[x] != x:
+            parent[x] = parent[parent[x]]
+            x = parent[x]
+        return x
+
+    def union(a, b):
+        ra, rb = find(a), find(b)
+        if ra != rb:
+            parent[rb] = ra
+
+    skipped, lines_ok = 0, 0
+    for line in text.splitlines():
+        line = line.strip()
+        if not line or '=' not in line:
+            if line:
+                skipped += 1
+            continue
+        left, _, right = line.partition('=')
+        left, right = left.strip(), right.strip()
+        if not left or not right:
+            skipped += 1
+            continue
+        kl, kr = fold_es(left), fold_es(right)
+        label.setdefault(kl, left.lower())
+        label.setdefault(kr, right.lower())
+        if kl != kr:
+            union(kl, kr)
+        lines_ok += 1
+
+    classes = {}
+    for term in list(parent):
+        classes.setdefault(find(term), []).append(term)
+
+    # Una clase de un solo termino no aporta nada: ese texto ya se encuentra
+    # por coincidencia literal.
+    syn = {}
+    for members in classes.values():
+        if len(members) < 2:
+            continue
+        vals = sorted({label.get(m, m) for m in members})
+        for m in members:
+            syn[m] = vals
+
+    # Los terminos de varias palabras ("Blanco estrella") se indexan tambien
+    # palabra a palabra, para que buscar solo "estrella" siga encontrando
+    # Starlight. No se pisa una clave que ya exista por si sola: si "Rosa" ya
+    # es una entrada, se queda con la suya y no hereda la de "Rosa nube".
+    singles = dict(syn)
+    for key, vals in list(syn.items()):
+        words = key.split()
+        if len(words) < 2:
+            continue
+        for w in words:
+            if len(w) < 4 or w in singles:
+                continue
+            bucket = syn.setdefault(w, [])
+            for v in vals:
+                if v not in bucket:
+                    bucket.append(v)
+
+    pairs = syn
+    max_words = max((len(k.split()) for k in pairs), key=int, default=1)
+    report = (f'Diccionario de busqueda: {len(pairs)} terminos en '
+              f'{sum(1 for v in classes.values() if len(v) > 1)} grupos desde '
+              f'{os.path.basename(path)} ({lines_ok} lineas leidas, '
+              f'{skipped} sin "=" ignoradas)')
+    return pairs, max_words, report
+
+
 THEME = {
     0: 'FFFFFF', 1: '000000', 2: 'E8E8E8', 3: '0E2841',
     4: '156082', 5: 'E97132', 6: '196B24', 7: '0F9ED5',
@@ -785,7 +947,7 @@ def canonical_ean_stem(stem, catalog_eans):
     return stem
 
 
-def clean_pictures_dir(catalog_eans=None, dry_run=False):
+def clean_pictures_dir(catalog_eans=None):
     """Limpia pictures/ antes de construir el manifiesto.
 
     Tres pasadas, en este orden:
@@ -827,14 +989,12 @@ def clean_pictures_dir(catalog_eans=None, dry_run=False):
             canon = canonical_ean_stem(base, catalog_eans)
             src = os.path.join(folder_path, fname)
             if canon in stems or base in stems:
-                if not dry_run:
-                    os.remove(src)
+                os.remove(src)
                 stems.discard(stem)
                 report['deleted'].append((folder, fname))
             else:
                 dst_name = canon + '.webp'
-                if not dry_run:
-                    os.rename(src, os.path.join(folder_path, dst_name))
+                os.rename(src, os.path.join(folder_path, dst_name))
                 stems.discard(stem)
                 stems.add(canon)
                 report['rescued'].append((folder, fname, dst_name))
@@ -848,12 +1008,10 @@ def clean_pictures_dir(catalog_eans=None, dry_run=False):
             dst = os.path.join(folder_path, canon + '.webp')
             if canon in stems:
                 # Ya existe la version correcta: el nombre corto sobra.
-                if not dry_run:
-                    os.remove(src)
+                os.remove(src)
                 report['deleted'].append((folder, stem + '.webp'))
             else:
-                if not dry_run:
-                    os.rename(src, dst)
+                os.rename(src, dst)
                 stems.add(canon)
                 report['normalized'].append((folder, stem + '.webp', canon + '.webp'))
 
@@ -1018,6 +1176,18 @@ def main():
                     'isAccessory': sec['is_accessory'],
                     'cells': cells,
                     'search': ' '.join(search_parts).lower(),
+                    # Forma solo-digitos de cada referencia numerica de la fila
+                    # (ECI, EAN...), con un espacio entre referencias para que una
+                    # busqueda no cruce de una a otra. Permite encontrar una
+                    # referencia tecleada con OTRA agrupacion de puntos -- o sin
+                    # ninguno -- ya que las etiquetas de ECI no siempre parten los
+                    # 11 digitos igual (a veces hay un punto de mas). La cadena
+                    # 'search' de arriba conserva el formato original con puntos;
+                    # esta es el respaldo normalizado.
+                    'searchnum': ' '.join(
+                        re.sub(r'\D', '', p) for p in search_parts
+                        if len(re.sub(r'\D', '', p)) >= 6
+                    ),
                 })
 
     # Build Level 1 and Level 2 navigation
@@ -1089,9 +1259,8 @@ def main():
     home_panel = f'''
       <section class="panel active" id="home" data-panel-name="Inicio">
         <div class="panel-header home-header">
-          <div class="home-today" id="homeToday">
+          <div class="home-today">
             <span class="home-today-date" id="homeTodayDate"></span>
-            <span class="home-today-fact" id="homeTodayFact"></span>
           </div>
           <div class="home-tip">
             <ul class="home-tip-list">
@@ -1279,8 +1448,13 @@ def main():
           f"({total_images} imagenes en {len(image_manifest)} hojas)")
 
     # --- Write HTML (now lightweight) ---
+    term_syn, term_max_words, term_report = load_term_synonyms()
+    print(term_report)
+
     html_doc = TEMPLATE.replace('__LEVEL1_BTNS__', "".join(level1_btns)) \
                         .replace('__LEVEL2_ROWS__', "\n".join(level2_rows)) \
+                        .replace('__TERM_SYNONYMS__', json.dumps(term_syn, ensure_ascii=False, sort_keys=True)) \
+                        .replace('__TERM_MAX_WORDS__', str(term_max_words)) \
                         .replace('__PANELS__', "\n".join(panels))
 
     with open(HTML_PATH, 'w', encoding='utf-8') as f:
@@ -1402,7 +1576,6 @@ body.light-mode .topbar-header h1 .brand-colon{background:linear-gradient(90deg,
 .nav-btn-fam.active:hover{color:#fff;background:
     linear-gradient(90deg, var(--accent), var(--accent-2)) padding-box,
     linear-gradient(135deg, var(--fam-grad)) border-box;}
-.nav-btn-home{padding:0;width:38px;min-width:38px;justify-content:center;font-size:16px;}
 .main{padding: 18px 16px calc(60px + env(safe-area-inset-bottom, 0));padding-left: calc(16px + env(safe-area-inset-left, 0));padding-right: calc(16px + env(safe-area-inset-right, 0));max-width:1000px;margin:0 auto;}
 .panel{display:none;}
 .panel.active{display:block; animation: fadein .18s ease;}
@@ -1471,7 +1644,6 @@ tbody tr:last-child td{border-bottom:none;}
    tabla y dispara el scroll horizontal en movil. Se les permite envolver. */
 tbody td[colspan]{white-space:normal;word-break:break-word;}
 td.mono, td.mono .cell-text{font-family: var(--mono);font-size: calc(13px * var(--ref-zoom, 1));}
-tr.row-hidden{display:none;}
 mark{background: #ffdf5e;color:#1a1a1a;padding:0 2px;border-radius:3px;}
 .matrix-card{background:var(--panel);}
 .matrix-table td{padding:8px 12px;font-size: calc(13px * var(--ref-zoom, 1));border:1px solid rgba(255,255,255,.06);white-space:normal;}
@@ -1497,11 +1669,7 @@ tr.matrix-spacer td{border:none; padding:4px;}
 .home-header h2{font-size:26px;}
 .home-today{display:flex;flex-direction:column;gap:6px;margin:0 0 10px;}
 .home-today-date{font-size:13px;font-weight:700;color: var(--accent);text-transform:capitalize;}
-.home-today-fact{font-size:13.5px;color: var(--text-dim);line-height:1.5;}
-.home-today-fact:empty{display:none;}
-.home-subtitle{color: var(--text-dim);font-size:14.5px;max-width:640px;margin:8px 0 6px;line-height:1.5;}
 .home-tip{color: var(--accent);font-size:13.5px;max-width:640px;margin:0 0 16px;line-height:1.5;}
-.home-tip-title{margin:0 0 4px;font-weight:600;}
 .home-tip-list{margin:0;padding-left:20px;}
 .home-tip-list li{margin:2px 0;}
 .home-tip-link{color: var(--accent);font-weight:600;text-decoration: underline dotted var(--accent);text-underline-offset: 3px;}
@@ -1583,7 +1751,6 @@ body.light-mode #barcodeModalTitle{color:#000000;}
 .barcode-product-img{max-width: 100%;max-height: 220px;object-fit: contain;border-radius: 6px;}
 .barcode-svg-container{background: #ffffff;padding: 20px 14px 14px;border-radius: 10px;display: flex;flex-direction: column;align-items: center;justify-content: center;border: 1px solid #dde1e8;}
 .barcode-svg-container svg{max-width: 100%;height: auto;display: block;}
-.barcode-number-display{margin-top: 10px;font-family: var(--mono);font-size: 15px;font-weight: 700;color: #111318;letter-spacing: 0.16em;}
 .scanner-modal-backdrop{position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.75);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:1100;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s ease;padding:16px;}
 .scanner-modal-backdrop.open{opacity:1;pointer-events:auto;}
 .scanner-modal-card{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:18px;max-width:94vw;width:420px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 40px rgba(0,0,0,.55);transform:translateY(12px) scale(.96);transition:transform .2s cubic-bezier(.16,1,.3,1);}
@@ -1598,7 +1765,6 @@ body.light-mode #barcodeModalTitle{color:#000000;}
 .scanner-status.error{color:#ff6b6b;}
 .scanner-results{max-height:220px;overflow-y:auto;}
 .scanner-no-match{text-align:center;color:var(--text-dim);font-size:13px;padding:16px 8px;}
-.scanner-match-count{font-size:12px;font-weight:600;color:var(--accent);margin-bottom:8px;text-transform:uppercase;letter-spacing:.03em;}
 .scanner-result-item{padding:10px 12px;border:1px solid var(--border);border-radius:9px;margin-bottom:8px;cursor:pointer;transition:border-color .12s,background .12s;touch-action:manipulation;}
 .scanner-result-item:hover,.scanner-result-item:active{border-color:var(--accent);background:var(--panel-2);}
 .scanner-result-title{font-size:13.5px;font-weight:600;color:var(--text);margin-bottom:4px;}
@@ -1618,6 +1784,7 @@ body.light-mode .scanner-detail-match{background:rgba(11,122,62,.12);color:#0b7a
 .scanner-live-spinner{width:26px;height:26px;border-radius:50%;border:3px solid rgba(255,255,255,.25);border-top-color:#fff;animation:scannerSpin .8s linear infinite;margin-bottom:10px;}
 @keyframes scannerSpin{to{transform:rotate(360deg);}}
 .scanner-live-frame{position:absolute;top:22.5%;left:5%;width:90%;height:55%;border:2px solid rgba(62,162,90,.85);border-radius:10px;pointer-events:none;box-shadow:0 0 0 2000px rgba(0,0,0,.35);transition:top .15s,left .15s,width .15s,height .15s;}
+.scanner-live-frame.locked{border-width:3px;border-color:rgba(52,199,89,1);box-shadow:0 0 0 2000px rgba(0,0,0,.55),0 0 14px rgba(52,199,89,.55);}
 .scanner-barcode-overlay{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;}
 .scanner-live-overlay{position:absolute;bottom:0;left:0;right:0;padding:8px 10px;background:linear-gradient(180deg,transparent,rgba(0,0,0,.75));color:#fff;font-size:11.5px;font-family:var(--mono);min-height:18px;}
 .scanner-live-badge{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.55);color:#fff;font-size:10.5px;font-weight:700;padding:3px 8px;border-radius:20px;display:flex;align-items:center;gap:5px;letter-spacing:.03em;}
@@ -1664,16 +1831,16 @@ TEMPLATE = r"""<!DOCTYPE html>
     <div class="topbar-actions">
       <button id="fontDecBtn" class="icon-btn icon-btn-font" type="button" title="Reducir tamaño de letra" aria-label="Reducir tamaño de letra" style="display:none;">A<span class="font-btn-sign">−</span></button>
       <button id="fontIncBtn" class="icon-btn icon-btn-font" type="button" title="Aumentar tamaño de letra" aria-label="Aumentar tamaño de letra" style="display:none;">A<span class="font-btn-sign">+</span></button>
+      <button id="eventsToggle" class="icon-btn icon-btn-events" type="button" title="Un día como hoy en Apple" aria-label="Un día como hoy en Apple" style="display:none;">🎁</button>
       <button id="searchToggle" class="icon-btn" type="button" title="Buscar" aria-label="Buscar">🔎</button>
       <button id="scanToggle" class="icon-btn" type="button" title="Escanear referencia" aria-label="Escanear referencia" style="display:none;">📷</button>
-      <button id="eventsToggle" class="icon-btn icon-btn-events" type="button" title="Un día como hoy en Apple" aria-label="Un día como hoy en Apple" style="display:none;">🎁</button>
       <button id="themeToggle" class="icon-btn" type="button" title="Cambiar apariencia" aria-label="Cambiar apariencia">🌙</button>
     </div>
   </div>
   <div class="search-bar-row" id="searchBarRow">
     <input type="text" id="sheetSearch" placeholder="Buscar por modelo, P/N, ECI o EAN...">
   </div>
-  <div class="btn-row level1" id="level1Row">__LEVEL1_BTNS__</div>
+  <div class="btn-row level1">__LEVEL1_BTNS__</div>
   __LEVEL2_ROWS__
 </div>
 <main class="main">
@@ -1722,7 +1889,7 @@ __PANELS__
       <div class="scanner-live-badge"><span class="scanner-live-dot"></span>EN VIVO</div>
       <div class="scanner-live-crop" id="scannerLiveCrop"></div>
       <div class="scanner-live-overlay" id="scannerLiveOverlay">Iniciando camara...</div>
-      <div class="scanner-live-loading" id="scannerLiveLoading"><div><div class="scanner-live-spinner"></div>Preparando base de datos...</div></div>
+      <div class="scanner-live-loading"><div><div class="scanner-live-spinner"></div>Preparando base de datos...</div></div>
     </div>
     <div class="scanner-zoom-row" id="scannerZoomRow">
       <span class="scanner-zoom-label">Zoom</span>
@@ -1755,19 +1922,14 @@ __PANELS__
     var level1Buttons = document.querySelectorAll('.btn-row.level1 .nav-btn');
     var lobRows = document.querySelectorAll('.btn-row.level2');
     var leafButtons = document.querySelectorAll('.nav-btn-leaf');
-    var homeBtn = document.querySelector('.nav-btn-home');
 
     // --- Show today's ephemeris (in a modal, opened from the topbar gift icon) ---
     var homeTodayDate = document.getElementById('homeTodayDate');
-    var homeTodayFact = document.getElementById('homeTodayFact');
     var eventsToggle = document.getElementById('eventsToggle');
     var eventsModal = document.getElementById('eventsModal');
     var eventsCloseBtn = document.getElementById('eventsCloseBtn');
     var eventsModalDate = document.getElementById('eventsModalDate');
     var eventsModalBody = document.getElementById('eventsModalBody');
-
-    // Festive icon for the Home button on a handful of special days.
-    var HOME_ICONS = { '10-31': '🎃', '12-24': '🎄', '12-31': '🥂', '01-05': '👑' };
 
     function escHtml(s){
       return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -1788,8 +1950,6 @@ __PANELS__
       setModalOpen(eventsModal, false);
     }
 
-    if(homeTodayFact){ homeTodayFact.innerHTML = ''; }
-
     var today = new Date();
     var weekday = today.toLocaleDateString('es-ES', { weekday: 'long' });
     weekday = weekday.charAt(0).toUpperCase() + weekday.slice(1);
@@ -1798,12 +1958,6 @@ __PANELS__
     var yyyy = today.getFullYear();
     var todayLabel = weekday + ' ' + dd + '/' + mm + '/' + yyyy;
     if(homeTodayDate){ homeTodayDate.textContent = todayLabel; }
-
-    // Swap the house for a seasonal emoji on the special dates above.
-    if(homeBtn){
-      var festive = HOME_ICONS[mm + '-' + dd];
-      if(festive){ homeBtn.textContent = festive; }
-    }
 
     var todayEvents = APPLE_ON_THIS_DAY[mm + '-' + dd];
     if(todayEvents && todayEvents.length){
@@ -1934,7 +2088,9 @@ __PANELS__
     }
     function syncNav(slug){
       if(slug === 'home' || slug === 'search-results'){
-        setActiveLevel1(homeBtn);
+        // null: no hay boton de nivel 1 que representar como activo en Inicio ni
+        // en resultados de busqueda, y setActiveLevel1(null) limpia el resto.
+        setActiveLevel1(null);
         hideAllLobRows();
         setActiveLeaf(null);
         return;
@@ -1958,11 +2114,10 @@ __PANELS__
     // --- Reset to Home ---
     function resetToHome(){
       panels.forEach(function(p){ p.classList.toggle('active', p.id === 'home'); });
-      level1Buttons.forEach(function(b){ b.classList.toggle('active', b === homeBtn || b.dataset.target === 'home'); });
+      level1Buttons.forEach(function(b){ b.classList.remove('active'); });
       lobRows.forEach(function(r){ r.classList.remove('open'); });
       leafButtons.forEach(function(b){ b.classList.remove('active'); });
-      document.querySelectorAll('.nav-btn-model').forEach(function(b){ b.classList.remove('active'); });
-      document.querySelectorAll('.card').forEach(function(c){ c.classList.remove('open'); });
+      collapseAllCards();
       if(sheetSearch){ sheetSearch.value = ''; sheetSearch.blur(); }
       if(searchBarRow){ searchBarRow.classList.remove('open'); }
       if(resultsBody){ resultsBody.innerHTML = ''; }
@@ -1998,9 +2153,7 @@ __PANELS__
     level1Buttons.forEach(function(btn){
       btn.addEventListener('click', function(e){
         e.preventDefault();
-        if(btn.dataset.target === 'home' || btn.classList.contains('nav-btn-home')){
-          resetToHome();
-        } else if(btn.dataset.lob){
+        if(btn.dataset.lob){
           var lobSlug = btn.dataset.lob;
           collapseAllCards();
           setActiveLevel1(btn);
@@ -2015,13 +2168,6 @@ __PANELS__
         }
       });
     });
-
-    if(homeBtn){
-      homeBtn.addEventListener('click', function(e){
-        e.preventDefault();
-        resetToHome();
-      });
-    }
 
     // La zona de marca (arcos + ECIarc) hace de boton Inicio: clic o Enter/Espacio.
     var brandHome = document.getElementById('brandHome');
@@ -2105,6 +2251,117 @@ __PANELS__
     });
 
     // Global search
+
+    // Diccionario ES -> EN generado en el build a partir del fichero "Colors"
+    // del proyecto. Clave = lo que teclea el empleado (espanol, ya normalizado
+    // sin acentos ni marca de plural/genero); valor = terminos tal como
+    // aparecen en la base de datos (ingles). Para actualizarlo se edita Colors
+    // y se relanza el build: no se toca este fichero.
+    var TERM_SYNONYMS = __TERM_SYNONYMS__;
+    var TERM_MAX_WORDS = __TERM_MAX_WORDS__;
+    var TERM_KEYS = Object.keys(TERM_SYNONYMS);
+    // Longitud minima de un prefijo para disparar la busqueda incremental en
+    // el diccionario (por debajo de esto hay demasiadas claves candidatas y
+    // el resultado deja de ser util).
+    var TERM_PREFIX_MIN = 2;
+
+    // Minusculas y sin acentos, SIN tocar plural ni genero. Es el nivel con el
+    // que se casa el texto literal (P/N, EAN, ECI, descripcion) y los terminos
+    // del diccionario contra la fila: conserva la grafia real del dato.
+    function stripAccents(s){
+      return String(s).toLowerCase()
+        .replace(/[áàäâã]/g,'a').replace(/[éèëê]/g,'e')
+        .replace(/[íìïî]/g,'i').replace(/[óòöôõ]/g,'o')
+        .replace(/[úùüû]/g,'u').replace(/ñ/g,'n').replace(/ç/g,'c');
+    }
+
+    // stripAccents() y ademas sin marca de plural ni genero, para que
+    // "Pequeñas", "pequeno" y "PEQUEÑA" acaben en la misma clave ("pequeno").
+    // Tiene que producir lo mismo que fold_es() en build_html.py.
+    // Solo recorta palabras puramente alfabeticas: un P/N ("MHFA4Y/A"), un EAN,
+    // una ECI o una talla ("S/M") llevan digitos o barras y quedan intactos.
+    // Este nivel se usa SOLO para buscar la clave en el diccionario, nunca para
+    // casar contra la fila.
+    function foldES(s){
+      var words = stripAccents(s).split(/\s+/), out = [];
+      for(var i=0;i<words.length;i++){
+        var w = words[i];
+        if(!w){ continue; }
+        if(/^[a-z]+$/.test(w)){
+          if(w.length > 3 && w.charAt(w.length-1) === 's'){ w = w.slice(0,-1); }
+          if(w.length > 3 && w.charAt(w.length-1) === 'a'){ w = w.slice(0,-1) + 'o'; }
+        }
+        out.push(w);
+      }
+      return out.join(' ');
+    }
+
+    // Los equivalentes ingleses se comparan por palabra completa, no por
+    // substring: valores cortos del diccionario como "S", "M" o "S/M"
+    // apareceran dentro de casi cualquier fila si se buscan como substring.
+    var _altReCache = {};
+    function altMatches(hay, alt){
+      var re = _altReCache[alt];
+      if(!re){
+        re = new RegExp('(^|[^a-z0-9])' + escapeRegExp(alt) + '([^a-z0-9]|$)');
+        _altReCache[alt] = re;
+      }
+      return re.test(hay);
+    }
+
+    // Convierte lo tecleado en grupos de condiciones. Cada grupo debe cumplirse
+    // (AND entre grupos, OR entre las alternativas de un grupo). Se reconocen
+    // traducciones de varias palabras ("blanco estrella") buscando primero la
+    // coincidencia mas larga.
+    //
+    // Resultados en tiempo real sin terminar de escribir: si no hay clave EXACTA
+    // para el trozo tecleado, se busca por PREFIJO entre las claves del
+    // diccionario ("estr" encuentra la clave "estrella" aunque falten letras).
+    // Solo el ULTIMO grupo (lo que el empleado esta escribiendo en este
+    // instante) se trata como posiblemente incompleto; los anteriores, al ya
+    // tener un espacio detras, se tratan como palabras cerradas. Si el prefijo
+    // es ambiguo (casa con varias claves: "pl" -> plata, plastico...) se
+    // combinan todas las traducciones candidatas.
+    function buildGroups(raw){
+      var endsWithSpace = /\s$/.test(raw);
+      var lit = raw.toLowerCase().split(/\s+/).filter(Boolean);
+      var acc = stripAccents(raw).split(/\s+/).filter(Boolean);
+      var fold = foldES(raw).split(/\s+/).filter(Boolean);
+      var groups = [], i = 0;
+      while(i < fold.length){
+        var hit = null, end = i + 1;
+        var maxJ = Math.min(fold.length, i + TERM_MAX_WORDS);
+        var isLast = (end === fold.length) && !endsWithSpace;
+        for(var j = maxJ; j > i; j--){
+          var phrase = fold.slice(i, j).join(' ');
+          var vals = TERM_SYNONYMS[phrase];
+          if(vals){ hit = vals; end = j; break; }
+          // Prefijo: solo si este trozo es lo ultimo que hay tecleado (todavia
+          // puede faltar por escribir) y tiene longitud suficiente.
+          if(isLast && j === maxJ && phrase.length >= TERM_PREFIX_MIN){
+            var merged = null;
+            for(var k = 0; k < TERM_KEYS.length; k++){
+              if(TERM_KEYS[k].indexOf(phrase) === 0){
+                merged = merged || [];
+                var cand = TERM_SYNONYMS[TERM_KEYS[k]];
+                for(var m = 0; m < cand.length; m++){
+                  if(merged.indexOf(cand[m]) === -1){ merged.push(cand[m]); }
+                }
+              }
+            }
+            if(merged){ hit = merged; end = j; break; }
+          }
+        }
+        groups.push({
+          lit: lit.slice(i, end).join(' '),
+          acc: acc.slice(i, end).join(' '),
+          alts: hit
+        });
+        i = end;
+      }
+      return groups;
+    }
+
     function escapeRegExp(s){ return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
     function highlightText(text, tokens){
       if(!tokens || !tokens.length){ return text; }
@@ -2120,8 +2377,46 @@ __PANELS__
 
     function renderResults(term, tokens){
       resultsBody.innerHTML = '';
+      var groups = buildGroups(term);
+      // Para resaltar se usa lo tecleado mas los equivalentes ingleses, de modo
+      // que al buscar "burdeos" se marque el "Burgundy" que trae la fila.
+      var hlTokens = [];
+      groups.forEach(function(g){
+        if(g.lit && hlTokens.indexOf(g.lit) === -1){ hlTokens.push(g.lit); }
+        if(g.alts){
+          g.alts.forEach(function(a){ if(hlTokens.indexOf(a) === -1){ hlTokens.push(a); } });
+        }
+      });
       var matches = ALL_ROWS.filter(function(r){
-        return tokens.every(function(t){ return r.search.indexOf(t) !== -1; });
+        // r._sa es r.search sin acentos, calculado una sola vez al cargar. Se
+        // casa SIEMPRE contra este texto, que conserva la grafia real del dato
+        // (P/N, EAN, ECI, descripcion); el plegado de plural/genero solo se usa
+        // para encontrar la clave del diccionario.
+        var hay = r._sa || (r._sa = stripAccents(r.search));
+        return groups.every(function(g){
+          // 1) Lo tecleado, tal cual, como substring: permite ir escribiendo a
+          //    medias ("macb", "mhfa") y cubre P/N, descripcion e ingles directo.
+          if (hay.indexOf(g.acc) !== -1) return true;
+          // 2) Equivalentes del diccionario, por palabra completa (si se
+          //    buscasen como substring, valores cortos como "S" o "M" saldrian
+          //    en casi cualquier fila).
+          if (g.alts) {
+            for (var i = 0; i < g.alts.length; i++) {
+              if (altMatches(hay, stripAccents(g.alts[i]))) return true;
+            }
+          }
+          // Si el termino es una referencia numerica (solo digitos y
+          // separadores: puntos, espacios, guiones), se compara tambien su
+          // forma solo-digitos contra la de la fila. Asi "152.170.12424",
+          // "15217012424" o "152.1701.2424" encuentran lo mismo: lo que importa
+          // son los 11 digitos, no como esten partidos en la etiqueta. Se exige
+          // longitud >= 6 para no convertir un "24" suelto en coincidencias.
+          if (/^[\d.\-\s·,/]+$/.test(g.lit)) {
+            var td = g.lit.replace(/\D/g, '');
+            if (td.length >= 6 && r.searchnum.indexOf(td) !== -1) return true;
+          }
+          return false;
+        });
       });
       resultsCount.textContent = matches.length + ' referencia' + (matches.length === 1 ? '' : 's') + ' encontrada' + (matches.length === 1 ? '' : 's') + ' para "' + term + '"';
 
@@ -2151,10 +2446,10 @@ __PANELS__
         var link = document.createElement('a');
         link.href = '#' + r.slug;
         link.className = 'result-sheet-link';
-        link.innerHTML = highlightText(r.sheet, tokens);
+        link.innerHTML = highlightText(r.sheet, hlTokens);
         var secSpan = document.createElement('div');
         secSpan.className = 'result-section-name';
-        secSpan.innerHTML = (r.isAccessory ? '🔌 ' : '') + highlightText(r.section, tokens);
+        secSpan.innerHTML = (r.isAccessory ? '🔌 ' : '') + highlightText(r.section, hlTokens);
         link.addEventListener('click', function(e){
           e.preventDefault();
           activate(r.slug);
@@ -2179,7 +2474,7 @@ __PANELS__
           labelSpan.textContent = c.label;
           var valueSpan = document.createElement('span');
           valueSpan.className = 'result-cell-value';
-          valueSpan.innerHTML = c.v ? highlightText(c.v, tokens) : '';
+          valueSpan.innerHTML = c.v ? highlightText(c.v, hlTokens) : '';
           if (rowEan) { valueSpan.classList.add('ean-clickable'); valueSpan.title = 'Ver código de barras'; }
           wrap.appendChild(labelSpan);
           wrap.appendChild(valueSpan);
@@ -2652,6 +2947,34 @@ __PANELS__
     var liveZoom = 1.0;              // digital zoom factor applied to the crop
     var liveNativeZoom = null;       // {min,max,step} when the camera exposes optical/native zoom
     var LIVE_INTERVAL_MS = 700;
+
+    // --- Captura a resolucion de sensor ------------------------------------
+    // El recorte que se le pasa al OCR solo puede tener los pixeles que traiga
+    // el frame de origen, asi que la resolucion del track es el techo duro de
+    // legibilidad: con un preview de 1280 una referencia ECI de estanteria cae
+    // a ~10px de alto y Tesseract no puede leerla por mucho que se reescale.
+    // Se pide el maximo que acepte la camara y, si el track declara un maximo
+    // mayor del concedido, se sube en caliente con applyConstraints.
+    var liveImageCapture = null;     // ImageCapture: existe en Chrome/Android, no en Safari/iOS
+    var liveCaptureCanvas = null;    // canvas reutilizado para el detect del barcode (downscale)
+
+    // --- Localizacion de la etiqueta (ROI) ----------------------------------
+    // Un codigo de barras es un patron de rayas verticales de frecuencia muy
+    // alta, y eso se detecta contando cruces de gradiente por fila SIN
+    // decodificar nada. Importa porque BarcodeDetector solo devuelve
+    // boundingBox cuando ha conseguido decodificar, y el caso que interesa
+    // aqui es justo el contrario: etiqueta gastada o borrosa que no decodifica,
+    // donde hay que leer por OCR los digitos impresos. Teniendo la banda de
+    // barras localizada, el legible esta pegado debajo (a veces encima), asi
+    // que el recorte se ancla ahi en vez de al centro ciego del encuadre.
+    var liveRoi = null;              // {x,y,w,h} normalizado 0..1 sobre el frame
+    var liveRoiAt = 0;               // timestamp de la ultima deteccion
+    var liveRoiMiss = 0;             // ticks seguidos sin lectura con ROI fijada
+    var ROI_TTL_MS = 1600;           // pasado este tiempo se vuelve al recuadro central
+    var ROI_TILES_X = 20;
+    var ROI_TILES_Y = 14;
+    var ROI_WORK_W = 360;            // ancho de trabajo del detector de rayas
+    var roiWorkCanvas = null;
     // Alternates the OCR alphabet between ticks (digits-only / part-number) and
     // keeps a short history of reads so both alphabets contribute to one match.
     var liveProfileToggle = false;
@@ -2760,26 +3083,41 @@ __PANELS__
       scannerZoomRow.classList.add('visible');
       scannerLiveOverlay.textContent = 'Iniciando camara...';
 
-      // Ask for the highest sensible resolution: the crop is what gets OCR'd, so
-      // source pixels directly determine how legible small digits are.
+      // Se pide la resolucion mas alta que la camara acepte: el recorte es lo
+      // que se OCR'ea, asi que los pixeles de origen determinan directamente
+      // cuan legibles son los digitos pequenos. 3840 de ancho es lo que dan
+      // hoy tanto los iPhone (Safari respeta width.ideal) como los Android de
+      // gama media; si la camara no llega, la propia negociacion de
+      // getUserMedia devuelve el modo mas cercano por debajo, no un error.
       var constraints = {
         video: {
           facingMode: { ideal: 'environment' },
-          width: { ideal: 1920 },
-          height: { ideal: 1080 },
+          width: { ideal: 3840 },
+          height: { ideal: 2160 },
           focusMode: { ideal: 'continuous' }
         }
       };
 
       // Start the OCR worker in parallel with the camera — it is the slow part.
+      // Que no este disponible NO es motivo para abortar el escaneo: el lector
+      // de codigos de barras no depende de Tesseract para nada, asi que se
+      // sigue adelante en modo "solo barcode" y lo unico que se pierde es la
+      // lectura de los digitos impresos.
       var workerPromise = getOcrWorker();
       if (!workerPromise) {
-        scannerLiveOverlay.textContent = 'Libreria OCR no cargada. Comprueba tu conexion.';
-        stopLiveScan();
-        return;
+        scannerLiveOverlay.textContent = 'OCR no disponible: solo lectura de codigo de barras.';
       }
 
       navigator.mediaDevices.getUserMedia(constraints)
+        .catch(function() {
+          // Escalon intermedio antes de rendirse: muchas webcam de portatil y
+          // algun Android antiguo rechazan 3840 pero si dan 1920, y perder esa
+          // opcion significaba caer al modo por defecto (640x480 en algunos
+          // navegadores), que es ilegible para OCR.
+          return navigator.mediaDevices.getUserMedia({
+            video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1080 } }
+          });
+        })
         .catch(function() {
           // Fall back to a plain request if the ideal constraints are rejected.
           return navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
@@ -2789,29 +3127,47 @@ __PANELS__
           liveStream = stream;
           liveTrack = stream.getVideoTracks()[0] || null;
           detectNativeZoom();
+          detectCaptureCapabilities();
           scannerVideo.srcObject = stream;
           return scannerVideo.play();
         }).then(function() {
-          if (!liveActive) return null;
-          // Start the barcode fast path immediately in the background — it does
-          // not depend on the OCR worker, so an EAN can resolve (and jump
-          // straight to results) before Tesseract even finishes loading. The
-          // camera itself stays hidden behind the loading screen below until
-          // OCR is ready too, so the user never sees a half-ready camera view.
-          startBarcodeFastPath();
-          return workerPromise;
-        }).then(function() {
           if (!liveActive) return;
-          // Both the stream and OCR are ready now — reveal the camera feed and
-          // its overlays (frame, badge, crop, barcode boxes) and swap the
-          // bottom status text in the same instant, so nothing "preparando..."
-          // is ever visible at the same time as the live picture.
+          // La subida de resolucion va DESPUES de play() y a proposito: una
+          // renegociacion del track tarda unas decimas y, puesta antes, deja la
+          // vista en negro ese tiempo. El elemento <video> absorbe el cambio de
+          // tamano en caliente, asi que el usuario ve imagen de inmediato y los
+          // pixeles extra entran por debajo sin interrumpir nada.
+          maximiseTrackResolution();
+          // La camara se revela EN CUANTO hay imagen. Antes se esperaba ademas
+          // a que Tesseract estuviera cargado (~10 MB de modelo, 1-3 s) para no
+          // mostrar nunca una vista "a medias". El efecto real en tienda era el
+          // contrario del buscado: el usuario miraba una pantalla de espera
+          // mientras el lector de codigos de barras -- que no necesita OCR para
+          // nada -- ya estaba corriendo debajo y podia haber resuelto el
+          // producto. Con un codigo legible el escaneo termina muchas veces
+          // antes de que el OCR acabe de cargar, asi que bloquear la vista solo
+          // anadia segundos por producto.
+          startBarcodeFastPath();
           scannerLiveWrap.classList.add('camera-ready');
           applyZoom(liveZoom);
-          scannerLiveOverlay.textContent = 'Encuadra el numero dentro del recuadro...';
-          liveTimer = setInterval(liveScanTick, LIVE_INTERVAL_MS);
+          scannerLiveOverlay.textContent = workerPromise
+            ? 'Apunta al codigo de barras (preparando lectura de digitos)...'
+            : 'Apunta al codigo de barras...';
+          if (!workerPromise) return;
+
+          // El OCR se incorpora cuando esta listo, sin bloquear la camara. Si
+          // falla, el escaneo sigue vivo leyendo codigos de barras en vez de
+          // caerse entero.
+          workerPromise.then(function() {
+            if (!liveActive) return;
+            scannerLiveOverlay.textContent = 'Encuadra el numero dentro del recuadro...';
+            liveTimer = setInterval(liveScanTick, LIVE_INTERVAL_MS);
+          }).catch(function() {
+            if (!liveActive) return;
+            scannerLiveOverlay.textContent = 'Solo codigo de barras: no se pudo cargar el OCR.';
+          });
         }).catch(function(err) {
-          scannerLiveOverlay.textContent = 'No se pudo iniciar la camara o el OCR. Revisa los permisos.';
+          scannerLiveOverlay.textContent = 'No se pudo iniciar la camara. Revisa los permisos.';
           stopLiveScan();
         });
     }
@@ -2881,7 +3237,14 @@ __PANELS__
       return ensureBarcodeDetector().then(function(ok) {
         if (!ok) { barcodeSupported = false; return false; }
         try {
-          barcodeDetector = new window.BarcodeDetector({ formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e'] });
+          // ean_13/upc_a cubren el codigo de la caja del producto; code_128 y
+          // code_39 son los que llevan las etiquetas de estanteria de ECI, que
+          // codifican la referencia ECI de 11 digitos. En tienda esa etiqueta
+          // se escanea tanto o mas que la propia caja.
+          // ean_8 y upc_e se han quitado a proposito: codifican 8 digitos y en
+          // el catalogo no hay ninguna referencia de esa longitud, asi que solo
+          // anadian trabajo de decodificacion por frame sin poder acertar nunca.
+          barcodeDetector = new window.BarcodeDetector({ formats: ['ean_13', 'upc_a', 'code_128', 'code_39'] });
           barcodeSupported = true;
           return true;
         } catch (e) { barcodeSupported = false; return false; }
@@ -2899,6 +3262,7 @@ __PANELS__
       ctx.lineWidth = Math.max(2, vw * 0.004);
       ctx.strokeStyle = 'rgba(52,199,89,.95)';
       boxes.forEach(function(b) {
+        if (!b) return;
         ctx.strokeRect(b.x, b.y, b.width, b.height);
       });
     }
@@ -2907,26 +3271,96 @@ __PANELS__
     // every frame). The WASM ponyfill is throttled to POLYFILL_TICK_MS instead
     // — decoding in WASM is real CPU work, and running it unthrottled would
     // compete with the OCR loop on older iPhones.
+    var BARCODE_DETECT_W = 1600;   // ancho maximo al que se le entrega el frame al detector
+
+    // Pedir 4K al track mejora el OCR pero encarece el decode: a 3840x2160 y en
+    // cada animation frame el detector -- y mucho mas el ponyfill WASM -- se come
+    // el hilo y arrastra consigo al bucle de OCR. Las barras se decodifican de
+    // sobra a 1600px de ancho, asi que el decode va sobre una copia reducida y
+    // los pixeles de verdad se reservan para el recorte que lee Tesseract, que
+    // es donde si hacen falta. Las cajas se devuelven a coordenadas de video
+    // multiplicando por el factor de reduccion.
+    function barcodeDetectSource() {
+      var vw = scannerVideo.videoWidth, vh = scannerVideo.videoHeight;
+      if (!vw || vw <= BARCODE_DETECT_W) return { src: scannerVideo, k: 1 };
+      var dw = BARCODE_DETECT_W;
+      var dh = Math.max(1, Math.round(vh * dw / vw));
+      if (!liveCaptureCanvas) liveCaptureCanvas = document.createElement('canvas');
+      if (liveCaptureCanvas.width !== dw || liveCaptureCanvas.height !== dh) {
+        liveCaptureCanvas.width = dw;
+        liveCaptureCanvas.height = dh;
+      }
+      try {
+        liveCaptureCanvas.getContext('2d').drawImage(scannerVideo, 0, 0, dw, dh);
+      } catch (e) { return { src: scannerVideo, k: 1 }; }
+      return { src: liveCaptureCanvas, k: vw / dw };
+    }
+
     function barcodeFastTick() {
       if (!liveActive || !barcodeSupported || !scannerVideo.videoWidth) return;
-      barcodeDetector.detect(scannerVideo).then(function(codes) {
+      var frame = barcodeDetectSource();
+      barcodeDetector.detect(frame.src).then(function(codes) {
         if (!liveActive) return;
-        drawBarcodeBoxes(codes.map(function(c) { return c.boundingBox; }));
+        var k = frame.k;
+        var boxes = codes.map(function(c) {
+          var b = c.boundingBox;
+          if (!b || k === 1) return b;
+          return { x: b.x * k, y: b.y * k, width: b.width * k, height: b.height * k };
+        });
+        drawBarcodeBoxes(boxes);
+
+        // Un barcode decodificado entrega la ROI exacta y gratis (ya esta
+        // calculada). Donde mas importa es cuando el valor leido NO esta en el
+        // catalogo: tipicamente la etiqueta lleva el EAN del fabricante en
+        // barras y la referencia util (ECI, P/N) impresa al lado en claro. Antes
+        // ese caso era un callejon sin salida; ahora la caja ancla el recorte y
+        // el OCR ataca la banda adyacente en vez del centro del encuadre.
+        if (!roiIsFresh() && boxes.length && scannerVideo.videoWidth) {
+          var bb = boxes[0];
+          if (bb && bb.width > 0 && bb.height > 0) {
+            setLiveRoi({
+              x: bb.x / scannerVideo.videoWidth,
+              y: bb.y / scannerVideo.videoHeight,
+              w: bb.width / scannerVideo.videoWidth,
+              h: bb.height / scannerVideo.videoHeight
+            });
+          }
+        }
+
+        var unknown = null;
         for (var i = 0; i < codes.length; i++) {
           var value = (codes[i].rawValue || '').replace(/\D/g, '');
-          var cl = value.length === 12 || value.length === 13
-            ? { kind: 'EAN', value: value.length === 13 ? value.replace(/^0/, '') : value }
-            : null;
+          // Misma clasificacion por longitud que classifyRef: 11 digitos es una
+          // referencia ECI (la etiqueta de estanteria, en code_128), 12 y 13
+          // son EAN. El 13 pierde el cero inicial porque asi se guarda en el
+          // indice del catalogo.
+          var cl = null;
+          if (value.length === 11) cl = { kind: 'ECI', value: value };
+          else if (value.length === 12) cl = { kind: 'EAN', value: value };
+          else if (value.length === 13) cl = { kind: 'EAN', value: value.replace(/^0/, '') };
           if (!cl) continue;
           var hit = matchExactRef(cl.kind, cl.value);
           if (hit) {
             stopLiveScan(true);
             scannerStatus.textContent = '1 producto encontrado';
             scannerStatus.className = 'scanner-status found';
-            scannerDetectedText.textContent = 'EAN: ' + cl.value;
+            scannerDetectedText.textContent = cl.kind + ': ' + cl.value;
             scannerDetected.style.display = 'block';
             displayScanResults([hit], false);
             return;
+          }
+          unknown = cl;
+        }
+        // Un codigo decodificado correctamente pero que no esta dado de alta
+        // producia silencio absoluto: el bucle seguia girando y parecia que el
+        // lector no funcionaba, cuando en realidad habia leido perfectamente.
+        // Decirlo evita que el usuario insista contra un producto que no esta
+        // en el catalogo.
+        if (unknown) {
+          var msg = unknown.kind + ' ' + unknown.value + ' leido — no esta en el catalogo';
+          if (scannerStatus.textContent !== msg) {
+            scannerStatus.textContent = msg;
+            scannerStatus.className = 'scanner-status';
           }
         }
         scheduleBarcodeTick();
@@ -2988,6 +3422,55 @@ __PANELS__
       } catch (e) { liveNativeZoom = null; }
     }
 
+    // ImageCapture solo existe en Chrome/Android. Donde esta, grabFrame()
+    // entrega el fotograma del track directamente como ImageBitmap, sin pasar
+    // por el elemento <video> ni por su escalado CSS. En Safari/iOS no existe
+    // y no hay sustituto: alli se dibuja el <video>, que a resolucion de track
+    // alta da practicamente lo mismo. takePhoto() se ha descartado a
+    // proposito: da el still del sensor completo, pero con latencia de
+    // obturador y sonido de disparo en Android, inaceptable en un bucle de
+    // tienda donde se escanean referencias en cadena.
+    function detectCaptureCapabilities() {
+      liveImageCapture = null;
+      if (!liveTrack) return;
+      try {
+        if (typeof window.ImageCapture === 'function') {
+          liveImageCapture = new window.ImageCapture(liveTrack);
+        }
+      } catch (e) { liveImageCapture = null; }
+    }
+
+    // getUserMedia negocia UN modo y se queda ahi, pero el track suele declarar
+    // un maximo mayor del concedido (tipico: concede 1920 y puede 4032). Subirlo
+    // en caliente es gratis en calidad de lectura y es el unico camino en
+    // Safari/iOS, donde no hay ImageCapture para pedir el still del sensor.
+    function maximiseTrackResolution() {
+      if (!liveTrack || !liveTrack.getCapabilities || !liveTrack.applyConstraints) return;
+      var caps;
+      try { caps = liveTrack.getCapabilities(); } catch (e) { return; }
+      if (!caps || !caps.width || typeof caps.width.max !== 'number') return;
+      var current = 0;
+      try { current = (liveTrack.getSettings() || {}).width || 0; } catch (e) {}
+      // Margen del 20%: renegociar para ganar unos pocos pixeles cuesta mas
+      // (parpadeo, reenfoque) de lo que aporta.
+      if (caps.width.max <= current * 1.2) return;
+      try {
+        liveTrack.applyConstraints({ width: { ideal: caps.width.max } })
+          .then(function() { detectNativeZoom(); })
+          .catch(function() {});
+      } catch (e) {}
+    }
+
+    // Devuelve una fuente dibujable con el frame actual al maximo detalle
+    // disponible, como promesa porque grabFrame() es asincrono. El <video> es
+    // el fallback universal.
+    function grabStillSource() {
+      if (liveImageCapture && liveImageCapture.grabFrame) {
+        return liveImageCapture.grabFrame().catch(function() { return scannerVideo; });
+      }
+      return Promise.resolve(scannerVideo);
+    }
+
     // Zoom has two independent effects and both help legibility:
     //  - native zoom (when available) makes the sensor itself zoom in;
     //  - the crop region shrinks, so the same OCR budget covers fewer, bigger pixels.
@@ -3005,7 +3488,10 @@ __PANELS__
       }
 
       // Shrink the guide frame in step with the crop so what the user frames is
-      // exactly what gets analysed.
+      // exactly what gets analysed. Con una etiqueta ya localizada el recuadro
+      // lo posiciona setLiveRoi() y no se toca aqui: el zoom del slider solo
+      // manda mientras el recorte es el central ciego.
+      if (roiIsFresh()) return;
       var wPct = 90 / z;
       var hPct = 55 / z;
       scannerLiveFrame.style.width = wPct + '%';
@@ -3026,6 +3512,11 @@ __PANELS__
         liveStream = null;
       }
       liveTrack = null;
+      liveImageCapture = null;
+      liveRoi = null;
+      liveRoiAt = 0;
+      liveRoiMiss = 0;
+      if (scannerLiveFrame) scannerLiveFrame.classList.remove('locked');
       if (scannerVideo) scannerVideo.srcObject = null;
       if (scannerLiveWrap) { scannerLiveWrap.style.display = 'none'; scannerLiveWrap.classList.remove('camera-ready'); }
       if (scannerLiveStopBtn) scannerLiveStopBtn.style.display = keepRestart ? 'block' : 'none';
@@ -3033,23 +3524,201 @@ __PANELS__
       if (scannerLiveCrop) scannerLiveCrop.textContent = '';
     }
 
-    // Crop the guide-frame region out of the frame and scale it UP to a fixed
-    // working width. The previous version downscaled the whole frame to 1000px,
-    // which left an ECI code about 8px tall — far below what Tesseract can read.
-    function grabLiveCrop() {
-      var vw = scannerVideo.videoWidth;
-      var vh = scannerVideo.videoHeight;
-      if (!vw || !vh) return null;
+    // --- Detector de banda de codigo de barras (sin decodificar) ------------
+    // Mide, sobre una copia reducida en gris, cuantas veces cambia el signo del
+    // gradiente horizontal en cada fila. Una banda de barras da una tasa de
+    // cruces alta Y casi identica en todas sus filas; un bloque de texto da una
+    // tasa parecida en las filas de glifos pero se derrumba en las de
+    // interlineado, asi que la UNIFORMIDAD VERTICAL es lo que de verdad separa
+    // barras de texto, no la tasa en si. Es aritmetica de canvas: cuesta una
+    // fraccion de un tick de Tesseract y no depende de ninguna API.
+    function detectBarcodeBand(src, sw, sh) {
+      if (!sw || !sh) return null;
+      var W = Math.min(ROI_WORK_W, sw);
+      var H = Math.max(8, Math.round(sh * W / sw));
+      if (!roiWorkCanvas) roiWorkCanvas = document.createElement('canvas');
+      if (roiWorkCanvas.width !== W || roiWorkCanvas.height !== H) {
+        roiWorkCanvas.width = W;
+        roiWorkCanvas.height = H;
+      }
+      var ctx = roiWorkCanvas.getContext('2d');
+      var data;
+      try {
+        ctx.drawImage(src, 0, 0, W, H);
+        data = ctx.getImageData(0, 0, W, H).data;
+      } catch (e) { return null; }
 
-      var cropW = Math.round(vw * 0.90 / liveZoom);
-      var cropH = Math.round(vh * 0.55 / liveZoom);
-      var cropX = Math.round((vw - cropW) / 2);
-      var cropY = Math.round((vh - cropH) / 2);
+      var gray = new Uint8Array(W * H);
+      for (var p = 0, g = 0; p < data.length; p += 4, g++) {
+        gray[g] = (data[p] * 0.299 + data[p + 1] * 0.587 + data[p + 2] * 0.114) | 0;
+      }
 
-      // Upscale so the digits are comfortably large for OCR, capped to keep each
-      // pass fast enough for a live loop.
-      var TARGET_W = 1400;
-      var scale = Math.min(3, Math.max(1, TARGET_W / cropW));
+      var tw = Math.floor(W / ROI_TILES_X);
+      var th = Math.floor(H / ROI_TILES_Y);
+      if (tw < 4 || th < 3) return null;
+      var DELTA = 18;        // cambio minimo de gris para contar como transicion
+      var RATE_MIN = 0.16;   // cruces por pixel: una transicion cada ~6px
+      var CV_MAX = 0.40;     // desviacion/media maxima entre filas del tile
+      var grid = new Uint8Array(ROI_TILES_X * ROI_TILES_Y);
+
+      for (var ty = 0; ty < ROI_TILES_Y; ty++) {
+        for (var tx = 0; tx < ROI_TILES_X; tx++) {
+          var x0 = tx * tw, y0 = ty * th;
+          var sum = 0, sumSq = 0, rows = 0;
+          for (var y = y0; y < y0 + th; y++) {
+            var base = y * W;
+            var crossings = 0, lastSign = 0;
+            for (var x = x0; x < x0 + tw - 1; x++) {
+              var d = gray[base + x + 1] - gray[base + x];
+              if (d > DELTA) {
+                if (lastSign === -1) crossings++;
+                lastSign = 1;
+              } else if (d < -DELTA) {
+                if (lastSign === 1) crossings++;
+                lastSign = -1;
+              }
+            }
+            var rate = crossings / tw;
+            sum += rate;
+            sumSq += rate * rate;
+            rows++;
+          }
+          if (!rows) continue;
+          var mean = sum / rows;
+          if (mean < RATE_MIN) continue;
+          var variance = Math.max(0, sumSq / rows - mean * mean);
+          if (Math.sqrt(variance) / mean > CV_MAX) continue;
+          grid[ty * ROI_TILES_X + tx] = 1;
+        }
+      }
+
+      var best = largestTileCluster(grid, ROI_TILES_X, ROI_TILES_Y);
+      if (!best || best.count < 3) return null;
+      return {
+        x: (best.x0 * tw) / W,
+        y: (best.y0 * th) / H,
+        w: ((best.x1 - best.x0 + 1) * tw) / W,
+        h: ((best.y1 - best.y0 + 1) * th) / H
+      };
+    }
+
+    // Componente conexa (4-vecinos) mas grande del grid de tiles marcados, con
+    // su bounding box. Se coge la mayor y no todas las marcadas juntas porque en
+    // una estanteria entran varias etiquetas en el encuadre y unir sus cajas
+    // daria un recorte que abarca toda la escena, justo lo que se quiere evitar.
+    function largestTileCluster(grid, cols, rows) {
+      var seen = new Uint8Array(cols * rows);
+      var best = null;
+      var stack = [];
+      for (var i = 0; i < grid.length; i++) {
+        if (!grid[i] || seen[i]) continue;
+        stack.length = 0;
+        stack.push(i);
+        seen[i] = 1;
+        var count = 0, x0 = cols, x1 = -1, y0 = rows, y1 = -1;
+        while (stack.length) {
+          var cur = stack.pop();
+          var cx = cur % cols, cy = (cur - cx) / cols;
+          count++;
+          if (cx < x0) x0 = cx;
+          if (cx > x1) x1 = cx;
+          if (cy < y0) y0 = cy;
+          if (cy > y1) y1 = cy;
+          var nb = [
+            cx > 0 ? cur - 1 : -1,
+            cx < cols - 1 ? cur + 1 : -1,
+            cy > 0 ? cur - cols : -1,
+            cy < rows - 1 ? cur + cols : -1
+          ];
+          for (var n = 0; n < 4; n++) {
+            var idx = nb[n];
+            if (idx >= 0 && grid[idx] && !seen[idx]) { seen[idx] = 1; stack.push(idx); }
+          }
+        }
+        if (!best || count > best.count) best = { count: count, x0: x0, x1: x1, y0: y0, y1: y1 };
+      }
+      return best;
+    }
+
+    // Expande la banda de barras hasta abarcar el legible impreso. Se incluyen
+    // las dos bandas adyacentes a proposito: en la caja del producto el EAN en
+    // claro va DEBAJO de las barras, pero en la etiqueta de estanteria de ECI la
+    // referencia suele ir ENCIMA, y a priori no se sabe cual de las dos se esta
+    // apuntando.
+    function roiToCropRect(roi) {
+      var padX = roi.w * 0.12;
+      var x = roi.x - padX;
+      var w = roi.w + padX * 2;
+      var y = roi.y - roi.h * 0.50;
+      var h = roi.h * 2.20;
+      // Suelo de tamano: un recorte demasiado estrecho deja a Tesseract sin
+      // contexto de linea y empeora la lectura en vez de mejorarla.
+      if (w < 0.35) { x -= (0.35 - w) / 2; w = 0.35; }
+      if (h < 0.14) { y -= (0.14 - h) / 2; h = 0.14; }
+      if (x < 0) x = 0;
+      if (y < 0) y = 0;
+      if (x + w > 1) w = 1 - x;
+      if (y + h > 1) h = 1 - y;
+      return { x: x, y: y, w: w, h: h };
+    }
+
+    function setLiveRoi(roi) {
+      liveRoi = roi;
+      liveRoiAt = roi ? Date.now() : 0;
+      liveRoiMiss = 0;
+      // Cambiar de etiqueta invalida la ventana de lecturas: mezclar digitos de
+      // dos etiquetas distintas es la forma mas facil de construir una
+      // referencia que no existe y darla por buena.
+      liveTextWindow = [];
+      if (!scannerLiveFrame) return;
+      if (roi) {
+        var r = roiToCropRect(roi);
+        scannerLiveFrame.style.left = (r.x * 100) + '%';
+        scannerLiveFrame.style.top = (r.y * 100) + '%';
+        scannerLiveFrame.style.width = (r.w * 100) + '%';
+        scannerLiveFrame.style.height = (r.h * 100) + '%';
+        scannerLiveFrame.classList.add('locked');
+      } else {
+        scannerLiveFrame.classList.remove('locked');
+        applyZoom(liveZoom);
+      }
+    }
+
+    function roiIsFresh() {
+      return !!(liveRoi && (Date.now() - liveRoiAt) < ROI_TTL_MS);
+    }
+
+
+    // Recorta la region a analizar y la reescala HACIA ARRIBA a un ancho de
+    // trabajo fijo. Si hay una banda de barras localizada y reciente el recorte
+    // se ancla a ella -- que es lo que hace que los digitos llenen el recorte en
+    // vez de ocupar una franja perdida dentro de una foto de estanteria; si no,
+    // se vuelve al recuadro guia centrado, el comportamiento que ya habia.
+    function grabLiveCrop(src, sw, sh) {
+      if (!sw || !sh) return null;
+
+      var anchored = roiIsFresh();
+      var cropX, cropY, cropW, cropH;
+      if (anchored) {
+        var r = roiToCropRect(liveRoi);
+        cropX = Math.round(r.x * sw);
+        cropY = Math.round(r.y * sh);
+        cropW = Math.round(r.w * sw);
+        cropH = Math.round(r.h * sh);
+      } else {
+        cropW = Math.round(sw * 0.90 / liveZoom);
+        cropH = Math.round(sh * 0.55 / liveZoom);
+        cropX = Math.round((sw - cropW) / 2);
+        cropY = Math.round((sh - cropH) / 2);
+      }
+      if (cropW < 16 || cropH < 8) return null;
+
+      // Con el recorte anclado la region es bastante mas pequena, asi que el
+      // mismo presupuesto de pixeles se gasta entero en los digitos: se puede
+      // subir el ancho de trabajo y el tope de ampliacion sin alargar el tick.
+      var TARGET_W = anchored ? 1600 : 1400;
+      var MAX_SCALE = anchored ? 5 : 3;
+      var scale = Math.min(MAX_SCALE, Math.max(1, TARGET_W / cropW));
       var outW = Math.round(cropW * scale);
       var outH = Math.round(cropH * scale);
 
@@ -3059,10 +3728,16 @@ __PANELS__
       var ctx = canvas.getContext('2d');
       ctx.imageSmoothingEnabled = true;
       if ('imageSmoothingQuality' in ctx) ctx.imageSmoothingQuality = 'high';
-      ctx.drawImage(scannerVideo, cropX, cropY, cropW, cropH, 0, 0, outW, outH);
+      ctx.drawImage(src, cropX, cropY, cropW, cropH, 0, 0, outW, outH);
+      preprocessCrop(ctx, outW, outH);
 
-      // Grayscale + contrast stretch. Label print is high-contrast dark-on-light,
-      // so this mostly removes the noise that makes Tesseract hallucinate digits.
+      scannerLiveCrop.textContent = outW + 'x' + outH + (anchored ? ' - fijado' : '');
+      return canvas;
+    }
+
+    // Grayscale + contrast stretch. Label print is high-contrast dark-on-light,
+    // so this mostly removes the noise that makes Tesseract hallucinate digits.
+    function preprocessCrop(ctx, outW, outH) {
       try {
         var img = ctx.getImageData(0, 0, outW, outH);
         var d = img.data;
@@ -3085,20 +3760,38 @@ __PANELS__
         }
         ctx.putImageData(img, 0, 0);
       } catch (e) { /* tainted canvas should not happen with a local stream */ }
-
-      scannerLiveCrop.textContent = outW + 'x' + outH;
-      return canvas;
     }
 
     function liveScanTick() {
       if (liveBusy || !liveActive) return;
       if (!ocrWorker) return;
       if (!scannerVideo.videoWidth) return;
-
-      var canvas = grabLiveCrop();
-      if (!canvas) return;
       liveBusy = true;
 
+      grabStillSource().then(function(src) {
+        if (!liveActive) { liveBusy = false; return; }
+        var sw = src.videoWidth || src.width || 0;
+        var sh = src.videoHeight || src.height || 0;
+
+        // Se relocaliza la etiqueta solo cuando no hay ROI vigente: mientras el
+        // usuario mantiene el encuadre, repetir la deteccion cada tick haria
+        // bailar el recorte entre fotogramas y las lecturas de la ventana
+        // (liveTextWindow) dejarian de corresponder a la misma etiqueta.
+        if (!roiIsFresh()) {
+          var band = detectBarcodeBand(src, sw, sh);
+          if (band) setLiveRoi(band);
+        }
+
+        var canvas = grabLiveCrop(src, sw, sh);
+        if (src && src.close) src.close();   // ImageBitmap: liberar el buffer
+        if (!canvas) { liveBusy = false; return; }
+        return runOcrOnCrop(canvas);
+      }).catch(function() {
+        liveBusy = false;
+      });
+    }
+
+    function runOcrOnCrop(canvas) {
       // PSM 6 = "single uniform block of text", the right model for a label crop.
       // Two passes over the SAME crop with different alphabets. A single mixed
       // alphabet is a bad compromise: it lets letters win on digit-only codes.
@@ -3106,7 +3799,7 @@ __PANELS__
       liveProfileToggle = !liveProfileToggle;
       var profile = liveProfileToggle ? 'digits' : 'pn';
 
-      setOcrProfile(ocrWorker, profile, '6').then(function() {
+      return setOcrProfile(ocrWorker, profile, '6').then(function() {
         return ocrWorker.recognize(canvas);
       }).then(function(result) {
         liveBusy = false;
@@ -3119,10 +3812,33 @@ __PANELS__
         if (liveTextWindow.length > 3) liveTextWindow.shift();
 
         var outcome = evaluateOcrText(liveTextWindow.join('\n'));
+        if (outcome.ambiguous) {
+          var dedupedAmb = dedupeMatchesByRow(outcome.matches);
+          scannerLiveOverlay.textContent = 'Leido: ' + outcome.reads.slice(0, 2).join(' | ') + ' — varias coincidencias posibles';
+          scannerStatus.textContent = dedupedAmb.length + ' posibles coincidencias — confirma visualmente cual es';
+          scannerStatus.className = 'scanner-status';
+          scannerDetectedText.textContent = outcome.reads.slice(0, 5).join(' | ');
+          scannerDetected.style.display = 'block';
+          displayScanResults(outcome.matches, true);
+          return;
+        }
         if (outcome.matches.length === 0) {
+          // Una ROI puede ser un falso positivo: un bloque de texto denso
+          // (ingredientes, legal) tambien da tasa de cruces alta y uniforme. Si
+          // estando fijado no sale ninguna lectura en dos ticks seguidos, se
+          // suelta el anclaje para que el detector vuelva a buscar en vez de
+          // insistir sobre una zona equivocada hasta que caduque el TTL.
+          if (roiIsFresh() && !outcome.reads.length) {
+            liveRoiMiss++;
+            if (liveRoiMiss >= 2) setLiveRoi(null);
+          } else {
+            liveRoiMiss = 0;
+          }
           scannerLiveOverlay.textContent = outcome.reads.length
             ? 'Leido: ' + outcome.reads.slice(0, 2).join(' | ') + ' — sin coincidencia, acerca o ajusta el zoom...'
-            : 'Buscando referencia... usa el zoom si los digitos se ven pequenos';
+            : (roiIsFresh()
+                ? 'Etiqueta localizada, leyendo los digitos...'
+                : 'Buscando referencia... usa el zoom si los digitos se ven pequenos');
           return;
         }
         if (outcome.exact) {
@@ -3356,7 +4072,18 @@ __PANELS__
         var bestDist = results.reduce(function(acc, r) { return Math.min(acc, r.dist); }, Infinity);
         var atBest = dedupeMatchesByRow(results.filter(function(r) { return r.dist === bestDist; }));
         if (atBest.length !== 1) {
-          return { tokens: tokens, matches: [], exact: false, reads: readsFallback() };
+          // Mas de un producto DISTINTO empata a la misma distancia: no hay
+          // forma fiable de elegir uno solo. En vez de descartarlo como si no
+          // se hubiera leido nada, se devuelven los candidatos empatados con
+          // ambiguous:true para que la UI se los ensene al usuario y sea el
+          // quien confirme visualmente cual es (en vez de acertar por sorteo).
+          var usedReadsAmb = [];
+          var usedSeenAmb = {};
+          atBest.forEach(function(r) {
+            var k = r.kind + ':' + r.read;
+            if (!usedSeenAmb[k]) { usedSeenAmb[k] = true; usedReadsAmb.push(r.kind + ': ' + r.read); }
+          });
+          return { tokens: tokens, matches: atBest, exact: false, ambiguous: true, reads: usedReadsAmb };
         }
         shown = atBest;
       }
@@ -3368,7 +4095,7 @@ __PANELS__
         if (!usedSeen[k]) { usedSeen[k] = true; usedReads.push(r.kind + ': ' + r.read); }
       });
 
-      return { tokens: tokens, matches: shown, exact: exact.length > 0, reads: usedReads };
+      return { tokens: tokens, matches: shown, exact: exact.length > 0, ambiguous: false, reads: usedReads };
     }
 
     // Banded edit distance. Returns -1 as soon as it is provably above max,
