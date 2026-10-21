@@ -97,6 +97,7 @@
 10-30 | 2020 | Se lanza el servicio de suscripciones Apple One.
 10-30 | 2023 | Se presenta el chip M3 a 3 nanómetros.
 11-01 | 2019 | Se lanza el servicio de streaming Apple TV+.
+11-05 | 1955 | El Dr. Emmett L. Brown tuvo la célebre visión del condensador de flujo, hito que haría posible el viaje en el tiempo. 
 11-10 | 1997 | Abre la tienda online Apple Store.
 11-10 | 2020 | Apple presenta los primeros Mac con el chip M1 a 5 nanómetros, su primer procesador propio.
 12-08 | 2020 | Se presentan los primeros AirPods Max.
