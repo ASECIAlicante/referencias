@@ -1783,6 +1783,7 @@ body.light-mode #barcodeModalTitle{color:#000000;}
 .barcode-share-btn:disabled{opacity:.5;cursor:default;}
 .events-modal-card{width: 440px;text-align: left;}
 .events-modal-header{display: flex;justify-content: space-between;align-items: center;gap: 12px;margin-bottom: 6px;}
+.events-modal-header-notitle{justify-content: flex-end;}
 .events-modal-date{font-size: 12.5px;font-weight: 700;color: var(--accent);text-transform: capitalize;margin: 0 0 12px;}
 .events-modal-body{max-height: min(58vh, 420px);overflow-y: auto;-webkit-overflow-scrolling: touch;}
 .events-modal-list{list-style: none;padding: 0;margin: 0;display: flex;flex-direction: column;gap: 11px;}
@@ -1911,10 +1912,9 @@ __PANELS__
   </div>
 </div>
 
-<div class="barcode-modal-backdrop events-modal-backdrop" id="eventsModal" aria-hidden="true" role="dialog" aria-labelledby="eventsModalTitle">
+<div class="barcode-modal-backdrop events-modal-backdrop" id="eventsModal" aria-hidden="true" role="dialog" aria-label="Un día como hoy en Apple">
   <div class="barcode-modal-card events-modal-card">
-    <div class="events-modal-header">
-      <h4 class="barcode-modal-title" id="eventsModalTitle">Un día como hoy en Apple</h4>
+    <div class="events-modal-header events-modal-header-notitle">
       <button type="button" class="barcode-modal-close" id="eventsCloseBtn" aria-label="Cerrar">&times;</button>
     </div>
     <p class="events-modal-date" id="eventsModalDate"></p>
