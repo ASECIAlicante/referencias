@@ -1,6 +1,6 @@
 import os
-import re
 from PIL import Image
+from img_naming import DUP_STEM_RE
 
 ROOT = "pictures"
 MAX_W = 700
@@ -8,16 +8,6 @@ TARGET_BYTES = 30 * 1024  # ~30 KB objetivo
 TOLERANCE = 4 * 1024      # margen aceptable (+/- 4KB) antes de reducir más el tamaño
 MIN_W = 120               # no reducir el ancho por debajo de esto
 SOURCE_EXTS = (".jpg", ".jpeg", ".png", ".webp")
-
-# Nombres que macOS / iCloud / los navegadores generan al bajar dos veces el
-# mismo fichero: "<base> 2.webp", "<base> 3.webp", "<base> copia.webp",
-# "<base> copia 2.webp", "<base> copy.webp". Siempre llevan un espacio antes
-# del sufijo; un nombre de imagen bueno (solo el EAN) nunca lo lleva, asi que
-# el espacio es la senal inequivoca de duplicado.
-DUP_STEM_RE = re.compile(
-    r'^(?P<base>.+?)[ ]+(?:\d+|cop(?:ia|y)(?:[ ]+\d+)?)$',
-    re.IGNORECASE,
-)
 
 
 def consolidate_duplicates(root):

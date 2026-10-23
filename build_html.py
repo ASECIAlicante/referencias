@@ -6,6 +6,7 @@ Incluye generador e interactividad de códigos de barras EAN/UPC vía SVG.
 """
 
 import openpyxl, json, colorsys, re, os, html, datetime
+from img_naming import DUP_STEM_RE
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 EXCEL_PATH = os.path.join(BASE_DIR, 'Database.xlsx')
@@ -943,13 +944,10 @@ IMAGES_JSON_PATH = os.path.join(BASE_DIR, 'images.json')
 
 # Nombres que macOS / iCloud / los navegadores generan al bajar dos veces el
 # mismo fichero: "<ean> 2.webp", "<ean> 3.webp", "<ean> copia.webp",
-# "<ean> copia 2.webp", "<ean> copy.webp". Siempre llevan un espacio, y un
-# nombre valido NUNCA lo lleva (es solo digitos), asi que el espacio es la
-# senal inequivoca de duplicado y no puede colisionar con una imagen buena.
-DUP_STEM_RE = re.compile(
-    r'^(?P<base>.+?)[ ]+(?:\d+|cop(?:ia|y)(?:[ ]+\d+)?)$',
-    re.IGNORECASE,
-)
+# "<ean> copia 2.webp", "<ean> copy.webp". Definida en img_naming.py y
+# compartida con resize_inplace.py: los dos scripts deben estar de acuerdo
+# sobre que es un duplicado o arriesgan borrar/conservar fotos de forma
+# inconsistente entre el redimensionado y el build.
 
 
 def canonical_ean_stem(stem, catalog_eans):
@@ -1761,7 +1759,8 @@ tr.matrix-spacer td{border:none; padding:4px;}
 .ean-clickable{cursor: pointer;text-decoration: underline dotted var(--accent);text-underline-offset: 3px;border-radius: 4px;padding: 1px 4px;transition: background-color .15s ease, color .15s ease;}
 .ean-clickable:hover{color: var(--accent) !important;background: rgba(62, 162, 90, 0.15);}
 body.light-mode .ean-clickable:hover{background: rgba(11, 122, 62, 0.15);}
-.barcode-modal-backdrop{position: fixed;top: 0;left: 0;width: 100vw;height: 100vh;background: rgba(0, 0, 0, 0.65);backdrop-filter: blur(5px);-webkit-backdrop-filter: blur(5px);z-index: 1000;display: flex;align-items: center;justify-content: center;opacity: 0;pointer-events: none;transition: opacity 0.2s ease;padding: 16px;}
+.barcode-modal-backdrop,.scanner-modal-backdrop{position: fixed;top: 0;left: 0;width: 100vw;height: 100vh;display: flex;align-items: center;justify-content: center;opacity: 0;pointer-events: none;transition: opacity 0.2s ease;padding: 16px;}
+.barcode-modal-backdrop{background: rgba(0, 0, 0, 0.65);backdrop-filter: blur(5px);-webkit-backdrop-filter: blur(5px);z-index: 1000;}
 .barcode-modal-backdrop.open{opacity: 1;pointer-events: auto;}
 .barcode-modal-card{background: var(--panel);border: 1px solid var(--border);border-radius: 16px;padding: 22px;max-width: 92vw;width: 370px;text-align: center;box-shadow: 0 20px 40px rgba(0, 0, 0, 0.55);transform: translateY(12px) scale(0.96);transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);}
 .barcode-modal-backdrop.open .barcode-modal-card{transform: translateY(0) scale(1);}
@@ -1775,11 +1774,9 @@ body.light-mode .ean-clickable:hover{background: rgba(11, 122, 62, 0.15);}
 body.light-mode #barcodeModalTitle{color:#000000;}
 #barcodeModalTitle:empty{display:none;}
 .barcode-modal-header .barcode-modal-close{position:absolute;right:0;top:50%;transform:translateY(-50%);}
-.barcode-modal-close{background: transparent;border: 1px solid var(--border);color: var(--text-dim);font-size: 18px;cursor: pointer;line-height: 1;width: 32px;height: 32px;border-radius: 8px;display: flex;align-items: center;justify-content: center;transition: color 0.15s, border-color 0.15s, background 0.15s;}
-.barcode-modal-close:hover{color: var(--text);border-color: var(--accent);background: var(--panel-2);}
 .barcode-modal-header .barcode-share-btn{position:absolute;left:0;top:50%;transform:translateY(-50%);}
-.barcode-share-btn{background: transparent;border: 1px solid var(--border);color: var(--text-dim);cursor: pointer;line-height: 1;width: 32px;height: 32px;border-radius: 8px;display: flex;align-items: center;justify-content: center;transition: color 0.15s, border-color 0.15s, background 0.15s;}
-.barcode-share-btn:hover{color: var(--text);border-color: var(--accent);background: var(--panel-2);}
+.barcode-modal-close,.barcode-share-btn{background: transparent;border: 1px solid var(--border);color: var(--text-dim);font-size: 18px;cursor: pointer;line-height: 1;width: 32px;height: 32px;border-radius: 8px;display: flex;align-items: center;justify-content: center;transition: color 0.15s, border-color 0.15s, background 0.15s;}
+.barcode-modal-close:hover,.barcode-share-btn:hover{color: var(--text);border-color: var(--accent);background: var(--panel-2);}
 .barcode-share-btn:disabled{opacity:.5;cursor:default;}
 .events-modal-card{width: 440px;text-align: left;}
 .events-modal-header{display: flex;justify-content: space-between;align-items: center;gap: 12px;margin-bottom: 6px;}
@@ -1794,7 +1791,7 @@ body.light-mode #barcodeModalTitle{color:#000000;}
 .barcode-product-img{max-width: 100%;max-height: 220px;object-fit: contain;border-radius: 6px;}
 .barcode-svg-container{background: #ffffff;padding: 20px 14px 14px;border-radius: 10px;display: flex;flex-direction: column;align-items: center;justify-content: center;border: 1px solid #dde1e8;}
 .barcode-svg-container svg{max-width: 100%;height: auto;display: block;}
-.scanner-modal-backdrop{position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.75);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:1100;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s ease;padding:16px;}
+.scanner-modal-backdrop{background:rgba(0,0,0,0.75);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:1100;}
 .scanner-modal-backdrop.open{opacity:1;pointer-events:auto;}
 .scanner-modal-card{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:18px;max-width:94vw;width:420px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 40px rgba(0,0,0,.55);transform:translateY(12px) scale(.96);transition:transform .2s cubic-bezier(.16,1,.3,1);}
 .scanner-modal-backdrop.open .scanner-modal-card{transform:translateY(0) scale(1);}
@@ -2292,6 +2289,7 @@ __PANELS__
       leafButtons.forEach(function(b){ b.classList.remove('active'); });
       collapseAllCards();
       if(!keepSearchOpen){
+        if(searchDebounceTimer){ clearTimeout(searchDebounceTimer); searchDebounceTimer = null; }
         if(sheetSearch){ sheetSearch.value = ''; sheetSearch.blur(); }
         if(sheetSearchClear){ sheetSearchClear.style.display = 'none'; }
         if(searchBarRow){ searchBarRow.classList.remove('open'); }
@@ -2576,12 +2574,18 @@ __PANELS__
     }
 
     function escapeRegExp(s){ return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
-    function highlightText(text, tokens){
-      if(!tokens || !tokens.length){ return text; }
+    // Compila una regex de resaltado UNA vez por busqueda. Antes se reconstruia
+    // dentro de highlightText() en cada celda renderizada (3 llamadas por fila
+    // mostrada), repitiendo la misma compilacion cientos de veces por tecla
+    // pulsada sobre resultados que no cambian de token dentro de la pasada.
+    function buildHighlightRegex(tokens){
+      if(!tokens || !tokens.length){ return null; }
       var sorted = tokens.slice().sort(function(a, b){ return b.length - a.length; });
       var pattern = sorted.map(escapeRegExp).join('|');
-      if(!pattern){ return text; }
-      var re = new RegExp('(' + pattern + ')', 'ig');
+      return pattern ? new RegExp('(' + pattern + ')', 'ig') : null;
+    }
+    function highlightText(text, re){
+      if(!re){ return text; }
       return String(text).replace(re, '<mark>$1</mark>');
     }
 
@@ -2600,6 +2604,7 @@ __PANELS__
           g.alts.forEach(function(a){ if(hlTokens.indexOf(a) === -1){ hlTokens.push(a); } });
         }
       });
+      var hlRe = buildHighlightRegex(hlTokens);
       var matches = ALL_ROWS.filter(function(r){
         // r._sa es r.search sin acentos, calculado una sola vez al cargar. Se
         // casa SIEMPRE contra este texto, que conserva la grafia real del dato
@@ -2667,10 +2672,10 @@ __PANELS__
         var link = document.createElement('a');
         link.href = '#' + r.slug;
         link.className = 'result-sheet-link';
-        link.innerHTML = highlightText(r.sheet, hlTokens);
+        link.innerHTML = highlightText(r.sheet, hlRe);
         var secSpan = document.createElement('div');
         secSpan.className = 'result-section-name';
-        secSpan.innerHTML = (r.isAccessory ? '🔌 ' : '') + highlightText(r.section, hlTokens);
+        secSpan.innerHTML = (r.isAccessory ? '🔌 ' : '') + highlightText(r.section, hlRe);
         link.addEventListener('click', function(e){
           e.preventDefault();
           activate(r.slug);
@@ -2695,7 +2700,7 @@ __PANELS__
           labelSpan.textContent = c.label;
           var valueSpan = document.createElement('span');
           valueSpan.className = 'result-cell-value';
-          valueSpan.innerHTML = c.v ? highlightText(c.v, hlTokens) : '';
+          valueSpan.innerHTML = c.v ? highlightText(c.v, hlRe) : '';
           if (rowEan) { valueSpan.classList.add('ean-clickable'); valueSpan.title = 'Ver código de barras'; }
           wrap.appendChild(labelSpan);
           wrap.appendChild(valueSpan);
@@ -2707,14 +2712,25 @@ __PANELS__
       });
     }
 
+    // Debounce de la busqueda en vivo: sin el, cada tecla pulsada disparaba un
+    // Array.filter sobre ~2000 filas mas la reconstruccion completa del DOM de
+    // resultados (renderResults), aunque la tecla siguiente llegara 50ms
+    // despues y desechara ese trabajo de inmediato. 130ms es imperceptible al
+    // escribir pero absorbe la rafaga de teclas de una palabra completa.
+    var searchDebounceTimer = null;
     sheetSearch.addEventListener('input', function(){
-      var raw = sheetSearch.value.trim();
       if(sheetSearchClear){ sheetSearchClear.style.display = sheetSearch.value ? 'flex' : 'none'; }
+      if(searchDebounceTimer){ clearTimeout(searchDebounceTimer); }
+      searchDebounceTimer = setTimeout(runSearch, 130);
+    });
+
+    function runSearch(){
+      var raw = sheetSearch.value.trim();
       var term = raw.toLowerCase();
       var tokens = term.split(/\s+/).filter(Boolean);
-      var existingEmpty = document.querySelector('#search-results .no-results');
-      if(existingEmpty){ existingEmpty.remove(); }
       if(!tokens.length){
+        var existingEmpty = document.querySelector('#search-results .no-results');
+        if(existingEmpty){ existingEmpty.remove(); }
         if(document.getElementById('search-results').classList.contains('active')){
           activate('home');
         }
@@ -2722,10 +2738,11 @@ __PANELS__
       }
       renderResults(raw, tokens);
       activate('search-results');
-    });
+    }
 
     if(sheetSearchClear){
       sheetSearchClear.addEventListener('click', function(){
+        if(searchDebounceTimer){ clearTimeout(searchDebounceTimer); searchDebounceTimer = null; }
         sheetSearch.value = '';
         sheetSearchClear.style.display = 'none';
         var existingEmpty = document.querySelector('#search-results .no-results');
@@ -4151,6 +4168,18 @@ __PANELS__
 
     // Pure extraction + matching, shared by photo mode and live mode. Never
     // touches the DOM, so live mode can call it every tick without side effects.
+    // Patron de separador entre grupos de digitos de un ECI impreso ("152.154
+    // 27335", "152-154-27335"...). Es fijo, asi que las dos regex que lo usan se
+    // compilan UNA vez a nivel de modulo en vez de en cada tick del escaner
+    // (~700ms, en paralelo con Tesseract): recrearlas ahi era trabajo identico
+    // repetido sin ningun dato nuevo del que depender.
+    var OCR_ECI_SEP = '[.,:;\\u00b7\\-\\s]';
+    // ECI 3/3/4/1 — the variant seen on some labels. Must be tried BEFORE
+    // the 3/3/5 rule, whose prefix it shares.
+    var RE_ECI_3341 = new RegExp('(\\d{3})\\s*' + OCR_ECI_SEP + '\\s*(\\d{3})\\s*' + OCR_ECI_SEP + '\\s*(\\d{4})\\s*' + OCR_ECI_SEP + '\\s*(\\d)(?!\\d)', 'g');
+    // ECI 3/3/5 — the common form.
+    var RE_ECI_335 = new RegExp('(\\d{3})\\s*' + OCR_ECI_SEP + '\\s*(\\d{3})\\s*' + OCR_ECI_SEP + '\\s*(\\d{5})(?!\\d)', 'g');
+
     function evaluateOcrText(rawText) {
       var empty = { tokens: [], matches: [], exact: false, reads: [] };
       if (!rawText || !rawText.trim()) return empty;
@@ -4180,17 +4209,15 @@ __PANELS__
       // --- Numeric references: read the text twice, once as-is and once with
       // letter->digit corrections, so a single bad glyph cannot hide a reference.
       [up, ocrDigitFix(up)].forEach(function(text) {
-        var sep = '[.,:;\\u00b7\\-\\s]';
-
-        // ECI 3/3/4/1 — the variant seen on some labels. Must be tried BEFORE
-        // the 3/3/5 rule, whose prefix it shares.
-        var re4 = new RegExp('(\\d{3})\\s*' + sep + '\\s*(\\d{3})\\s*' + sep + '\\s*(\\d{4})\\s*' + sep + '\\s*(\\d)(?!\\d)', 'g');
+        // Las regex son 'g' y compartidas entre llamadas: hay que resetear
+        // lastIndex o un exec() previo que no llegara al final del texto
+        // dejaria la siguiente busqueda empezando a mitad de cadena.
         var m;
-        while ((m = re4.exec(text)) !== null) addToken(m[1] + m[2] + m[3] + m[4], 'ECI');
+        RE_ECI_3341.lastIndex = 0;
+        while ((m = RE_ECI_3341.exec(text)) !== null) addToken(m[1] + m[2] + m[3] + m[4], 'ECI');
 
-        // ECI 3/3/5 — the common form.
-        var re5 = new RegExp('(\\d{3})\\s*' + sep + '\\s*(\\d{3})\\s*' + sep + '\\s*(\\d{5})(?!\\d)', 'g');
-        while ((m = re5.exec(text)) !== null) addToken(m[1] + m[2] + m[3], 'ECI');
+        RE_ECI_335.lastIndex = 0;
+        while ((m = RE_ECI_335.exec(text)) !== null) addToken(m[1] + m[2] + m[3], 'ECI');
 
         // Sliding windows over digit runs. Crucially the run is built by joining
         // digit groups across in-line separators: EAN under a barcode is printed
