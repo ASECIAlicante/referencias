@@ -20,7 +20,8 @@ def consolidate_duplicates(root):
     Devuelve (borrados, rescatados) para el resumen.
     """
     deleted, rescued = [], []
-    for dirpath, _dirnames, filenames in os.walk(root):
+    for dirpath, dirnames, filenames in os.walk(root):
+        dirnames[:] = [d for d in dirnames if not d.startswith('_')]
         webps = [f for f in filenames if f.lower().endswith('.webp')]
         stems = set(f[:-5] for f in webps)
         for fname in sorted(webps):
@@ -104,66 +105,99 @@ def encode_to_target(img, target_bytes, tmp_path):
         width = max(MIN_W, int(width * 0.85))
 
 
-processed = []
-skipped_already_ok = 0
-tmp_path = os.path.join(ROOT, "_tmp_convert.webp")
+def optimize_pictures(root=ROOT, run_dedup=True, verbose=True):
+    """Recorre `root` y convierte/recomprime a WebP cualquier imagen que no
+    esté ya en formato y peso correctos (<= TARGET_BYTES + TOLERANCE).
 
-for dirpath, _dirnames, filenames in os.walk(ROOT):
-    for fname in sorted(filenames):
-        lower = fname.lower()
-        if not lower.endswith(SOURCE_EXTS):
-            continue
-        path = os.path.join(dirpath, fname)
-        if not os.path.isfile(path):
-            continue
+    Pensada para poder llamarse tanto desde la CLI (`python resize_inplace.py`)
+    como desde build_html.py al principio de cada build, para que el propio
+    build garantice que ninguna imagen nueva se cuela sin optimizar.
 
-        orig_size = os.path.getsize(path)
+    Devuelve un dict-resumen con lo procesado, para que el caller pueda
+    imprimir o loguear el resultado como prefiera.
+    """
+    processed = []
+    skipped_already_ok = 0
+    tmp_path = os.path.join(root, "_tmp_convert.webp")
 
-        # Si ya es WebP y pesa <= 30KB (dentro del margen), no tocar nada.
-        if lower.endswith(".webp") and orig_size <= TARGET_BYTES + TOLERANCE:
-            skipped_already_ok += 1
-            continue
+    for dirpath, dirnames, filenames in os.walk(root):
+        # Poda carpetas internas (p.ej. _huerfanos): la cuarentena no se
+        # reoptimiza ni se cuenta -- son fotos ya fuera del catalogo activo.
+        dirnames[:] = [d for d in dirnames if not d.startswith('_')]
+        for fname in sorted(filenames):
+            lower = fname.lower()
+            if not lower.endswith(SOURCE_EXTS):
+                continue
+            path = os.path.join(dirpath, fname)
+            if not os.path.isfile(path):
+                continue
 
-        img = Image.open(path)
-        if img.mode in ("RGBA", "P"):
-            img = img.convert("RGB")
-        if img.width > MAX_W:
-            new_h = max(1, int(img.height * (MAX_W / img.width)))
-            img = img.resize((MAX_W, new_h), Image.LANCZOS)
+            orig_size = os.path.getsize(path)
 
-        final_size, quality, width = encode_to_target(img, TARGET_BYTES, tmp_path)
+            # Si ya es WebP y pesa <= 30KB (dentro del margen), no tocar nada.
+            if lower.endswith(".webp") and orig_size <= TARGET_BYTES + TOLERANCE:
+                skipped_already_ok += 1
+                continue
 
-        base, ext = os.path.splitext(path)
-        new_path = base + ".webp"
-        os.replace(tmp_path, new_path)
-        if ext.lower() != ".webp" and os.path.exists(path) and path != new_path:
-            os.remove(path)
+            img = Image.open(path)
+            if img.mode in ("RGBA", "P"):
+                img = img.convert("RGB")
+            if img.width > MAX_W:
+                new_h = max(1, int(img.height * (MAX_W / img.width)))
+                img = img.resize((MAX_W, new_h), Image.LANCZOS)
 
-        processed.append((new_path, orig_size, final_size, quality, width))
+            final_size, quality, width = encode_to_target(img, TARGET_BYTES, tmp_path)
 
-if os.path.exists(tmp_path):
-    os.remove(tmp_path)
+            base, ext = os.path.splitext(path)
+            new_path = base + ".webp"
+            os.replace(tmp_path, new_path)
+            if ext.lower() != ".webp" and os.path.exists(path) and path != new_path:
+                os.remove(path)
 
-total_orig = sum(r[1] for r in processed)
-total_new = sum(r[2] for r in processed)
-for path, o, n, q, w in processed:
-    pct = (1 - n / o) * 100 if o else 0
-    print(f"{path}: {o/1024:.0f}KB -> {n/1024:.1f}KB (q={q}, w={w}px, {pct:.0f}% menos)")
+            processed.append((new_path, orig_size, final_size, quality, width))
 
-print(f"\nConvertidas/reducidas: {len(processed)} imagenes (objetivo ~{TARGET_BYTES/1024:.0f}KB)")
-print(f"Ya estaban en WebP <= {(TARGET_BYTES + TOLERANCE)/1024:.0f}KB, sin tocar: {skipped_already_ok}")
-if total_orig:
-    print(f"TOTAL: {total_orig/1024:.0f}KB -> {total_new/1024:.0f}KB ({(1 - total_new/total_orig)*100:.0f}% menos)")
+    if os.path.exists(tmp_path):
+        os.remove(tmp_path)
 
-# --- Consolidacion de duplicados (siempre al final, con todo ya en .webp) ---
-dup_deleted, dup_rescued = consolidate_duplicates(ROOT)
-print(f"\nDuplicados eliminados: {len(dup_deleted)}")
-for src in dup_deleted[:10]:
-    print(f"  - borrado: {src}")
-if len(dup_deleted) > 10:
-    print(f"  ... y {len(dup_deleted) - 10} mas")
-print(f"Duplicados rescatados (sin original, renombrados): {len(dup_rescued)}")
-for src, dst in dup_rescued[:10]:
-    print(f"  - {src} -> {dst}")
-if len(dup_rescued) > 10:
-    print(f"  ... y {len(dup_rescued) - 10} mas")
+    total_orig = sum(r[1] for r in processed)
+    total_new = sum(r[2] for r in processed)
+
+    if verbose:
+        for path, o, n, q, w in processed:
+            pct = (1 - n / o) * 100 if o else 0
+            print(f"{path}: {o/1024:.0f}KB -> {n/1024:.1f}KB (q={q}, w={w}px, {pct:.0f}% menos)")
+        print(f"\nConvertidas/reducidas: {len(processed)} imagenes (objetivo ~{TARGET_BYTES/1024:.0f}KB)")
+        print(f"Ya estaban en WebP <= {(TARGET_BYTES + TOLERANCE)/1024:.0f}KB, sin tocar: {skipped_already_ok}")
+        if total_orig:
+            print(f"TOTAL: {total_orig/1024:.0f}KB -> {total_new/1024:.0f}KB ({(1 - total_new/total_orig)*100:.0f}% menos)")
+
+    dup_deleted, dup_rescued = ([], [])
+    if run_dedup:
+        # Consolidacion de duplicados (siempre al final, con todo ya en .webp).
+        # build_html.py hace su propia limpieza EAN-aware justo despues de
+        # llamar a esta funcion, asi que aqui solo cubrimos el caso CLI.
+        dup_deleted, dup_rescued = consolidate_duplicates(root)
+        if verbose:
+            print(f"\nDuplicados eliminados: {len(dup_deleted)}")
+            for src in dup_deleted[:10]:
+                print(f"  - borrado: {src}")
+            if len(dup_deleted) > 10:
+                print(f"  ... y {len(dup_deleted) - 10} mas")
+            print(f"Duplicados rescatados (sin original, renombrados): {len(dup_rescued)}")
+            for src, dst in dup_rescued[:10]:
+                print(f"  - {src} -> {dst}")
+            if len(dup_rescued) > 10:
+                print(f"  ... y {len(dup_rescued) - 10} mas")
+
+    return {
+        'processed': processed,
+        'skipped_already_ok': skipped_already_ok,
+        'total_orig': total_orig,
+        'total_new': total_new,
+        'dup_deleted': dup_deleted,
+        'dup_rescued': dup_rescued,
+    }
+
+
+if __name__ == '__main__':
+    optimize_pictures(ROOT, run_dedup=True, verbose=True)

@@ -7,6 +7,7 @@ Incluye generador e interactividad de códigos de barras EAN/UPC vía SVG.
 
 import openpyxl, json, colorsys, re, os, html, datetime
 from img_naming import DUP_STEM_RE
+from resize_inplace import optimize_pictures
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 EXCEL_PATH = os.path.join(BASE_DIR, 'Database.xlsx')
@@ -942,6 +943,13 @@ def render_matrix(sheet):
 PICTURES_DIR = os.path.join(BASE_DIR, 'pictures')
 IMAGES_JSON_PATH = os.path.join(BASE_DIR, 'images.json')
 
+# Carpeta de cuarentena para fotos huerfanas (ver remove_orphan_images). Vive
+# DENTRO de pictures/ pero empieza por "_" y se excluye explicitamente de todos
+# los bucles que recorren categorias (manifiesto, limpieza, optimizacion), para
+# que nunca se trate como una pestaña mas ni vuelva a entrar en el borrado.
+QUARANTINE_DIRNAME = '_huerfanos'
+QUARANTINE_DIR = os.path.join(PICTURES_DIR, QUARANTINE_DIRNAME)
+
 # Nombres que macOS / iCloud / los navegadores generan al bajar dos veces el
 # mismo fichero: "<ean> 2.webp", "<ean> 3.webp", "<ean> copia.webp",
 # "<ean> copia 2.webp", "<ean> copy.webp". Definida en img_naming.py y
@@ -989,6 +997,8 @@ def clean_pictures_dir(catalog_eans=None):
         return report
 
     for folder in sorted(os.listdir(PICTURES_DIR)):
+        if folder.startswith('_'):
+            continue  # carpetas internas (p.ej. _huerfanos), no son categorias
         folder_path = os.path.join(PICTURES_DIR, folder)
         if not os.path.isdir(folder_path):
             continue
@@ -1040,6 +1050,52 @@ def clean_pictures_dir(catalog_eans=None):
             report['empty_folders'].append(folder)
 
     return report
+
+
+def remove_orphan_images(image_manifest, eans_by_folder):
+    """Mueve a cuarentena (pictures/_huerfanos/<folder>/<ean>.webp) las fotos
+    cuyo EAN ya no aparece en la pestaña de Excel que corresponde a esa carpeta
+    (folder == nombre de pestaña limpio == data-sheet-folder del HTML).
+
+    NO se borra nada de forma permanente: el fichero se traslada a _huerfanos/
+    conservando su carpeta de origen, para que el repo activo quede limpio (la
+    foto deja de aparecer y de pesar) pero siempre sea recuperable a mano. Si ya
+    existe una copia en cuarentena con ese nombre, se sobrescribe (os.replace).
+
+    Solo se actua sobre carpetas para las que tenemos un set de EAN fiable:
+    las de pestañas de tipo 'sections' (la inmensa mayoria). Las pestañas de
+    tipo 'matrix' (p.ej. tablas de compatibilidad) no pasan por el bucle que
+    rellena `eans_by_folder`, asi que sus carpetas -si las tuvieran- quedan
+    FUERA de `eans_by_folder` y aqui se dejan intactas a proposito: sin un set
+    de EAN fiable con el que comparar, mover seria arriesgarse a sacar fotos
+    buenas. Esas carpetas se devuelven en `skipped_folders` para que el caller
+    pueda avisar en vez de tocarlas a ciegas.
+
+    Devuelve (quarantined, skipped_folders):
+      quarantined     -> lista de (folder, ean) movidos a cuarentena.
+      skipped_folders -> carpetas de pictures/ sin pestaña 'sections' conocida.
+    """
+    quarantined = []
+    skipped_folders = []
+    for folder in list(image_manifest.keys()):
+        if folder not in eans_by_folder:
+            skipped_folders.append(folder)
+            continue
+        valid = eans_by_folder[folder]
+        orphan_eans = [e for e in image_manifest[folder] if e not in valid]
+        for ean in orphan_eans:
+            src = os.path.join(PICTURES_DIR, folder, ean + '.webp')
+            if not os.path.isfile(src):
+                continue
+            dst_dir = os.path.join(QUARANTINE_DIR, folder)
+            os.makedirs(dst_dir, exist_ok=True)
+            os.replace(src, os.path.join(dst_dir, ean + '.webp'))
+            quarantined.append((folder, ean))
+        if orphan_eans:
+            image_manifest[folder] = [e for e in image_manifest[folder] if e not in orphan_eans]
+            if not image_manifest[folder]:
+                del image_manifest[folder]
+    return quarantined, skipped_folders
 
 
 def diff_image_manifest(new_manifest):
@@ -1097,6 +1153,8 @@ def build_image_manifest():
     if not os.path.isdir(PICTURES_DIR):
         return manifest
     for folder in os.listdir(PICTURES_DIR):
+        if folder.startswith('_'):
+            continue  # carpetas internas (p.ej. _huerfanos), no son categorias
         folder_path = os.path.join(PICTURES_DIR, folder)
         if not os.path.isdir(folder_path):
             continue
@@ -1395,16 +1453,39 @@ def main():
     print(f"Datos generados: {data_path} ({len(all_rows)} filas)")
 
     # --- Image manifest: qué referencias tienen foto .webp en disco ---
+    # 0) Optimizacion previa: cualquier imagen que no sea .webp o que pese de
+    #    mas (fotos nuevas añadidas a mano, exports sin comprimir, etc.) se
+    #    convierte/recomprime aqui mismo, ANTES de tocar nombres o generar el
+    #    manifiesto. Así el build nunca sirve una imagen con formato o peso
+    #    incorrectos. No corremos aqui el dedup de resize_inplace (run_dedup=False)
+    #    porque el paso 1 de abajo (clean_pictures_dir) hace una limpieza de
+    #    duplicados mas completa, con conocimiento de los EAN reales del catalogo.
+    opt = optimize_pictures(PICTURES_DIR, run_dedup=False, verbose=False)
+    if opt['processed']:
+        print(f"Optimizacion de imagenes: {len(opt['processed'])} convertidas/recomprimidas "
+              f"({opt['total_orig']/1024:.0f}KB -> {opt['total_new']/1024:.0f}KB)")
+        for path, o, n, q, w in opt['processed'][:15]:
+            rel = os.path.relpath(path, BASE_DIR)
+            print(f"   {rel}: {o/1024:.0f}KB -> {n/1024:.1f}KB (q={q}, w={w}px)")
+        if len(opt['processed']) > 15:
+            print(f"   ... y {len(opt['processed']) - 15} mas")
+    else:
+        print(f"Optimizacion de imagenes: nada que convertir "
+              f"({opt['skipped_already_ok']} ya estaban en WebP y peso correcto)")
+
     # 1) Limpieza previa de pictures/: duplicados "<ean> 2.webp" y nombres de
     #    EAN sin el 0 inicial. Se le pasa el conjunto de EAN reales del catálogo
     #    para que ningún renombrado invente una referencia inexistente.
     catalog_eans = set()
+    eans_by_folder = {}
     for row in all_rows:
+        folder_eans = eans_by_folder.setdefault(row['sheetFolder'], set())
         for c in row['cells']:
             if (c.get('label') or '').strip().upper() == 'EAN':
                 v = (c.get('v') or '').strip()
                 if v.isdigit():
                     catalog_eans.add(v)
+                    folder_eans.add(v)
 
     clean = clean_pictures_dir(catalog_eans)
     if clean['deleted'] or clean['rescued'] or clean['normalized'] or clean['skipped']:
@@ -1426,9 +1507,27 @@ def main():
     else:
         print("Limpieza de pictures/: nada que limpiar")
 
-    # 2) Escaneo del arbol ya limpio y diff contra el build anterior, para que
-    #    quede claro que carpetas/imagenes nuevas se han detectado.
+    # 2) Escaneo del arbol ya limpio y cuarentena de huerfanos: fotos cuyo EAN
+    #    ya no esta en la pestaña de Excel que corresponde a esa carpeta (p.ej.
+    #    la referencia se quito del catalogo, o se movio de familia). No se
+    #    borran: se mueven a pictures/_huerfanos/<folder>/ para que el repo
+    #    activo quede limpio pero sigan siendo recuperables. Solo se actua
+    #    cuando tenemos el set de EAN de esa pestaña con certeza
+    #    (ver remove_orphan_images); si no, se avisa sin tocar nada.
     image_manifest = build_image_manifest()
+    quarantined, skipped_folders = remove_orphan_images(image_manifest, eans_by_folder)
+    if quarantined:
+        print(f"Huerfanos a cuarentena: {len(quarantined)} fotos sin EAN en su pestaña "
+              f"-> pictures/{QUARANTINE_DIRNAME}/")
+        for folder, ean in quarantined[:15]:
+            print(f"   ~ {folder}/{ean}.webp")
+        if len(quarantined) > 15:
+            print(f"   ... y {len(quarantined) - 15} mas")
+    else:
+        print("Huerfanos a cuarentena: ninguno")
+
+    # 3) Diff contra el build anterior, para que quede claro que carpetas e
+    #    imagenes son nuevas/han desaparecido respecto al build previo.
     diff = diff_image_manifest(image_manifest)
     if diff['first_run']:
         print("Deteccion de novedades: primer manifiesto (no hay anterior con que comparar)")
@@ -1453,10 +1552,13 @@ def main():
     else:
         print("Novedades detectadas en pictures/: ninguna (sin cambios desde el build anterior)")
 
-    orphans = sum(1 for folder, eans in image_manifest.items()
-                  for e in eans if e not in catalog_eans)
-    if orphans:
-        print(f"   AVISO: {orphans} imagenes sin EAN correspondiente en Database.xlsx")
+    if skipped_folders:
+        orphans = sum(1 for folder in skipped_folders
+                      for e in image_manifest.get(folder, []) if e not in catalog_eans)
+        if orphans:
+            print(f"   AVISO: {orphans} imagenes en carpetas sin pestaña 'sections' conocida "
+                  f"({', '.join(skipped_folders)}) sin EAN en el catalogo global -- no se han "
+                  f"borrado automaticamente, revisar a mano")
 
     images_path = os.path.join(BASE_DIR, 'images.json')
     with open(images_path, 'w', encoding='utf-8') as f:
