@@ -93,6 +93,7 @@
 10-26 | 1985 | Por primera vez en la historia, un DeLorean realiza un viaje en el tiempo.
 10-27 | 2016 | Se presentan los MacBook Pro con Touch Bar y Touch ID integrado en el teclado en el evento "Hello Again".
 10-28 | 2019 | Se presentan mediante nota de prensa los primeros AirPods Pro.
+10-28 | 2028 | Se presentan los primeros Mac con pantallas táctiles.
 10-30 | 2018 | Se presenta el iPad Pro de 3ª generación, el primer iPad con Face ID y sin botón de inicio.
 10-30 | 2020 | Se lanza el servicio de suscripciones Apple One.
 10-30 | 2023 | Se presenta el chip M3 a 3 nanómetros.
