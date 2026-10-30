@@ -31,6 +31,7 @@
 03-24 | 2001 | Se lanza Mac OS X 10.0 "Cheetah", la primera versión pública del nuevo sistema operativo que cerraba definitivamente la etapa de Mac OS 9 y estrenaba la arquitectura moderna basada en UNIX.
 03-25 | 2019 | Se presentan la Apple Card, Apple Arcade, Apple News+ y Apple TV+.
 04-01 | 1976 | Steve Jobs, Steve Wozniak y Ronald Wayne fundan Apple y presentan de forma informal el Apple I en el Homebrew Computer Club.
+04-01 | 2026 | Despega Artemis II, con iPhone 17 Pro Max en los trajes. 
 04-15 | 2020 | Se presenta el iPhone SE de 2ª generación.
 04-16 | 1977 | Se presenta el Apple II en la West Coast Computer Faire de San Francisco.
 04-24 | 2015 | El Apple Watch original sale a la venta.
@@ -64,6 +65,8 @@
 08-02 | 2018 | Apple se convierte en la primera empresa cotizada en superar el billón de dólares de valor en bolsa.
 08-06 | 1997 | Steve Jobs anuncia la inversión de 150 millones de dólares de Microsoft en el Macworld de Boston.
 08-07 | 2006 | Se presenta el primer Mac Pro con procesador Intel.
+08-07 | 2011 | La misión STS-135 (el último vuelo del transbordador espacial Atlantis), lleva dos iPhone 4 a la ISS. 
+08-09 | 1991 | Primer correo electrónico enviado desde el espacio, desde un Macintosh Portable con AppleLink,
 08-24 | 2011 | Steve Jobs renuncia como CEO de Apple y Tim Cook toma el relevo.
 08-29 | 1997 | Skynet toma conciencia a la 8:14 de la mañana, hora española.  
 09-01 | 2010 | Se presenta la 2ª generación de Apple TV en el evento "Back to the Rock".
@@ -85,10 +88,12 @@
 09-12 | 2023 | Se presenta el iPhone 15.
 09-13 | 2000 | Se lanza la beta pública de Mac OS X.
 09-14 | 2021 | Se presenta el iPhone 13.
+09-15 | 2021 | Despega la Inspiration4 de SpaceX con Apple Watch Series 6, iPad mini y un iPhone 12 Pro.
 09-18 | 2013 | Se lanza iOS 7, el mayor rediseño visual de la historia de iOS.
 09-19 | 2019 | Se lanza el servicio de videojuegos Apple Arcade.
 09-20 | 2016 | Se lanza macOS Sierra, la primera versión bajo la nomenclatura "macOS".
 10-04 | 2011 | Se presenta el iPhone 4S junto con el asistente virtual Siri.
+10-06 | 1990 | El Discovery despega en la STS-41 con un Macintosh Portable a bordo.
 10-12 | 2005 | Se presenta el primer iPod video (5ª generación).
 10-13 | 2020 | Se presentan la familia iPhone 12 (incluyendo el formato compacto mini) y el primer HomePod mini.
 10-13 | 2026 | Apple presenta el HomeView, su primera pantalla para el hogar, junto con la 2ª generación del HomePod mini.
@@ -105,6 +110,7 @@
 10-28 | 2019 | Se presentan mediante nota de prensa los primeros AirPods Pro.
 10-28 | 2026 | Se presentan los primeros Mac táctiles de la historia.
 10-29 | 1969 | Se envía el primer mensaje por ARPANET, antecesora de Internet: "LO" (el sistema se cayó antes de completar "LOGIN").
+10-30 | 2011 | La nave rusa Progress M-13M lleva iPad de 1ª generación a la ISS,
 10-30 | 2018 | Se presenta el iPad Pro de 3ª generación, el primer iPad con Face ID y sin botón de inicio.
 10-30 | 2020 | Se lanza el servicio de suscripciones Apple One.
 10-30 | 2023 | Se presenta el chip M3 a 3 nanómetros.
