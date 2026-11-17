@@ -1,5 +1,6 @@
+import io
 import os
-from PIL import Image
+from PIL import Image, ImageOps
 from img_naming import DUP_STEM_RE
 
 ROOT = "pictures"
@@ -7,7 +8,42 @@ MAX_W = 700
 TARGET_BYTES = 30 * 1024  # ~30 KB objetivo
 TOLERANCE = 4 * 1024      # margen aceptable (+/- 4KB) antes de reducir más el tamaño
 MIN_W = 120               # no reducir el ancho por debajo de esto
+MIN_QUALITY = 60          # por debajo de esto WebP lossy muestra bloques/artefactos:
+                          # si no cabe en el peso objetivo, se reduce el ancho en vez de la calidad
 SOURCE_EXTS = (".jpg", ".jpeg", ".png", ".webp")
+
+
+def load_rgb(path):
+    """Abre la imagen y la devuelve como RGB 'limpia', sin los glitches tipicos:
+      - orientacion EXIF aplicada (fotos de movil giradas/volteadas);
+      - transparencia (PNG/WebP con alfa, paletas con transparencia) compuesta
+        sobre BLANCO. El convert("RGB") directo la pintaba de NEGRO;
+      - perfil de color (Display P3 de iPhone, AdobeRGB) pasado a sRGB, porque
+        el WebP resultante no lleva el perfil y los colores salian apagados.
+    """
+    img = Image.open(path)
+    img.load()
+    icc = img.info.get("icc_profile")
+    img = ImageOps.exif_transpose(img)
+
+    if img.mode == "P":
+        img = img.convert("RGBA") if "transparency" in img.info else img.convert("RGB")
+    if img.mode in ("RGBA", "LA", "PA"):
+        rgba = img.convert("RGBA")
+        flat = Image.new("RGB", rgba.size, (255, 255, 255))
+        flat.paste(rgba, mask=rgba.getchannel("A"))
+        img = flat
+    elif img.mode != "RGB":
+        img = img.convert("RGB")
+
+    if icc:
+        try:
+            from PIL import ImageCms
+            src = ImageCms.ImageCmsProfile(io.BytesIO(icc))
+            img = ImageCms.profileToProfile(img, src, ImageCms.createProfile("sRGB"), outputMode="RGB")
+        except Exception:
+            pass
+    return img
 
 
 def consolidate_duplicates(root):
@@ -63,7 +99,7 @@ def encode_to_target(img, target_bytes, tmp_path):
 
     while True:
         # Muestreo de calidades para encontrar el minimo local mas cercano al objetivo
-        candidates = [1, 10, 20, 30, 40, 50, 60, 70, 80, 90, 95, 100]
+        candidates = [q for q in (1, 10, 20, 30, 40, 50, 60, 70, 80, 90, 95, 100) if q >= MIN_QUALITY]
         sizes = {}
         for q in candidates:
             sizes[q] = size_at_quality(img, width, q, tmp_path)
@@ -139,14 +175,16 @@ def optimize_pictures(root=ROOT, run_dedup=True, verbose=True):
                 skipped_already_ok += 1
                 continue
 
-            img = Image.open(path)
-            if img.mode in ("RGBA", "P"):
-                img = img.convert("RGB")
+            img = load_rgb(path)
             if img.width > MAX_W:
                 new_h = max(1, int(img.height * (MAX_W / img.width)))
                 img = img.resize((MAX_W, new_h), Image.LANCZOS)
 
-            final_size, quality, width = encode_to_target(img, TARGET_BYTES, tmp_path)
+            _, quality, width = encode_to_target(img, TARGET_BYTES, tmp_path)
+            # encode_to_target deja en tmp_path el ULTIMO intento de la busqueda,
+            # no el mejor: se reescribe aqui con los parametros ganadores para que
+            # el fichero final coincida con lo que se informa (q/ancho).
+            final_size = size_at_quality(img, width, quality, tmp_path)
 
             base, ext = os.path.splitext(path)
             new_path = base + ".webp"
