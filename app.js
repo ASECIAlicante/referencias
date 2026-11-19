@@ -903,6 +903,14 @@ IMAGE_MANIFEST[folder] = set;
 function productImageUrl(sheetFolder, eanCode) {
 return 'pictures/' + encodeURIComponent(sheetFolder) + '/' + encodeURIComponent(eanCode) + '.webp';
 }
+function findProductImageUrl(sheetFolder, eanCode) {
+if (hasProductImage(sheetFolder, eanCode)) return productImageUrl(sheetFolder, eanCode);
+var folders = Object.keys(IMAGE_MANIFEST);
+for (var i = 0; i < folders.length; i++) {
+if (IMAGE_MANIFEST[folders[i]][eanCode] === 1) return productImageUrl(folders[i], eanCode);
+}
+return null;
+}
 var IMG_CACHE = {};
 function prefetchProductImage(sheetFolder, eanCode) {
 if (!hasProductImage(sheetFolder, eanCode)) return null;
@@ -2002,6 +2010,21 @@ matches.slice(0, SCAN_RESULTS_MAX).forEach(function(m) {
 var r = m.row;
 var item = document.createElement('div');
 item.className = 'scanner-result-item';
+var body = item;
+var photoUrl = m.type === 'EAN' ? findProductImageUrl(r.sheetFolder, m.ref) : null;
+if (photoUrl) {
+var photo = document.createElement('img');
+photo.className = 'scanner-result-photo';
+photo.src = photoUrl;
+photo.alt = 'Foto: ' + r.section;
+photo.decoding = 'async';
+photo.onerror = function() { this.remove(); item.classList.remove('with-photo'); };
+item.classList.add('with-photo');
+item.appendChild(photo);
+body = document.createElement('div');
+body.className = 'scanner-result-text';
+item.appendChild(body);
+}
 var titleDiv = document.createElement('div');
 titleDiv.className = 'scanner-result-title';
 var badge = document.createElement('span');
@@ -2009,12 +2032,12 @@ badge.className = 'scanner-type-badge';
 badge.textContent = REF_TYPES[m.type].label;
 titleDiv.appendChild(badge);
 titleDiv.appendChild(document.createTextNode(r.sheet + ' — ' + r.section));
-item.appendChild(titleDiv);
+body.appendChild(titleDiv);
 if (mode === 'approx' && m.dist) {
 var note = document.createElement('div');
 note.className = 'scanner-approx-note';
 note.textContent = REF_TYPES[m.type].label + ' ' + m.ref + ' (leido ' + formatRefKey(m.type, m.read) + ')';
-item.appendChild(note);
+body.appendChild(note);
 }
 var detailDiv = document.createElement('div');
 detailDiv.className = 'scanner-result-detail';
@@ -2026,9 +2049,20 @@ if (c.v.trim() === m.ref) chip.classList.add('scanner-detail-match');
 chip.textContent = (c.label ? c.label + ': ' : '') + c.v;
 detailDiv.appendChild(chip);
 });
-item.appendChild(detailDiv);
+body.appendChild(detailDiv);
 item.addEventListener('click', function() {
+var cellOf = function(label) {
+var c = r.cells.filter(function(x) { return x.label && x.label.trim().toUpperCase() === label; })[0];
+return c && c.v ? c.v.trim() : '';
+};
+var ean = cellOf('EAN');
 closeScanner();
+if (ean && EAN_TEXT_RE.test(ean)) {
+try {
+openBarcodeModal(ean, r.sheetFolder, cellOf('ECI'));
+return;
+} catch (err) { /* si la ficha falla, se cae a la busqueda */ }
+}
 if (sheetSearch) {
 sheetSearch.value = m.ref;
 sheetSearch.dispatchEvent(new Event('input'));
@@ -2053,6 +2087,15 @@ scannerZoomSlider.addEventListener('input', function() {
 applyZoom(parseInt(scannerZoomSlider.value, 10) / 10);
 });
 }
+function reportScannerError(msg) {
+if (scannerModal && scannerModal.classList.contains('open')) {
+setScanStatus('Error del escaner: ' + String(msg).slice(0, 120), 'error');
+}
+}
+window.addEventListener('error', function(e) { reportScannerError(e.message); });
+window.addEventListener('unhandledrejection', function(e) {
+reportScannerError(e.reason && e.reason.message ? e.reason.message : e.reason);
+});
 closeOnBackdrop(scannerModal, closeScanner);
 onEscape(scannerModal, closeScanner);
 
