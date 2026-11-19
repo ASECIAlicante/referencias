@@ -495,7 +495,9 @@ panels.forEach(function(p){ p.classList.remove('active'); });
 level1Buttons.forEach(function(btn){
 btn.addEventListener('click', function(e){
 e.preventDefault();
+var wasActive = btn.classList.contains('active');
 if(btn.dataset.lob){
+if(wasActive && !activePanelId()){ resetToHome(); return; }
 collapseAllCards();
 setActiveLevel1(btn);
 showLobRow(btn.dataset.lob);
@@ -503,6 +505,7 @@ setActiveLeaf(null);
 deactivateAllPanels();
 if(history.replaceState){ history.replaceState(null, '', '#'); }
 } else if(btn.dataset.target){
+if(wasActive){ resetToHome(); return; }
 hideAllLobRows();
 activate(btn.dataset.target);
 window.scrollTo({top:0, behavior:'smooth'});
