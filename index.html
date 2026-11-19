@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default" id="statusBarMeta">
+<meta name="theme-color" content="#ffffff" id="themeColorMeta">
+<title>El Corte Inglés Apple Reference Catalog</title>
+<link rel="stylesheet" href="style.css?v=46f0faca0a">
+<link rel="preload" href="catalog.json?v=dbfcfa74c9" as="fetch" crossorigin="anonymous">
+</head>
+<body class="light-mode" data-catalog-v="dbfcfa74c9" data-images-v="666f8edf5b">
+<div class="topbar">
+  <div class="topbar-header">
+    <div class="brand-lockup" id="brandHome" role="button" tabindex="0" title="Volver a Inicio" aria-label="Volver a Inicio">
+      <svg class="brand-arc-mark" viewBox="0 0 400 228" aria-hidden="true" focusable="false">
+        <defs><linearGradient id="eciarcGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" class="arc-stop-start"/><stop offset="100%" class="arc-stop-end"/></linearGradient></defs>
+        <path d="M 30 220 A 170 170 0 0 1 370 220" stroke="url(#eciarcGrad)" stroke-width="11" fill="none"/>
+        <path d="M 55 220 A 145 145 0 0 1 345 220" stroke="url(#eciarcGrad)" stroke-width="11" fill="none"/>
+        <path d="M 80 220 A 120 120 0 0 1 320 220" stroke="url(#eciarcGrad)" stroke-width="11" fill="none"/>
+        <path d="M 105 220 A 95 95 0 0 1 295 220" stroke="url(#eciarcGrad)" stroke-width="11" fill="none"/>
+        <path d="M 130 220 A 70 70 0 0 1 270 220" stroke="url(#eciarcGrad)" stroke-width="11" fill="none"/>
+        <path d="M 155 220 A 45 45 0 0 1 245 220" stroke="url(#eciarcGrad)" stroke-width="11" fill="none"/>
+      </svg>
+      <h1 title="El Corte Inglés Apple Reference Catalog"><span class="brand-eci">ECI</span><span class="brand-colon">:</span><span class="brand-arc">arc</span></h1>
+    </div>
+    <div class="topbar-actions">
+      <button id="fontDecBtn" class="icon-btn icon-btn-font" type="button" title="Reducir tamaño de letra" aria-label="Reducir tamaño de letra" style="display:none;">A<span class="font-btn-sign">−</span></button>
+      <button id="fontIncBtn" class="icon-btn icon-btn-font" type="button" title="Aumentar tamaño de letra" aria-label="Aumentar tamaño de letra" style="display:none;">A<span class="font-btn-sign">+</span></button>
+      <button id="eventsToggle" class="icon-btn icon-btn-events" type="button" title="Un día como hoy en Apple" aria-label="Un día como hoy en Apple" style="display:none;">🐣</button>
+      <button id="searchToggle" class="icon-btn" type="button" title="Buscar" aria-label="Buscar">🔎</button>
+      <button id="scanToggle" class="icon-btn" type="button" title="Escanear referencia" aria-label="Escanear referencia" style="display:none;">📷</button>
+      <button id="themeToggle" class="icon-btn" type="button" title="Cambiar apariencia" aria-label="Cambiar apariencia">🌙</button>
+    </div>
+  </div>
+  <div class="search-bar-row" id="searchBarRow">
+    <div class="search-input-wrap">
+      <input type="text" id="sheetSearch" placeholder="Buscar por modelo, P/N, ECI o EAN...">
+      <button type="button" id="sheetSearchClear" class="search-clear-btn" aria-label="Borrar busqueda" title="Borrar busqueda" style="display:none;">&times;</button>
+    </div>
+  </div>
+  <div class="btn-row level1"><button type="button" class="nav-btn" data-lob="mac">Mac</button><button type="button" class="nav-btn" data-target="display-2">Display</button><button type="button" class="nav-btn" data-lob="ipad">iPad</button><button type="button" class="nav-btn" data-lob="iphone">iPhone</button><button type="button" class="nav-btn" data-lob="watch">Watch</button><button type="button" class="nav-btn" data-target="audio-20">Audio</button><button type="button" class="nav-btn" data-target="apple-tv-acc-21">Apple TV &amp; Acc.</button><button type="button" class="nav-btn" data-lob="eol">EOL</button></div>
+  <div class="btn-row level2" id="lobrow-mac"><button type="button" class="nav-btn nav-btn-leaf nav-btn-fam" style="--fam-grad:#7D8EBF, #FFFA3D, #2896FF, #B08D8D, #FF813D, #B08D8D;--fam-wash:rgba(125,142,191,0.14), rgba(255,250,61,0.14), rgba(40,150,255,0.14), rgba(176,141,141,0.14), rgba(255,129,61,0.14), rgba(176,141,141,0.14)" data-target="mac-macbook-0">MacBook</button><button type="button" class="nav-btn nav-btn-leaf nav-btn-fam" style="--fam-grad:#3DC8FF, #FF3DE9, #71FF3D, #B08D8D, #B08D8D;--fam-wash:rgba(61,200,255,0.14), rgba(255,61,233,0.14), rgba(113,255,61,0.14), rgba(176,141,141,0.14), rgba(176,141,141,0.14)" data-target="mac-mac-1">Mac</button></div>
+<div class="btn-row level2" id="lobrow-ipad"><button type="button" class="nav-btn nav-btn-leaf nav-btn-fam" style="--fam-grad:#3DC9FF, #FF3DE9, #FFFF00, #B08D8D;--fam-wash:rgba(61,201,255,0.14), rgba(255,61,233,0.14), rgba(255,255,0,0.14), rgba(176,141,141,0.14)" data-target="ipad-a16-3">A16</button><button type="button" class="nav-btn nav-btn-leaf nav-btn-fam" style="--fam-grad:#77A7C5, #FF813D;--fam-wash:rgba(119,167,197,0.14), rgba(255,129,61,0.14)" data-target="ipad-mini-8-4">Mini 8</button><button type="button" class="nav-btn nav-btn-leaf nav-btn-fam" style="--fam-grad:#B08D8D, #3DA2FF, #FF3DE9, #FF813D;--fam-wash:rgba(176,141,141,0.14), rgba(61,162,255,0.14), rgba(255,61,233,0.14), rgba(255,129,61,0.14)" data-target="ipad-air-m4-5">Air M4</button><button type="button" class="nav-btn nav-btn-leaf nav-btn-fam" style="--fam-grad:#B08D8D, #B08D8D;--fam-wash:rgba(176,141,141,0.14), rgba(176,141,141,0.14)" data-target="ipad-pro-m5-6">Pro M5</button><button type="button" class="nav-btn nav-btn-leaf" data-target="ipad-pencil-keyboard-7">Pencil &amp; Keyboard</button></div>
+<div class="btn-row level2" id="lobrow-iphone"><button type="button" class="nav-btn nav-btn-leaf nav-btn-fam" style="--fam-grad:#B08D8D, #346DAC;--fam-wash:rgba(176,141,141,0.14), rgba(52,109,172,0.14)" data-target="iphone-duo-8">Duo</button><button type="button" class="nav-btn nav-btn-leaf nav-btn-fam" style="--fam-grad:#936666, #B08D8D, #F20035, #3D9AFF;--fam-wash:rgba(147,102,102,0.14), rgba(176,141,141,0.14), rgba(242,0,53,0.14), rgba(61,154,255,0.14)" data-target="iphone-18-9">18</button><button type="button" class="nav-btn nav-btn-leaf nav-btn-fam" style="--fam-grad:#B08D8D, #3D65FF, #A53DFF, #3E83FF, #B08D8D, #FF3DE9;--fam-wash:rgba(176,141,141,0.14), rgba(61,101,255,0.14), rgba(165,61,255,0.14), rgba(62,131,255,0.14), rgba(176,141,141,0.14), rgba(255,61,233,0.14)" data-target="iphone-17-10">17</button><button type="button" class="nav-btn nav-btn-leaf nav-btn-fam" style="--fam-grad:#3DBEFF, #FFB93D, #B08D8D, #B08D8D;--fam-wash:rgba(61,190,255,0.14), rgba(255,185,61,0.14), rgba(176,141,141,0.14), rgba(176,141,141,0.14)" data-target="iphone-air-11">Air</button><button type="button" class="nav-btn nav-btn-leaf nav-btn-fam" style="--fam-grad:#B08D8D, #B08D8D, #FF3DE9, #3DC9FF, #3DFF58;--fam-wash:rgba(176,141,141,0.14), rgba(176,141,141,0.14), rgba(255,61,233,0.14), rgba(61,201,255,0.14), rgba(61,255,88,0.14)" data-target="iphone-16-12">16</button><button type="button" class="nav-btn nav-btn-leaf nav-btn-fam" style="--fam-grad:#FF1BC1, #3D92FF, #6F8BB7, #A48765, #558ADA, #404CA2;--fam-wash:rgba(255,27,193,0.14), rgba(61,146,255,0.14), rgba(111,139,183,0.14), rgba(164,135,101,0.14), rgba(85,138,218,0.14), rgba(64,76,162,0.14)" data-target="iphone-strap-wallet-13">Strap &amp; Wallet</button><button type="button" class="nav-btn nav-btn-leaf nav-btn-fam" style="--fam-grad:#B08D8D, #B08D8D;--fam-wash:rgba(176,141,141,0.14), rgba(176,141,141,0.14)" data-target="iphone-demo-14">DEMO</button></div>
+<div class="btn-row level2" id="lobrow-watch"><button type="button" class="nav-btn nav-btn-leaf nav-btn-fam" style="--fam-grad:#FF813D, #B08D8D;--fam-wash:rgba(255,129,61,0.14), rgba(176,141,141,0.14)" data-target="watch-se3-15">SE3</button><button type="button" class="nav-btn nav-btn-leaf nav-btn-fam" style="--fam-grad:#B08D8D, #B08D8D, #E99750, #B08D8D, #D5A668, #6D7FBA;--fam-wash:rgba(176,141,141,0.14), rgba(176,141,141,0.14), rgba(233,151,80,0.14), rgba(176,141,141,0.14), rgba(213,166,104,0.14), rgba(109,127,186,0.14)" data-target="watch-series-12-16">Series 12</button><button type="button" class="nav-btn nav-btn-leaf nav-btn-fam" style="--fam-grad:#B08D8D, #B08D8D;--fam-wash:rgba(176,141,141,0.14), rgba(176,141,141,0.14)" data-target="watch-ultra-4-17">Ultra 4</button><button type="button" class="nav-btn nav-btn-leaf nav-btn-fam" style="--fam-grad:#CC3A52, #9E7474, #3D8DFF, #D5964D, #E6A257, #AE827B;--fam-wash:rgba(204,58,82,0.14), rgba(158,116,116,0.14), rgba(61,141,255,0.14), rgba(213,150,77,0.14), rgba(230,162,87,0.14), rgba(174,130,123,0.14)" data-target="watch-bands-18">Bands</button><button type="button" class="nav-btn nav-btn-leaf" data-target="watch-compatibility-19">Compatibility</button></div>
+<div class="btn-row level2" id="lobrow-eol"><button type="button" class="nav-btn nav-btn-leaf nav-btn-fam" style="--fam-grad:#B08D8D, #B08D8D, #B08D8D;--fam-wash:rgba(176,141,141,0.14), rgba(176,141,141,0.14), rgba(176,141,141,0.14)" data-target="eol-macbook-22">MacBook</button><button type="button" class="nav-btn nav-btn-leaf nav-btn-fam" style="--fam-grad:#3DC8FF, #FF3DE9, #71FF3D, #B08D8D;--fam-wash:rgba(61,200,255,0.14), rgba(255,61,233,0.14), rgba(113,255,61,0.14), rgba(176,141,141,0.14)" data-target="eol-mac-23">Mac</button><button type="button" class="nav-btn nav-btn-leaf nav-btn-fam" style="--fam-grad:#B08D8D, #3DCCFF, #FF813D, #FF3DE9, #FF3DF4;--fam-wash:rgba(176,141,141,0.14), rgba(61,204,255,0.14), rgba(255,129,61,0.14), rgba(255,61,233,0.14), rgba(255,61,244,0.14)" data-target="eol-ipad-24">iPad</button><button type="button" class="nav-btn nav-btn-leaf" data-target="eol-iphone-25">iPhone</button><button type="button" class="nav-btn nav-btn-leaf nav-btn-fam" style="--fam-grad:#FF7536, #417EB8, #825FB0, #B3B389, #FF5C16, #5760BB;--fam-wash:rgba(255,117,54,0.14), rgba(65,126,184,0.14), rgba(130,95,176,0.14), rgba(179,179,137,0.14), rgba(255,92,22,0.14), rgba(87,96,187,0.14)" data-target="eol-strap-wallet-26">Strap &amp; Wallet</button><button type="button" class="nav-btn nav-btn-leaf nav-btn-fam" style="--fam-grad:#FF813D, #B08D8D, #B08D8D, #FF3DE9, #B08D8D;--fam-wash:rgba(255,129,61,0.14), rgba(176,141,141,0.14), rgba(176,141,141,0.14), rgba(255,61,233,0.14), rgba(176,141,141,0.14)" data-target="eol-apple-watch-27">Apple Watch</button><button type="button" class="nav-btn nav-btn-leaf nav-btn-fam" style="--fam-grad:#5A94E2, #F1FF02, #D5A967, #9BA562, #966868, #A26B6B;--fam-wash:rgba(90,148,226,0.14), rgba(241,255,2,0.14), rgba(213,169,103,0.14), rgba(155,165,98,0.14), rgba(150,104,104,0.14), rgba(162,107,107,0.14)" data-target="eol-bands-28">Bands</button><button type="button" class="nav-btn nav-btn-leaf nav-btn-fam" style="--fam-grad:#B08D8D, #B08D8D, #2896FF, #FF803D, #FFFF00;--fam-wash:rgba(176,141,141,0.14), rgba(176,141,141,0.14), rgba(40,150,255,0.14), rgba(255,128,61,0.14), rgba(255,255,0,0.14)" data-target="eol-audio-29">Audio</button><button type="button" class="nav-btn nav-btn-leaf nav-btn-fam" style="--fam-grad:#B08D8D, #B08D8D;--fam-wash:rgba(176,141,141,0.14), rgba(176,141,141,0.14)" data-target="eol-apple-tv-acc-30">Apple TV &amp; Acc.</button></div>
+</div>
+<main class="main">
+
+      <section class="panel active" id="home" data-panel-name="Inicio">
+        <div class="panel-header home-header">
+          <div class="home-today">
+            <span class="home-today-date" id="homeTodayDate"></span>
+          </div>
+          <div class="home-links">
+            <a href="#" id="homeHelpLink" class="home-link home-link-primary"><span class="home-link-icon">❓</span> Ayuda — cómo usar la página</a>
+            <a href="https://pjexposito.github.io/planmy.html" target="_blank" rel="noopener noreferrer" class="home-link"><span class="home-link-icon">🧮</span> Calculadora PlanMy</a>
+            <a href="#" id="homeIncidentLink" class="home-link"><span class="home-link-icon">✉️</span> Reportar una incidencia</a>
+          </div>
+          <div class="home-stats">
+            <span><strong>1646</strong> referencias</span>
+            <span class="home-version">Versión <strong>2.1</strong></span>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" id="search-results" data-panel-name="Resultados">
+        <div class="panel-header">
+          <h2>Resultados de búsqueda</h2>
+          <p class="search-results-count" id="searchResultsCount"></p>
+        </div>
+        <div class="table-wrap"><table id="searchResultsTable">
+          <tbody id="searchResultsBody"></tbody>
+        </table></div>
+      </section>
+
+      <section class="panel" id="mac-macbook-0" data-panel-name="MacBook" data-sheet-folder="Mac - MacBook">
+        <div class="panel-header">
+          <h2>MacBook</h2>
+        </div>
+        <div class="panel-content" data-panel-content="mac-macbook-0"></div>
+      </section>
+
+      <section class="panel" id="mac-mac-1" data-panel-name="Mac" data-sheet-folder="Mac - Mac">
+        <div class="panel-header">
+          <h2>Mac</h2>
+        </div>
+        <div class="panel-content" data-panel-content="mac-mac-1"></div>
+      </section>
+
+      <section class="panel" id="display-2" data-panel-name="Display" data-sheet-folder="Display">
+        <div class="panel-header">
+          <h2>Display</h2>
+        </div>
+        <div class="panel-content" data-panel-content="display-2"></div>
+      </section>
+
+      <section class="panel" id="ipad-a16-3" data-panel-name="iPad A16" data-sheet-folder="iPad - A16">
+        <div class="panel-header">
+          <h2>iPad A16</h2>
+        </div>
+        <div class="panel-content" data-panel-content="ipad-a16-3"></div>
+      </section>
+
+      <section class="panel" id="ipad-mini-8-4" data-panel-name="iPad Mini 8" data-sheet-folder="iPad - Mini 8">
+        <div class="panel-header">
+          <h2>iPad Mini 8</h2>
+        </div>
+        <div class="panel-content" data-panel-content="ipad-mini-8-4"></div>
+      </section>
+
+      <section class="panel" id="ipad-air-m4-5" data-panel-name="iPad Air M4" data-sheet-folder="iPad - Air M4">
+        <div class="panel-header">
+          <h2>iPad Air M4</h2>
+        </div>
+        <div class="panel-content" data-panel-content="ipad-air-m4-5"></div>
+      </section>
+
+      <section class="panel" id="ipad-pro-m5-6" data-panel-name="iPad Pro M5" data-sheet-folder="iPad - Pro M5">
+        <div class="panel-header">
+          <h2>iPad Pro M5</h2>
+        </div>
+        <div class="panel-content" data-panel-content="ipad-pro-m5-6"></div>
+      </section>
+
+      <section class="panel" id="ipad-pencil-keyboard-7" data-panel-name="Pencil &amp; Keyboard" data-sheet-folder="iPad - Pencil &amp; Keyboard">
+        <div class="panel-header">
+          <h2>Pencil &amp; Keyboard</h2>
+        </div>
+        <div class="panel-content" data-panel-content="ipad-pencil-keyboard-7"></div>
+      </section>
+
+      <section class="panel" id="iphone-duo-8" data-panel-name="iPhone Duo" data-sheet-folder="iPhone - Duo">
+        <div class="panel-header">
+          <h2>iPhone Duo</h2>
+        </div>
+        <div class="panel-content" data-panel-content="iphone-duo-8"></div>
+      </section>
+
+      <section class="panel" id="iphone-18-9" data-panel-name="iPhone 18" data-sheet-folder="iPhone - 18">
+        <div class="panel-header">
+          <h2>iPhone 18</h2>
+        </div>
+        <div class="panel-content" data-panel-content="iphone-18-9"></div>
+      </section>
+
+      <section class="panel" id="iphone-17-10" data-panel-name="iPhone 17" data-sheet-folder="iPhone - 17">
+        <div class="panel-header">
+          <h2>iPhone 17</h2>
+        </div>
+        <div class="panel-content" data-panel-content="iphone-17-10"></div>
+      </section>
+
+      <section class="panel" id="iphone-air-11" data-panel-name="iPhone Air" data-sheet-folder="iPhone - Air">
+        <div class="panel-header">
+          <h2>iPhone Air</h2>
+        </div>
+        <div class="panel-content" data-panel-content="iphone-air-11"></div>
+      </section>
+
+      <section class="panel" id="iphone-16-12" data-panel-name="iPhone 16" data-sheet-folder="iPhone - 16">
+        <div class="panel-header">
+          <h2>iPhone 16</h2>
+        </div>
+        <div class="panel-content" data-panel-content="iphone-16-12"></div>
+      </section>
+
+      <section class="panel" id="iphone-strap-wallet-13" data-panel-name="Strap &amp; Wallet" data-sheet-folder="iPhone - Strap &amp; Wallet">
+        <div class="panel-header">
+          <h2>Strap &amp; Wallet</h2>
+        </div>
+        <div class="panel-content" data-panel-content="iphone-strap-wallet-13"></div>
+      </section>
+
+      <section class="panel" id="iphone-demo-14" data-panel-name="iPhone DEMO" data-sheet-folder="iPhone - DEMO">
+        <div class="panel-header">
+          <h2>iPhone DEMO</h2>
+        </div>
+        <div class="panel-content" data-panel-content="iphone-demo-14"></div>
+      </section>
+
+      <section class="panel" id="watch-se3-15" data-panel-name="SE3" data-sheet-folder="Watch - SE3">
+        <div class="panel-header">
+          <h2>SE3</h2>
+        </div>
+        <div class="panel-content" data-panel-content="watch-se3-15"></div>
+      </section>
+
+      <section class="panel" id="watch-series-12-16" data-panel-name="Series 12" data-sheet-folder="Watch - Series 12">
+        <div class="panel-header">
+          <h2>Series 12</h2>
+        </div>
+        <div class="panel-content" data-panel-content="watch-series-12-16"></div>
+      </section>
+
+      <section class="panel" id="watch-ultra-4-17" data-panel-name="Ultra 4" data-sheet-folder="Watch - Ultra 4">
+        <div class="panel-header">
+          <h2>Ultra 4</h2>
+        </div>
+        <div class="panel-content" data-panel-content="watch-ultra-4-17"></div>
+      </section>
+
+      <section class="panel" id="watch-bands-18" data-panel-name="Bands" data-sheet-folder="Watch - Bands">
+        <div class="panel-header">
+          <h2>Bands</h2>
+        </div>
+        <div class="panel-content" data-panel-content="watch-bands-18"></div>
+      </section>
+
+      <section class="panel" id="watch-compatibility-19" data-panel-name="Compatibility" data-sheet-folder="Watch - Compatibility">
+        <div class="panel-header">
+          <h2>Compatibility</h2>
+        </div>
+        <div class="panel-content" data-panel-content="watch-compatibility-19"></div>
+      </section>
+
+      <section class="panel" id="audio-20" data-panel-name="Audio" data-sheet-folder="Audio">
+        <div class="panel-header">
+          <h2>Audio</h2>
+        </div>
+        <div class="panel-content" data-panel-content="audio-20"></div>
+      </section>
+
+      <section class="panel" id="apple-tv-acc-21" data-panel-name="Apple TV &amp; Acc." data-sheet-folder="Apple TV &amp; Acc.">
+        <div class="panel-header">
+          <h2>Apple TV &amp; Acc.</h2>
+        </div>
+        <div class="panel-content" data-panel-content="apple-tv-acc-21"></div>
+      </section>
+
+      <section class="panel" id="eol-macbook-22" data-panel-name="MacBook EOL" data-sheet-folder="EOL - MacBook">
+        <div class="panel-header">
+          <h2>MacBook EOL</h2>
+        </div>
+        <div class="panel-content" data-panel-content="eol-macbook-22"></div>
+      </section>
+
+      <section class="panel" id="eol-mac-23" data-panel-name="Mac EOL" data-sheet-folder="EOL - Mac">
+        <div class="panel-header">
+          <h2>Mac EOL</h2>
+        </div>
+        <div class="panel-content" data-panel-content="eol-mac-23"></div>
+      </section>
+
+      <section class="panel" id="eol-ipad-24" data-panel-name="iPad EOL" data-sheet-folder="EOL - iPad">
+        <div class="panel-header">
+          <h2>iPad EOL</h2>
+        </div>
+        <div class="panel-content" data-panel-content="eol-ipad-24"></div>
+      </section>
+
+      <section class="panel" id="eol-iphone-25" data-panel-name="iPhone EOL" data-sheet-folder="EOL - iPhone">
+        <div class="panel-header">
+          <h2>iPhone EOL</h2>
+        </div>
+        <div class="panel-content" data-panel-content="eol-iphone-25"></div>
+      </section>
+
+      <section class="panel" id="eol-strap-wallet-26" data-panel-name="Strap &amp; Wallet EOL" data-sheet-folder="EOL - Strap &amp; Wallet">
+        <div class="panel-header">
+          <h2>Strap &amp; Wallet EOL</h2>
+        </div>
+        <div class="panel-content" data-panel-content="eol-strap-wallet-26"></div>
+      </section>
+
+      <section class="panel" id="eol-apple-watch-27" data-panel-name="Apple Watch EOL" data-sheet-folder="EOL - Apple Watch">
+        <div class="panel-header">
+          <h2>Apple Watch EOL</h2>
+        </div>
+        <div class="panel-content" data-panel-content="eol-apple-watch-27"></div>
+      </section>
+
+      <section class="panel" id="eol-bands-28" data-panel-name="Bands EOL" data-sheet-folder="EOL - Bands">
+        <div class="panel-header">
+          <h2>Bands EOL</h2>
+        </div>
+        <div class="panel-content" data-panel-content="eol-bands-28"></div>
+      </section>
+
+      <section class="panel" id="eol-audio-29" data-panel-name="Audio EOL" data-sheet-folder="EOL - Audio">
+        <div class="panel-header">
+          <h2>Audio EOL</h2>
+        </div>
+        <div class="panel-content" data-panel-content="eol-audio-29"></div>
+      </section>
+
+      <section class="panel" id="eol-apple-tv-acc-30" data-panel-name="Apple TV &amp; Acc. EOL" data-sheet-folder="EOL - Apple TV &amp; Acc.">
+        <div class="panel-header">
+          <h2>Apple TV &amp; Acc. EOL</h2>
+        </div>
+        <div class="panel-content" data-panel-content="eol-apple-tv-acc-30"></div>
+      </section>
+</main>
+
+<div class="barcode-modal-backdrop" id="barcodeModal" aria-hidden="true" role="dialog">
+  <div class="barcode-modal-card">
+    <div class="barcode-modal-header">
+      <button type="button" class="barcode-share-btn" id="barcodeShareBtn" aria-label="Compartir">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"/><path d="M8 8l4-4 4 4"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
+      </button>
+      <h4 class="barcode-modal-title" id="barcodeModalTitle"></h4>
+      <button type="button" class="barcode-modal-close" id="barcodeCloseBtn" aria-label="Cerrar">&times;</button>
+    </div>
+    <div class="barcode-product-img-wrap" id="barcodeProductImgWrap" style="display:none;">
+      <img class="barcode-product-img" id="barcodeProductImg" alt="Imagen del producto">
+    </div>
+    <div class="barcode-svg-container">
+      <svg id="barcodeSvg"></svg>
+    </div>
+  </div>
+</div>
+
+<div class="barcode-modal-backdrop events-modal-backdrop" id="eventsModal" aria-hidden="true" role="dialog" aria-label="Un día como hoy en Apple">
+  <div class="barcode-modal-card events-modal-card">
+    <div class="events-modal-header">
+      <p class="events-modal-date" id="eventsModalDate"></p>
+      <button type="button" class="barcode-modal-close" id="eventsCloseBtn" aria-label="Cerrar">&times;</button>
+    </div>
+    <div class="events-modal-body" id="eventsModalBody"></div>
+  </div>
+</div>
+
+<div class="barcode-modal-backdrop" id="helpModal" aria-hidden="true" role="dialog" aria-labelledby="helpModalTitle">
+  <div class="barcode-modal-card events-modal-card help-modal-card">
+    <div class="events-modal-header">
+      <h4 class="barcode-modal-title" id="helpModalTitle">Cómo usar la página</h4>
+      <button type="button" class="barcode-modal-close" id="helpCloseBtn" aria-label="Cerrar">&times;</button>
+    </div>
+    <div class="events-modal-body">
+      <ol class="help-modal-list">
+        <li><strong>Menús:</strong> navega entre productos; en los desplegables encontrarás los accesorios relacionados.</li>
+        <li><strong>🔎:</strong> busca por EAN, referencia ECI, Part Number o descripción del producto.</li>
+        <li><strong>👆 en una línea de producto:</strong> ➡️ ventana con código de barras y foto del artículo. <svg class="help-inline-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4"/><path d="M8 8l4-4 4 4"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg> para compartir (mensaje, correo, etc.).</li>
+        <li><strong>📷:</strong> desde el móvil, apunta a la etiqueta de la caja para identificar el artículo.</li>
+        <li>Haz clic sobre el logo <strong>ECI:arc</strong> para volver al inicio y resetear la página.</li>
+        <li><strong>Modo claro/oscuro (🌙/☀️):</strong> cambia la apariencia de la página.</li>
+        <li><strong>🐣:</strong> solo aparece en fechas señaladas; 👆 para descubrir su contenido.</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<div class="barcode-modal-backdrop" id="incidentModal" aria-hidden="true" role="dialog" aria-labelledby="incidentModalTitle">
+  <div class="barcode-modal-card events-modal-card incident-modal-card">
+    <div class="events-modal-header">
+      <h4 class="barcode-modal-title" id="incidentModalTitle">Reportar una incidencia</h4>
+      <button type="button" class="barcode-modal-close" id="incidentCloseBtn" aria-label="Cerrar">&times;</button>
+    </div>
+    <textarea id="incidentText" class="incident-textarea" placeholder="Describe lo que quieres reportar..." rows="5"></textarea>
+    <div class="incident-actions">
+      <button type="button" id="incidentSendBtn" class="incident-send-btn">Enviar</button>
+      <span class="incident-status" id="incidentStatus"></span>
+    </div>
+  </div>
+</div>
+
+<div class="scanner-modal-backdrop" id="scannerModal" aria-hidden="true" role="dialog">
+  <div class="scanner-modal-card">
+    <div class="scanner-modal-header">
+      <h4 class="scanner-modal-title">Identificar producto</h4>
+      <button type="button" class="barcode-modal-close" id="scannerCloseBtn" aria-label="Cerrar">&times;</button>
+    </div>
+    <div class="scanner-live-wrap" id="scannerLiveWrap">
+      <video id="scannerVideo" playsinline muted autoplay></video>
+      <canvas class="scanner-barcode-overlay" id="scannerBarcodeOverlay"></canvas>
+      <div class="scanner-live-frame" id="scannerLiveFrame"></div>
+      <div class="scanner-live-badge"><span class="scanner-live-dot"></span>EN VIVO</div>
+      <div class="scanner-live-crop" id="scannerLiveCrop"></div>
+      <div class="scanner-live-overlay" id="scannerLiveOverlay">Iniciando camara...</div>
+      <div class="scanner-live-loading"><div><div class="scanner-live-spinner"></div>Preparando camara...</div></div>
+    </div>
+    <div class="scanner-types" id="scannerTypes" aria-label="Tipo de referencia detectado">
+      <span class="scanner-type" data-type="EAN"><b>EAN</b> 12 dígitos</span>
+      <span class="scanner-type" data-type="PN"><b>P/N</b> ·····/A</span>
+    </div>
+    <div class="scanner-zoom-row" id="scannerZoomRow">
+      <span class="scanner-zoom-label">Zoom</span>
+      <input type="range" class="scanner-zoom-slider" id="scannerZoomSlider" min="10" max="40" step="1" value="10">
+      <span class="scanner-zoom-value" id="scannerZoomValue">1.0x</span>
+    </div>
+    <button type="button" class="scanner-live-stop" id="scannerLiveStopBtn" style="display:none;">Reiniciar escaner</button>
+    <div class="scanner-status" id="scannerStatus"></div>
+    <div class="scanner-detected" id="scannerDetected" style="display:none;">
+      <span class="scanner-detected-label">Leído:</span>
+      <span class="scanner-detected-text" id="scannerDetectedText"></span>
+    </div>
+    <div class="scanner-results" id="scannerResults"></div>
+  </div>
+</div>
+
+<script src="app.js?v=1c89d51962"></script>
+</body>
+</html>
